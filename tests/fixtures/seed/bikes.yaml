@@ -1,0 +1,42 @@
+# SAMPLE DATA (step 4a): a made-up brand that proves the loader works.
+# Replaced with real, verified bikes in step 4b.
+
+- id: sample-trailhound-2025
+  make: Sample Cycles
+  model: Trailhound
+  year: 2025
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: dub
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Sample 4-piston
+  rotor_mount: 6-bolt
+  max_rotor_mm: 220
+  max_tire_mm: 66
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 584
+  source: https://example.com/sample-cycles/trailhound
+
+- id: sample-roadster-2015
+  make: Sample Cycles
+  model: Roadster
+  year: 2015
+  category: road
+  bb_standard: bsa
+  crank_spindle: hollowtech_24
+  rear_axle: qr_130
+  freehub: hg
+  drivetrain_speeds: 11
+  udh: false
+  dropper_post: false
+  brake_type: rim
+  brake_caliper: Sample dual-pivot
+  max_tire_mm: 28
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://example.com/sample-cycles/roadster

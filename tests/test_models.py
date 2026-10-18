@@ -3,6 +3,7 @@ import re
 import pytest
 from pydantic import ValidationError
 
+from counterwrench.catalog import WheelSize
 from counterwrench.db.migrate import migrate
 from counterwrench.models import (
     BikeCategory,
@@ -213,7 +214,8 @@ def check_values(conn, table: str, column: str) -> set[str]:
     ).fetchall()
     for (definition,) in rows:
         if re.search(rf"\(\(?{column} = ANY", definition):
-            return set(re.findall(r"'([^']+)'::text", definition))
+            items = re.search(r"ARRAY\[(.*?)\]", definition).group(1).split(",")
+            return {item.strip().removesuffix("::text").strip("'") for item in items}
     raise AssertionError(f"no list CHECK on {table}.{column}")
 
 
@@ -224,8 +226,10 @@ def check_values(conn, table: str, column: str) -> set[str]:
         ("bikes", "brake_type", BrakeType),
         ("bikes", "rotor_mount", RotorMount),
         ("parts", "category", PartCategory),
+        ("bikes", "front_wheel_bsd_mm", WheelSize),
+        ("bikes", "rear_wheel_bsd_mm", WheelSize),
     ],
 )
 def test_python_enum_matches_sql_check(conn, table, column, enum):
     migrate(conn)
-    assert check_values(conn, table, column) == {member.value for member in enum}
+    assert check_values(conn, table, column) == {str(member.value) for member in enum}

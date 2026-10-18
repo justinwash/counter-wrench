@@ -115,6 +115,11 @@ BIKE = {
     "rotor_mount": "centerlock",
     "max_rotor_mm": 160,
     "max_tire_mm": 45,
+    # Added by 002_bike_fit.sql
+    "front_wheel_bsd_mm": 622,
+    "rear_wheel_bsd_mm": 622,
+    "crank_spindle": "hollowtech_24",
+    "dropper_post": False,
 }
 
 

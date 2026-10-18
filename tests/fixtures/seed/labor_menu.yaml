@@ -1,0 +1,15 @@
+# SAMPLE DATA (step 4a): placeholder prices. The real menu comes in step 4b.
+
+- code: SEATPOST-ADJUST
+  name: Seatpost clean, grease and re-torque
+  description: Remove, clean and grease a rigid seatpost and clamp; reinstall to torque spec.
+  category: adjustment
+  price_cents: 1500
+  est_minutes: 15
+
+- code: DROPPER-SERVICE
+  name: Dropper post service
+  description: Remove, disassemble, clean, re-lube and reinstall a dropper post.
+  category: service
+  price_cents: 9000
+  est_minutes: 75

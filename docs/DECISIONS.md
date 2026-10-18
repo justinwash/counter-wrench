@@ -73,3 +73,13 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 **Context:** The plan had three levels, with `cosmetic_or_adjustment` merging things that lead to different actions at the counter. Customers also regularly bring in bikes that are working as intended ("this doesn't look right" when it is right).
 **Decision:** `safety_critical` (don't ride it; stays in the shop), `needs_service` (book it in), `needs_adjustment` (quick fix), `cosmetic` (look it over, confirm it's only cosmetic, hand it back), `no_action_needed` (explain why it's normal). Damage that could hide structural damage (carbon after a crash) is never cosmetic. The safety gate stays binary, so it's unaffected.
 **Alternatives:** Three levels (merges different actions). Four, folding cosmetic into no-action (Justin: cosmetic complaints get their own counter flow). Cost of five: exact-match severity grading is noisier at the boundaries between adjacent levels.
+
+## D-014: Seeding validates everything, then syncs in one transaction
+**Context:** `make seed` must be safe to re-run, and the database must match the YAML files, which are the reviewable source of truth.
+**Decision:** Phase 1 validates every entry of every file (Pydantic, with standards as enums and a specs model per part category) and stops at the first error, naming file and entry. Phase 2 syncs each table in one transaction: insert new rows, update changed ones, delete rows gone from the files. Each bike has a `source` URL in YAML for fact-checking, which isn't stored.
+**Alternatives:** Upsert only (rows deleted from YAML linger). Truncate and reload (simplest, but breaks once work orders reference parts in step 9). Seeding row by row without a transaction (a bad entry leaves a half-seeded catalog).
+
+## D-015: Wheel sizes as ISO bead-seat diameter, front and rear
+**Context:** 700c and 29" are the same rim (622 mm), as are 650b and 27.5" (584 mm); shop staff know this cold. Mixed-wheel "mullet" MTBs are common.
+**Decision:** Store `front_wheel_bsd_mm` and `rear_wheel_bsd_mm` as ISO diameters (migration 002), and show the agent every name for a size (`WheelSize.label`: `622 mm (700c / 29")`). Tire and tube compatibility is checked per wheel position. Migration 002 also adds `crank_spindle` (BB fit depends on frame and crank) and `dropper_post` (a seated creak means different work on a dropper bike).
+**Alternatives:** Label strings ("29", "700c"), which would make a 29er tire look incompatible with a 700c rim. A single wheel size per bike, which can't represent mullets.

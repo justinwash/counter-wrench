@@ -294,6 +294,7 @@ dependencies = [
     { name = "langchain-openrouter" },
     { name = "psycopg", extra = ["binary"] },
     { name = "python-dotenv" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -312,6 +313,7 @@ requires-dist = [
     { name = "langchain-openrouter", specifier = ">=0.2.9" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.6" },
     { name = "python-dotenv", specifier = ">=1.2.4" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
 ]
 
 [package.metadata.requires-dev]

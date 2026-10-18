@@ -31,3 +31,11 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 3b: Core Pydantic models and complaint taxonomy
 **Assistant did:** Drafted the complaint → suspected-area taxonomy for review, wrote `taxonomy.py`, `models.py` and 38 tests (including a test that reads the SQL `CHECK` lists from Postgres and compares them to the Python enums), and ran a live check that both models produce a valid `RowAssessment`.
 **Justin checked / decided:** Expanded the taxonomy with suspension-specific complaints (packing up, bouncing, bottoming, harsh, sticky, leaking, knock), dropper post and slow-leak complaints, because MTBs are most of a shop's service volume; approved code-computed prices and totals; decided that invalid triage output gets one retry, then goes to the review queue.
+
+## Severity levels (amendment to 3b)
+**Assistant did:** Implemented the change, pointed doctor's probe at the real `Severity` enum, and ran a probe showing models split on a seated creak (adjustment vs service).
+**Justin checked / decided:** Split severity into five levels from shop experience ("this doesn't look right" bikes that are working as intended; cosmetic complaints get looked over and handed back); dropper post work is a service, a rigid seatpost clean-and-grease is an adjustment.
+
+## Step 4a: Seed loader and part specs
+**Assistant did:** Wrote migration 002, the catalog entry models (standards as enums, a specs model per part category), the two-phase seed loader (validate everything, then sync in one transaction), sample data under a made-up brand, and tests. While explaining rollback, found that its own demo and test passed for the wrong reason (the failure happened before the price update ran); rewrote the test to prove the update ran inside the transaction and was then rolled back.
+**Justin checked / decided:** Reviewed the part spec attributes; asked for wheel naming (700c = 29") and mixed-wheel "mullet" bikes to be first-class, which led to ISO bead-seat storage, front/rear wheel sizes, a `WheelSize.label` for tool output, and planned docs, compat checks and eval cases; asked for the rollback explanation in shop terms, which exposed the weak test.

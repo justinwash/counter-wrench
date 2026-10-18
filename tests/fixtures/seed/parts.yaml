@@ -1,0 +1,29 @@
+# SAMPLE DATA (step 4a): made-up parts, one per kind of spec. Replaced in step 4b.
+
+- id: sample-cassette-12s-ms
+  category: cassette
+  brand: Sample Parts
+  name: 12-speed cassette 10-51 (Microspline)
+  price_cents: 12999
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+
+- id: sample-chain-12s
+  category: chain
+  brand: Sample Parts
+  name: 12-speed chain
+  price_cents: 4999
+  specs: {speeds: 12, chain_type: hyperglide_plus}
+
+- id: sample-rotor-203-6b
+  category: rotor
+  brand: Sample Parts
+  name: 203 mm 6-bolt rotor
+  price_cents: 5499
+  specs: {mount: 6-bolt, size_mm: 203}
+
+- id: sample-tube-700x25
+  category: tube
+  brand: Sample Parts
+  name: 700x20-28 tube, 48 mm Presta
+  price_cents: 899
+  specs: {wheel_bsd_mm: 622, min_width_mm: 20, max_width_mm: 28, valve: presta, valve_length_mm: 48}
