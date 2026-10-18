@@ -14,6 +14,7 @@ A front-of-house service intake tool for bike shops. Counter staff pick the cust
 
 ```sh
 make install   # create .venv and install dependencies
+make doctor    # check keys, resolved models, and live tool-calling/structured-output calls
 make lint      # ruff check + format check
 make format    # apply ruff fixes and formatting
 make test      # run pytest

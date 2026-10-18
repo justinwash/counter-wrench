@@ -15,3 +15,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 1b: Model config module
 **Assistant did:** Checked current LangChain packages (found the official `langchain-openrouter` integration, replacing the plan's base-URL approach), researched current model IDs, pricing and tool/structured-output support across providers and OpenRouter backends, wrote `config.py` and its 22 tests.
 **Justin checked / decided:** Approved splitting the plan's step 1b into config (1b) and `make doctor` (1c); chose the default model table and the official config (Haiku 5.5 agent, GPT-6.1 Sol judge via OpenRouter); created the dedicated OpenRouter key; explained back the resolution rules, provider vs family, and why pinning and repeated runs matter for comparisons.
+
+## Step 1c: `make doctor`
+**Assistant did:** Wrote the doctor (live tool-calling and structured-output checks per model, key names only, base-URL override detection, fix hints by error type), found that LangChain's response metadata omits the serving backend and used OpenRouter's generation-stats endpoint instead (which also exposes the dated snapshot), and fixed its own `.env.example` bug (tracing on with no key) and the `make format` target order.
+**Justin checked / decided:** Approved treating one OpenRouter key (two families, two backends) as meeting the done-when for development; added the LangSmith key; explained back what only live checks can catch and how a pin can be configured but not applied.
