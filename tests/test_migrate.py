@@ -128,6 +128,8 @@ BIKE = {
     # Added by 003_rotor_sizes.sql
     "front_rotor_mm": 160,
     "rear_rotor_mm": 160,
+    # Added by 004_drivetrain.sql
+    "shift_family": "shimano_road_11",
 }
 
 
@@ -223,9 +225,13 @@ def test_rotor_split_backfills_existing_disc_bikes(conn, tmp_path):
     for path in sorted(MIGRATIONS_DIR.glob("00[12]_*.sql")):
         (tmp_path / path.name).write_text(path.read_text("utf-8"), "utf-8")
     migrate(conn, tmp_path)
-    old_bike = {k: v for k, v in BIKE.items() if k not in ("front_rotor_mm", "rear_rotor_mm")}
+    old_bike = {
+        k: v
+        for k, v in BIKE.items()
+        if k not in ("front_rotor_mm", "rear_rotor_mm", "shift_family")
+    }
     insert_bike(conn, base=old_bike, max_rotor_mm=180)
     # ...then apply the real migrations: 003 must carry the rotor size over, not reject the row.
-    assert [m.name for m in migrate(conn)] == ["003_rotor_sizes.sql"]
+    assert [m.name for m in migrate(conn)] == ["003_rotor_sizes.sql", "004_drivetrain.sql"]
     row = conn.execute("SELECT front_rotor_mm, rear_rotor_mm FROM bikes").fetchone()
     assert row == (180, 180)

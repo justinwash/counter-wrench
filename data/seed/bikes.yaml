@@ -20,6 +20,7 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: Shimano Deore M6120 4-piston
   rotor_mount: 6-bolt
@@ -42,6 +43,7 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: Shimano Deore XT M8120 4-piston
   rotor_mount: 6-bolt
@@ -65,6 +67,7 @@
   drivetrain_speeds: 12
   udh: false
   dropper_post: true
+  shift_family: sram_eagle_12
   brake_type: hydraulic_disc
   brake_caliper: Shimano MT200 2-piston
   rotor_mount: 6-bolt
@@ -88,6 +91,7 @@
   drivetrain_speeds: 10
   udh: false
   dropper_post: false  # source: rigid Bontrager seatpost (frame has dropper routing)
+  shift_family: shimano_mtb_10
   brake_type: hydraulic_disc
   brake_caliper: Shimano MT200 2-piston
   rotor_mount: 6-bolt
@@ -110,6 +114,7 @@
   drivetrain_speeds: 12
   udh: false
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: Shimano MT200 2-piston
   rotor_mount: centerlock
@@ -132,6 +137,7 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: Shimano M6120 4-piston
   rotor_mount: 6-bolt
@@ -155,6 +161,8 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: sram_t_type_axs
+  required_chain_type: sram_t_type
   brake_type: hydraulic_disc
   brake_caliper: SRAM Level Bronze 4-piston
   rotor_mount: 6-bolt
@@ -179,6 +187,7 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: TRP Trail EVO 4-piston
   rotor_mount: 6-bolt
@@ -201,6 +210,7 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: sram_eagle_12
   brake_type: hydraulic_disc
   brake_caliper: SRAM G2 R 4-piston
   rotor_mount: 6-bolt
@@ -223,6 +233,7 @@
   drivetrain_speeds: 12
   udh: false
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: Shimano Deore MT420 4-piston
   rotor_mount: 6-bolt
@@ -248,6 +259,8 @@
   drivetrain_speeds: 12
   udh: true  # source: frame "T47, UDH"
   dropper_post: false  # source: Bontrager alloy rigid seatpost
+  shift_family: sram_xplr_12
+  required_chain_type: sram_flattop
   brake_type: hydraulic_disc
   brake_caliper: SRAM Apex D1 flat mount
   rotor_mount: centerlock
@@ -270,6 +283,7 @@
   drivetrain_speeds: 10
   udh: false
   dropper_post: false
+  shift_family: shimano_road_10_4700
   brake_type: hydraulic_disc
   brake_caliper: Shimano GRX RX400 flat mount
   rotor_mount: centerlock
@@ -291,6 +305,7 @@
   drivetrain_speeds: 12
   udh: false
   dropper_post: false
+  shift_family: shimano_road_12_di2
   brake_type: hydraulic_disc
   brake_caliper: Shimano 105 flat mount
   rotor_mount: centerlock
@@ -313,6 +328,7 @@
   drivetrain_speeds: 9  # Shimano LinkGlide LG300 11-46 (source)
   udh: false
   dropper_post: false
+  shift_family: shimano_linkglide
   brake_type: hydraulic_disc
   brake_caliper: Tektro HD-R280 flat mount
   rotor_mount: 6-bolt
@@ -338,6 +354,7 @@
   drivetrain_speeds: 10
   udh: false
   dropper_post: false  # source: Bontrager Rhythm Elite rigid post
+  shift_family: shimano_mtb_10
   brake_type: hydraulic_disc
   brake_caliper: Shimano SLX M666 2-piston
   rotor_mount: 6-bolt
@@ -360,6 +377,7 @@
   drivetrain_speeds: 10
   udh: false
   dropper_post: false
+  shift_family: shimano_road_10
   brake_type: rim
   brake_caliper: Tektro R580 dual-pivot
   max_tire_mm: 25
@@ -380,6 +398,7 @@
   drivetrain_speeds: 9
   udh: false
   dropper_post: false
+  shift_family: shimano_9
   brake_type: rim
   brake_caliper: Tektro linear-pull (V-brake)
   front_wheel_bsd_mm: 622

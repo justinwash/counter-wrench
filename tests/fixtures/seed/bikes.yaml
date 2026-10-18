@@ -12,6 +12,7 @@
   drivetrain_speeds: 12
   udh: true
   dropper_post: true
+  shift_family: shimano_mtb_12
   brake_type: hydraulic_disc
   brake_caliper: Sample 4-piston
   rotor_mount: 6-bolt
@@ -34,6 +35,7 @@
   drivetrain_speeds: 11
   udh: false
   dropper_post: false
+  shift_family: shimano_road_11
   brake_type: rim
   brake_caliper: Sample dual-pivot
   max_tire_mm: 28

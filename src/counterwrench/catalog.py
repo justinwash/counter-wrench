@@ -96,11 +96,23 @@ class DerailleurMount(StrEnum):
     UDH_DIRECT = "udh_direct"  # SRAM Transmission: needs a UDH frame
 
 
-class DrivetrainSystem(StrEnum):
-    SHIMANO_MECHANICAL = "shimano_mechanical"
-    SHIMANO_DI2 = "shimano_di2"
-    SRAM_MECHANICAL = "sram_mechanical"
-    SRAM_AXS = "sram_axs"
+class ShiftFamily(StrEnum):
+    """Derailleurs only work with shifters of a compatible family (cable pull or electronic
+    protocol). Same family is compatible; cross-family exceptions live in compat_rules."""
+
+    SHIMANO_9 = "shimano_9"  # road and MTB 9-speed share cable pull
+    SHIMANO_MTB_10 = "shimano_mtb_10"  # Dyna-Sys 10
+    SHIMANO_MTB_11 = "shimano_mtb_11"
+    SHIMANO_MTB_12 = "shimano_mtb_12"
+    SHIMANO_ROAD_10 = "shimano_road_10"  # 5700/6700-era road 10
+    SHIMANO_ROAD_10_4700 = "shimano_road_10_4700"  # Tiagra 4700, GRX 400 10-speed
+    SHIMANO_ROAD_11 = "shimano_road_11"
+    SHIMANO_ROAD_12 = "shimano_road_12"
+    SHIMANO_ROAD_12_DI2 = "shimano_road_12_di2"
+    SHIMANO_LINKGLIDE = "shimano_linkglide"  # CUES
+    SRAM_EAGLE_12 = "sram_eagle_12"
+    SRAM_XPLR_12 = "sram_xplr_12"  # mechanical Apex/Rival XPLR 12-speed
+    SRAM_T_TYPE_AXS = "sram_t_type_axs"  # Eagle Transmission
 
 
 class PadCompound(StrEnum):
@@ -134,6 +146,9 @@ class Bike(Strict):
     drivetrain_speeds: Speeds
     udh: bool
     dropper_post: bool
+    shift_family: ShiftFamily
+    # Only for drivetrains that demand a specific chain; otherwise any chain of the right speed.
+    required_chain_type: ChainType | None = None
     brake_type: BrakeType
     brake_caliper: ShortText | None = None
     rotor_mount: RotorMount | None = None
@@ -154,6 +169,8 @@ class Bike(Strict):
             raise ValueError("rim brakes can't have rotor_mount or rotor sizes")
         if not rim and any(f is None for f in rotor_fields):
             raise ValueError("disc brakes need rotor_mount, front_rotor_mm and rear_rotor_mm")
+        if self.required_chain_type not in (None, ChainType.SRAM_FLATTOP, ChainType.SRAM_T_TYPE):
+            raise ValueError("required_chain_type is only for SRAM Flattop or T-Type drivetrains")
         if self.spec_variant and not self.variant_note:
             raise ValueError("a spec_variant needs a variant_note saying how to tell it apart")
         return self
@@ -184,7 +201,7 @@ class RearDerailleurSpecs(Strict):
     speeds: Speeds
     mount: DerailleurMount
     max_cog: PositiveInt
-    system: DrivetrainSystem
+    shift_family: ShiftFamily
 
 
 class BrakePadSpecs(Strict):

@@ -1,29 +1,594 @@
-# Placeholder from step 4a; real parts come next in step 4b.
+# Parts catalog. Chosen so each category has parts that fit some catalog bikes and
+# deliberately don't fit others. Prices are ballpark US list prices.
+# `# VERIFY` marks facts Claude is unsure of, for Justin's pass.
 
-- id: sample-cassette-12s-ms
+# --- Cassettes ---------------------------------------------------------------------------------
+
+- id: shimano-cs-m6100-10-51
   category: cassette
-  brand: Sample Parts
-  name: 12-speed cassette 10-51 (Microspline)
-  price_cents: 12999
+  brand: Shimano
+  name: Deore CS-M6100 12-speed 10-51
+  price_cents: 7500
   specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
 
-- id: sample-chain-12s
+- id: shimano-cs-m7100-10-51
+  category: cassette
+  brand: Shimano
+  name: SLX CS-M7100 12-speed 10-51
+  price_cents: 9500
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+
+- id: shimano-cs-m8100-10-51
+  category: cassette
+  brand: Shimano
+  name: Deore XT CS-M8100 12-speed 10-51
+  price_cents: 19000
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+
+- id: sram-pg-1210-11-50
+  category: cassette
+  brand: SRAM
+  name: SX Eagle PG-1210 12-speed 11-50
+  price_cents: 5500
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 50}
+
+- id: sram-pg-1230-11-50
+  category: cassette
+  brand: SRAM
+  name: NX Eagle PG-1230 12-speed 11-50
+  price_cents: 7500
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 50}
+
+- id: sram-xs-1275-10-52
+  category: cassette
+  brand: SRAM
+  name: GX Eagle Transmission XS-1275 T-Type 12-speed 10-52
+  price_cents: 25000
+  specs: {freehub: xd, speeds: 12, smallest_cog: 10, largest_cog: 52}
+
+- id: sram-pg-1231-11-44
+  category: cassette
+  brand: SRAM
+  name: XPLR PG-1231 12-speed 11-44
+  price_cents: 9000
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 44}
+
+- id: shimano-cs-r7101-11-34
+  category: cassette
+  brand: Shimano
+  name: 105 CS-R7101 12-speed 11-34
+  price_cents: 10000
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 34}
+
+- id: shimano-cs-m8000-11-46
+  category: cassette
+  brand: Shimano
+  name: Deore XT CS-M8000 11-speed 11-46
+  price_cents: 12000
+  specs: {freehub: hg, speeds: 11, smallest_cog: 11, largest_cog: 46}
+
+- id: shimano-cs-hg500-10-11-34
+  category: cassette
+  brand: Shimano
+  name: CS-HG500-10 10-speed 11-34
+  price_cents: 4500
+  specs: {freehub: hg, speeds: 10, smallest_cog: 11, largest_cog: 34}
+
+- id: shimano-cs-5700-12-27
+  category: cassette
+  brand: Shimano
+  name: 105 CS-5700 10-speed 12-27
+  price_cents: 6000
+  specs: {freehub: hg, speeds: 10, smallest_cog: 12, largest_cog: 27}
+
+- id: shimano-cs-m4100-11-46
+  category: cassette
+  brand: Shimano
+  name: Deore CS-M4100 10-speed 11-46
+  price_cents: 4500
+  specs: {freehub: hg, speeds: 10, smallest_cog: 11, largest_cog: 46}
+
+- id: shimano-cs-hg200-9-11-32
+  category: cassette
+  brand: Shimano
+  name: CS-HG200 9-speed 11-32
+  price_cents: 2500
+  specs: {freehub: hg, speeds: 9, smallest_cog: 11, largest_cog: 32}
+
+- id: shimano-cs-lg300-11-46
+  category: cassette
+  brand: Shimano
+  name: CUES CS-LG300 9-speed 11-46 (LinkGlide)
+  price_cents: 4000
+  specs: {freehub: hg, speeds: 9, smallest_cog: 11, largest_cog: 46}
+
+# --- Chains (shops default to SRAM of the right speed; Shimano for customers who ask) ----------
+
+- id: sram-pc-971
   category: chain
-  brand: Sample Parts
-  name: 12-speed chain
-  price_cents: 4999
+  brand: SRAM
+  name: PC-971 9-speed chain
+  price_cents: 2000
+  specs: {speeds: 9, chain_type: standard}
+
+- id: sram-pc-1031
+  category: chain
+  brand: SRAM
+  name: PC-1031 10-speed chain
+  price_cents: 2500
+  specs: {speeds: 10, chain_type: standard}
+
+- id: sram-pc-1110
+  category: chain
+  brand: SRAM
+  name: PC-1110 11-speed chain
+  price_cents: 3000
+  specs: {speeds: 11, chain_type: standard}
+
+- id: sram-nx-eagle-chain
+  category: chain
+  brand: SRAM
+  name: NX Eagle 12-speed chain
+  price_cents: 3000
+  specs: {speeds: 12, chain_type: standard}
+
+- id: sram-gx-t-type-chain
+  category: chain
+  brand: SRAM
+  name: GX Eagle T-Type Flattop 12-speed chain
+  price_cents: 7000
+  specs: {speeds: 12, chain_type: sram_t_type}
+
+- id: sram-rival-flattop-chain
+  category: chain
+  brand: SRAM
+  name: Rival Flattop 12-speed chain
+  price_cents: 5000
+  specs: {speeds: 12, chain_type: sram_flattop}
+
+- id: shimano-cn-m7100
+  category: chain
+  brand: Shimano
+  name: SLX CN-M7100 12-speed chain (Hyperglide+)
+  price_cents: 4500
   specs: {speeds: 12, chain_type: hyperglide_plus}
 
-- id: sample-rotor-203-6b
+- id: shimano-cn-hg54
+  category: chain
+  brand: Shimano
+  name: CN-HG54 10-speed chain
+  price_cents: 2500
+  specs: {speeds: 10, chain_type: standard}
+
+# --- Rear derailleurs ----------------------------------------------------------------------------
+
+- id: shimano-rd-m7100-sgs
+  category: rear_derailleur
+  brand: Shimano
+  name: SLX RD-M7100-SGS 12-speed
+  price_cents: 9500
+  specs: {speeds: 12, mount: hanger, max_cog: 51, shift_family: shimano_mtb_12}
+
+- id: shimano-rd-m8100-sgs
+  category: rear_derailleur
+  brand: Shimano
+  name: Deore XT RD-M8100-SGS 12-speed
+  price_cents: 13000
+  specs: {speeds: 12, mount: hanger, max_cog: 51, shift_family: shimano_mtb_12}
+
+- id: sram-sx-eagle-rd
+  category: rear_derailleur
+  brand: SRAM
+  name: SX Eagle 12-speed rear derailleur
+  price_cents: 6000
+  specs: {speeds: 12, mount: hanger, max_cog: 50, shift_family: sram_eagle_12}
+
+- id: sram-nx-eagle-rd
+  category: rear_derailleur
+  brand: SRAM
+  name: NX Eagle 12-speed rear derailleur
+  price_cents: 9000
+  specs: {speeds: 12, mount: hanger, max_cog: 50, shift_family: sram_eagle_12}
+
+- id: sram-gx-t-type-rd
+  category: rear_derailleur
+  brand: SRAM
+  name: GX Eagle Transmission AXS T-Type rear derailleur
+  price_cents: 40000
+  specs: {speeds: 12, mount: udh_direct, max_cog: 52, shift_family: sram_t_type_axs}
+
+- id: sram-apex-xplr-rd
+  category: rear_derailleur
+  brand: SRAM
+  name: Apex XPLR 12-speed mechanical rear derailleur
+  price_cents: 15000
+  specs: {speeds: 12, mount: hanger, max_cog: 44, shift_family: sram_xplr_12}
+
+- id: shimano-rd-m5120-sgs
+  category: rear_derailleur
+  brand: Shimano
+  name: Deore RD-M5120-SGS 10/11-speed
+  price_cents: 4500
+  # VERIFY: sold as 10/11-speed; modeled as 10-speed Dyna-Sys for the 10-speed bikes
+  specs: {speeds: 10, mount: hanger, max_cog: 46, shift_family: shimano_mtb_10}
+
+- id: shimano-rd-rx400
+  category: rear_derailleur
+  brand: Shimano
+  name: GRX RD-RX400 10-speed
+  price_cents: 6000
+  specs: {speeds: 10, mount: hanger, max_cog: 36, shift_family: shimano_road_10_4700}
+
+- id: shimano-rd-5701
+  category: rear_derailleur
+  brand: Shimano
+  name: 105 RD-5701 10-speed
+  price_cents: 5000
+  specs: {speeds: 10, mount: hanger, max_cog: 28, shift_family: shimano_road_10}
+
+- id: shimano-rd-m3100-sgs
+  category: rear_derailleur
+  brand: Shimano
+  name: Alivio RD-M3100-SGS 9-speed
+  price_cents: 3500
+  specs: {speeds: 9, mount: hanger, max_cog: 36, shift_family: shimano_9}
+
+- id: shimano-rd-u4020
+  category: rear_derailleur
+  brand: Shimano
+  name: CUES RD-U4020 9-speed  # VERIFY: model number
+  price_cents: 4000
+  specs: {speeds: 9, mount: hanger, max_cog: 46, shift_family: shimano_linkglide}
+
+# --- Brake pads (pad_shape is matched to calipers by compat_rules) ----------------------------
+
+- id: shimano-d03s-resin
+  category: brake_pads
+  brand: Shimano
+  name: D03S resin pads (4-piston)
+  price_cents: 3000
+  specs: {pad_shape: shimano_d_type, compound: resin}
+
+- id: shimano-n04c-metal
+  category: brake_pads
+  brand: Shimano
+  name: N04C metal pads with fins (4-piston)
+  price_cents: 4500
+  specs: {pad_shape: shimano_d_type, compound: metallic}
+
+- id: shimano-b05s-resin
+  category: brake_pads
+  brand: Shimano
+  name: B05S resin pads (2-piston MT200)
+  price_cents: 2000
+  specs: {pad_shape: shimano_b_type, compound: resin}
+
+- id: shimano-g05s-resin
+  category: brake_pads
+  brand: Shimano
+  name: G05S resin pads (2-piston SLX/XT, 2011-2014)  # VERIFY: shape for SLX M666
+  price_cents: 2500
+  specs: {pad_shape: shimano_g_type, compound: resin}
+
+- id: shimano-l03a-resin
+  category: brake_pads
+  brand: Shimano
+  name: L03A resin pads (road flat mount)
+  price_cents: 3000
+  specs: {pad_shape: shimano_l_type, compound: resin}
+
+- id: sram-level-4p-organic
+  category: brake_pads
+  brand: SRAM
+  name: Level 4-piston organic pads  # VERIFY: pad shape for Level Bronze 4-piston
+  price_cents: 3000
+  specs: {pad_shape: sram_level_4p, compound: resin}
+
+- id: sram-g2-organic
+  category: brake_pads
+  brand: SRAM
+  name: Guide/G2 organic pads
+  price_cents: 2500
+  specs: {pad_shape: sram_g2_guide, compound: resin}
+
+- id: sram-g2-metallic
+  category: brake_pads
+  brand: SRAM
+  name: Guide/G2 sintered pads
+  price_cents: 3000
+  specs: {pad_shape: sram_g2_guide, compound: metallic}
+
+- id: sram-road-flat-mount-organic
+  category: brake_pads
+  brand: SRAM
+  name: Road flat mount organic pads
+  price_cents: 3000
+  specs: {pad_shape: sram_road_flat_mount, compound: resin}
+
+- id: trp-trail-evo-pads
+  category: brake_pads
+  brand: TRP
+  name: Trail EVO / DH-R EVO pads  # VERIFY: shared shape across TRP 4-piston
+  price_cents: 3000
+  specs: {pad_shape: trp_trail_evo, compound: resin}
+
+- id: tektro-hd-r280-pads
+  category: brake_pads
+  brand: Tektro
+  name: Road flat mount pads for HD-R280  # VERIFY: pad model
+  price_cents: 2000
+  specs: {pad_shape: tektro_hd_r280, compound: resin}
+
+- id: shimano-r55c4-inserts
+  category: brake_pads
+  brand: Shimano
+  name: R55C4 road rim cartridge inserts
+  price_cents: 2000
+  specs: {pad_shape: road_rim_cartridge, compound: resin}
+
+- id: koolstop-v-brake-pads
+  category: brake_pads
+  brand: Kool-Stop
+  name: V-brake pads (threaded post)
+  price_cents: 1500
+  specs: {pad_shape: v_brake, compound: resin}
+
+# --- Rotors (Shimano uses 203 mm, SRAM 200 mm: not interchangeable without the right adapter) --
+
+- id: shimano-rt66-160-6b
   category: rotor
-  brand: Sample Parts
-  name: 203 mm 6-bolt rotor
-  price_cents: 5499
+  brand: Shimano
+  name: SM-RT66 160 mm 6-bolt
+  price_cents: 3000
+  specs: {mount: 6-bolt, size_mm: 160}
+
+- id: shimano-rt66-180-6b
+  category: rotor
+  brand: Shimano
+  name: SM-RT66 180 mm 6-bolt
+  price_cents: 3500
+  specs: {mount: 6-bolt, size_mm: 180}
+
+- id: shimano-rt66-203-6b
+  category: rotor
+  brand: Shimano
+  name: SM-RT66 203 mm 6-bolt
+  price_cents: 4000
   specs: {mount: 6-bolt, size_mm: 203}
 
-- id: sample-tube-700x25
+- id: shimano-rt64-180-cl
+  category: rotor
+  brand: Shimano
+  name: SM-RT64 180 mm Center Lock
+  price_cents: 4500
+  specs: {mount: centerlock, size_mm: 180}
+
+- id: shimano-rt70-160-cl
+  category: rotor
+  brand: Shimano
+  name: SM-RT70 160 mm Center Lock (road)
+  price_cents: 4500
+  specs: {mount: centerlock, size_mm: 160}
+
+- id: sram-centerline-160-6b
+  category: rotor
+  brand: SRAM
+  name: CenterLine 160 mm 6-bolt
+  price_cents: 3500
+  specs: {mount: 6-bolt, size_mm: 160}
+
+- id: sram-centerline-180-6b
+  category: rotor
+  brand: SRAM
+  name: CenterLine 180 mm 6-bolt
+  price_cents: 4000
+  specs: {mount: 6-bolt, size_mm: 180}
+
+- id: sram-centerline-200-6b
+  category: rotor
+  brand: SRAM
+  name: CenterLine 200 mm 6-bolt
+  price_cents: 4500
+  specs: {mount: 6-bolt, size_mm: 200}
+
+- id: sram-paceline-160-cl
+  category: rotor
+  brand: SRAM
+  name: Paceline 160 mm Center Lock
+  price_cents: 5000
+  specs: {mount: centerlock, size_mm: 160}
+
+# --- Bottom brackets ---------------------------------------------------------------------------
+
+- id: shimano-bb-mt501
+  category: bottom_bracket
+  brand: Shimano
+  name: BB-MT501 BSA, 24 mm
+  price_cents: 2500
+  specs: {bb_standard: bsa, spindle: hollowtech_24}
+
+- id: shimano-bb-mt800
+  category: bottom_bracket
+  brand: Shimano
+  name: BB-MT800 BSA, 24 mm
+  price_cents: 4000
+  specs: {bb_standard: bsa, spindle: hollowtech_24}
+
+- id: shimano-bb-mt500-pa
+  category: bottom_bracket
+  brand: Shimano
+  name: BB-MT500-PA press-fit 92, 24 mm
+  price_cents: 2500
+  specs: {bb_standard: pf92, spindle: hollowtech_24}
+
+- id: sram-dub-bsa
+  category: bottom_bracket
+  brand: SRAM
+  name: DUB BSA threaded
+  price_cents: 4000
+  specs: {bb_standard: bsa, spindle: dub}
+
+- id: sram-dub-pf92
+  category: bottom_bracket
+  brand: SRAM
+  name: DUB press-fit 92
+  price_cents: 4500
+  specs: {bb_standard: pf92, spindle: dub}
+
+- id: sram-dub-t47
+  category: bottom_bracket
+  brand: SRAM
+  name: DUB T47 internal-bearing
+  price_cents: 6000
+  specs: {bb_standard: t47, spindle: dub}
+
+- id: wheels-mfg-t47-24
+  category: bottom_bracket
+  brand: Wheels Manufacturing
+  name: T47 internal-bearing, 24 mm
+  price_cents: 9000
+  specs: {bb_standard: t47, spindle: hollowtech_24}
+
+- id: fsa-bb30-bearings
+  category: bottom_bracket
+  brand: FSA
+  name: BB30 bearings, 30 mm
+  price_cents: 3500
+  specs: {bb_standard: bb30, spindle: 30mm}
+
+- id: truvativ-powerspline-bsa
+  category: bottom_bracket
+  brand: TruVativ
+  name: Powerspline BSA 73 mm
+  price_cents: 2500
+  specs: {bb_standard: bsa, spindle: powerspline}
+
+- id: shimano-bb-un300-68-122
+  category: bottom_bracket
+  brand: Shimano
+  name: BB-UN300 square taper, 68x122.5
+  price_cents: 2500
+  specs: {bb_standard: bsa, spindle: square_taper}
+
+# --- Tires (wheel_bsd_mm: 622 = 700c/29", 584 = 650b/27.5", 559 = 26") ------------------------
+
+- id: maxxis-dhf-29x2-5
+  category: tire
+  brand: Maxxis
+  name: Minion DHF 29x2.5 WT EXO TR
+  price_cents: 8500
+  specs: {wheel_bsd_mm: 622, width_mm: 64, tubeless_ready: true}
+
+- id: maxxis-dhr2-29x2-4
+  category: tire
+  brand: Maxxis
+  name: Minion DHR II 29x2.4 WT EXO TR
+  price_cents: 8500
+  specs: {wheel_bsd_mm: 622, width_mm: 61, tubeless_ready: true}
+
+- id: maxxis-dhr2-27-5x2-4
+  category: tire
+  brand: Maxxis
+  name: Minion DHR II 27.5x2.4 WT EXO TR
+  price_cents: 8500
+  specs: {wheel_bsd_mm: 584, width_mm: 61, tubeless_ready: true}
+
+- id: maxxis-ardent-29x2-4
+  category: tire
+  brand: Maxxis
+  name: Ardent 29x2.4 EXO TR
+  price_cents: 6500
+  specs: {wheel_bsd_mm: 622, width_mm: 61, tubeless_ready: true}
+
+- id: maxxis-rekon-29x2-6
+  category: tire
+  brand: Maxxis
+  name: Rekon 29x2.6 EXO TR
+  price_cents: 7500
+  specs: {wheel_bsd_mm: 622, width_mm: 66, tubeless_ready: true}
+
+- id: maxxis-ardent-26x2-25
+  category: tire
+  brand: Maxxis
+  name: Ardent 26x2.25
+  price_cents: 5500
+  specs: {wheel_bsd_mm: 559, width_mm: 57, tubeless_ready: false}
+
+- id: continental-gp5000-700x25
+  category: tire
+  brand: Continental
+  name: Grand Prix 5000 700x25
+  price_cents: 7000
+  specs: {wheel_bsd_mm: 622, width_mm: 25, tubeless_ready: false}
+
+- id: continental-gp5000-700x28
+  category: tire
+  brand: Continental
+  name: Grand Prix 5000 700x28
+  price_cents: 7000
+  specs: {wheel_bsd_mm: 622, width_mm: 28, tubeless_ready: false}
+
+- id: bontrager-h2-700x35
+  category: tire
+  brand: Bontrager
+  name: H2 Comp 700x35
+  price_cents: 3500
+  specs: {wheel_bsd_mm: 622, width_mm: 35, tubeless_ready: false}
+
+- id: schwalbe-g-one-700x40
+  category: tire
+  brand: Schwalbe
+  name: G-One Allround 700x40 TLE
+  price_cents: 6500
+  specs: {wheel_bsd_mm: 622, width_mm: 40, tubeless_ready: true}
+
+- id: panaracer-gravelking-700x45
+  category: tire
+  brand: Panaracer
+  name: GravelKing SK 700x45 TLC
+  price_cents: 6000
+  specs: {wheel_bsd_mm: 622, width_mm: 45, tubeless_ready: true}
+
+# --- Tubes -------------------------------------------------------------------------------------
+
+- id: tube-29x2-1-2-6-presta
   category: tube
-  brand: Sample Parts
-  name: 700x20-28 tube, 48 mm Presta
-  price_cents: 899
-  specs: {wheel_bsd_mm: 622, min_width_mm: 20, max_width_mm: 28, valve: presta, valve_length_mm: 48}
+  brand: Bontrager
+  name: 29x2.1-2.6 tube, Presta 48 mm
+  price_cents: 1200
+  specs: {wheel_bsd_mm: 622, min_width_mm: 53, max_width_mm: 66, valve: presta, valve_length_mm: 48}
+
+- id: tube-27-5x2-1-2-6-presta
+  category: tube
+  brand: Bontrager
+  name: 27.5x2.1-2.6 tube, Presta 48 mm
+  price_cents: 1200
+  specs: {wheel_bsd_mm: 584, min_width_mm: 53, max_width_mm: 66, valve: presta, valve_length_mm: 48}
+
+- id: tube-26x1-9-2-35-schrader
+  category: tube
+  brand: Bontrager
+  name: 26x1.9-2.35 tube, Schrader
+  price_cents: 1000
+  specs: {wheel_bsd_mm: 559, min_width_mm: 48, max_width_mm: 60, valve: schrader, valve_length_mm: 35}
+
+- id: tube-700x18-25-presta-60
+  category: tube
+  brand: Bontrager
+  name: 700x18-25 tube, Presta 60 mm
+  price_cents: 1000
+  specs: {wheel_bsd_mm: 622, min_width_mm: 18, max_width_mm: 25, valve: presta, valve_length_mm: 60}
+
+- id: tube-700x28-35-presta
+  category: tube
+  brand: Bontrager
+  name: 700x28-35 tube, Presta 48 mm
+  price_cents: 1000
+  specs: {wheel_bsd_mm: 622, min_width_mm: 28, max_width_mm: 35, valve: presta, valve_length_mm: 48}
+
+- id: tube-700x35-45-presta
+  category: tube
+  brand: Bontrager
+  name: 700x35-45 tube, Presta 48 mm
+  price_cents: 1000
+  specs: {wheel_bsd_mm: 622, min_width_mm: 35, max_width_mm: 45, valve: presta, valve_length_mm: 48}

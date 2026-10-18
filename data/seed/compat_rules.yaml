@@ -1,10 +1,41 @@
-# Placeholder from step 4a; real parts come next in step 4b.
+# Compatibility rules: which bike values fit which part values. The compatibility engine
+# (step 5) applies them; simple equality checks (rotor mount and size, wheel size, BB standard
+# and spindle, speeds, shift family) live in code and need no rules here.
+# `# VERIFY` marks facts Claude is unsure of, for Justin's pass.
 
-- {rule_type: freehub_cassette, bike_value: microspline, part_value: microspline, compatible: true}
+# --- Freehub (bike) <-> cassette (part) --------------------------------------------------------
+
+- {rule_type: freehub_cassette, bike_value: hg, part_value: hg, compatible: true}
 - {rule_type: freehub_cassette, bike_value: hg, part_value: microspline, compatible: false}
+- {rule_type: freehub_cassette, bike_value: hg, part_value: xd, compatible: false}
+- {rule_type: freehub_cassette, bike_value: microspline, part_value: microspline, compatible: true}
+- {rule_type: freehub_cassette, bike_value: microspline, part_value: hg, compatible: false}
+- {rule_type: freehub_cassette, bike_value: microspline, part_value: xd, compatible: false}
+- {rule_type: freehub_cassette, bike_value: xd, part_value: xd, compatible: true}
+- {rule_type: freehub_cassette, bike_value: xd, part_value: hg, compatible: false}
+- {rule_type: freehub_cassette, bike_value: xd, part_value: microspline, compatible: false}
 - rule_type: freehub_cassette
   bike_value: xdr
   part_value: xd
   compatible: true
   adapter: 1.85 mm spacer
   note: XDR is 1.85 mm longer than XD; an XD cassette needs the spacer.
+
+# --- Brake caliper (bike) <-> pad shape (part) ------------------------------------------------
+# bike_value is the bike's brake_caliper exactly as written in bikes.yaml.
+
+- {rule_type: caliper_pad, bike_value: Shimano Deore M6120 4-piston, part_value: shimano_d_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: Shimano Deore XT M8120 4-piston, part_value: shimano_d_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: Shimano M6120 4-piston, part_value: shimano_d_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: Shimano Deore MT420 4-piston, part_value: shimano_d_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: Shimano MT200 2-piston, part_value: shimano_b_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: Shimano SLX M666 2-piston, part_value: shimano_g_type, compatible: true}  # VERIFY
+- {rule_type: caliper_pad, bike_value: Shimano GRX RX400 flat mount, part_value: shimano_l_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: Shimano 105 flat mount, part_value: shimano_l_type, compatible: true}
+- {rule_type: caliper_pad, bike_value: SRAM Level Bronze 4-piston, part_value: sram_level_4p, compatible: true}  # VERIFY
+- {rule_type: caliper_pad, bike_value: SRAM G2 R 4-piston, part_value: sram_g2_guide, compatible: true}
+- {rule_type: caliper_pad, bike_value: SRAM Apex D1 flat mount, part_value: sram_road_flat_mount, compatible: true}
+- {rule_type: caliper_pad, bike_value: TRP Trail EVO 4-piston, part_value: trp_trail_evo, compatible: true}  # VERIFY
+- {rule_type: caliper_pad, bike_value: Tektro HD-R280 flat mount, part_value: tektro_hd_r280, compatible: true}  # VERIFY
+- {rule_type: caliper_pad, bike_value: Tektro R580 dual-pivot, part_value: road_rim_cartridge, compatible: true}
+- {rule_type: caliper_pad, bike_value: Tektro linear-pull (V-brake), part_value: v_brake, compatible: true}
