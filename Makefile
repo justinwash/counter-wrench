@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql
+.PHONY: install lint format test doctor up down db-reset psql migrate
 
 install:
 	uv sync
@@ -31,3 +31,6 @@ db-reset:
 
 psql:
 	docker compose exec db psql
+
+migrate:
+	uv run python -m counterwrench.db.migrate

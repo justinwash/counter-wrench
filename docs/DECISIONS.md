@@ -43,3 +43,18 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 **Context:** The official Postgres image runs `/docker-entrypoint-initdb.d` scripts only when the data volume is empty.
 **Decision:** The init script only runs `CREATE EXTENSION vector`. The schema comes from plain-SQL migrations (step 3) that apply to an existing database. The image is pinned to an exact tag (`pgvector/pgvector:0.8.7-pg16`), and the port is bound to `127.0.0.1`.
 **Alternatives:** Schema in init scripts (every schema change would need `make db-reset`). No init script, with the extension created in migration 001 (one mechanism, and it works on managed Postgres where init scripts can't be mounted; reasonable, but the plan called for init SQL and this keeps step 2 verifiable on its own).
+
+## D-008: Homemade migration runner over plain SQL
+**Context:** The schema grows step by step (catalog now, `doc_chunks` in step 7, `work_orders` in step 9) on databases that already hold data.
+**Decision:** About 80 lines: numbered `NNN_name.sql` files, each applied in its own transaction, recorded in `schema_migrations` with a checksum (line endings normalized). The runner refuses to continue if an applied file was edited or is missing; fix forward with a new migration. Each step adds its own tables.
+**Alternatives:** Alembic (built around SQLAlchemy models, which we don't have); dbmate/yoyo (one more tool to install and explain). All tables in step 3 (tables would appear long before any code used them).
+
+## D-009: Catalog modeling choices
+**Context:** Eval datasets will reference catalog rows, prices feed an estimate-math evaluator, and part categories have different attributes.
+**Decision:** Text slug IDs (stable across reseeds, readable in traces). Money in integer cents. Part attributes in JSONB `specs`, validated by a Pydantic model per category at seed time. Compatibility as a data table (`compat_rules`) read by engine code. Small stable value sets get `CHECK` constraints; standards lists (BB, axle, freehub) stay free text in SQL and are validated by Pydantic. `UNIQUE NULLS NOT DISTINCT` so two variant-less rows of the same bike collide. A `udh` column, since SRAM Transmission derailleurs only fit UDH frames.
+**Alternatives:** Integer IDs (can change on reseed and break datasets). Floats for money. A wide `parts` table (mostly NULL columns) or a table per category (8 tables and 8 sets of queries). Postgres `ENUM` types (awkward to change).
+
+## D-010: Connect to 127.0.0.1, and derive DATABASE_URL
+**Context:** Tests hung connecting to `localhost`: it resolved to IPv6 `::1` first, while compose binds IPv4 `127.0.0.1` only. Separately, a hand-written `DATABASE_URL` had to be kept in sync with the `POSTGRES_*` values compose uses.
+**Decision:** The default host is `127.0.0.1`, and `DATABASE_URL` is optional: when blank it's built from the same `POSTGRES_*` values and defaults as compose.
+**Alternatives:** Binding compose to both IPv4 and IPv6 (wider exposure for no benefit).
