@@ -1,0 +1,30 @@
+name: counterwrench
+
+services:
+  db:
+    # Exact tag: a floating tag (pg16, latest) can pull a different pgvector on the next machine.
+    image: pgvector/pgvector:0.8.7-pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-counterwrench}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-counterwrench}
+      POSTGRES_DB: ${POSTGRES_DB:-counterwrench}
+      # Defaults for psql/pg_isready inside the container, so `make psql` needs no arguments.
+      PGUSER: ${POSTGRES_USER:-counterwrench}
+      PGDATABASE: ${POSTGRES_DB:-counterwrench}
+    ports:
+      # Localhost only: the dev password shouldn't be reachable from the LAN.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Runs only when the data volume is empty (first start or after `make db-reset`).
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Check over TCP: during first-start init, Postgres runs a temporary server on the
+      # Unix socket only, so a socket check would report healthy before init scripts finish.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  pgdata:
