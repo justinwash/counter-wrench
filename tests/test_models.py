@@ -148,9 +148,7 @@ def test_overall_severity_is_the_worst_row():
     agree = {**ASSESSMENT, "agrees_with_suspected_area": True, "disagreement_reason": None}
     result = TriageResult(
         assessments=[
-            RowAssessment.model_validate(
-                {**agree, "row_id": "r1", "severity": "cosmetic_or_adjustment"}
-            ),
+            RowAssessment.model_validate({**agree, "row_id": "r1", "severity": "no_action_needed"}),
             RowAssessment.model_validate({**agree, "row_id": "r2", "severity": "safety_critical"}),
         ]
     )
@@ -158,10 +156,22 @@ def test_overall_severity_is_the_worst_row():
     assert result.escalated
 
 
-def test_max_severity_ordering():
-    assert max_severity([Severity.NEEDS_SERVICE, Severity.COSMETIC_OR_ADJUSTMENT]) is (
-        Severity.NEEDS_SERVICE
-    )
+def test_severity_ranks_follow_declaration_order():
+    # Members are declared most severe first; ranks must agree, with no ties.
+    assert [s.rank for s in Severity] == list(range(len(Severity) - 1, -1, -1))
+
+
+@pytest.mark.parametrize(
+    ("severities", "worst"),
+    [
+        (["no_action_needed", "cosmetic"], "cosmetic"),
+        (["cosmetic", "needs_adjustment"], "needs_adjustment"),
+        (["needs_adjustment", "needs_service", "no_action_needed"], "needs_service"),
+        (["needs_service", "safety_critical"], "safety_critical"),
+    ],
+)
+def test_max_severity_ordering(severities, worst):
+    assert max_severity(Severity(s) for s in severities) is Severity(worst)
 
 
 # --- Compat and work order ------------------------------------------------------------------

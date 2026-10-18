@@ -14,7 +14,6 @@ import sys
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Literal
 
 import httpx
 from dotenv import find_dotenv, load_dotenv
@@ -30,6 +29,7 @@ from counterwrench.config import (
     resolve_models,
     split_model,
 )
+from counterwrench.models import Severity
 
 # Overrides that silently redirect provider SDKs (e.g. a local proxy inherited from the shell).
 BASE_URL_VARS = ("ANTHROPIC_BASE_URL", "ANTHROPIC_API_URL", "OPENAI_BASE_URL", "OPENAI_API_BASE")
@@ -45,7 +45,7 @@ def lookup_labor_price(code: str) -> str:
 
 
 class SeverityCheck(BaseModel):
-    severity: Literal["safety_critical", "needs_service", "cosmetic_or_adjustment"]
+    severity: Severity
     reason: str
 
 

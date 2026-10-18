@@ -68,3 +68,8 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 **Context:** Work orders carry prices and totals, and LLMs are unreliable at arithmetic and at recalling prices.
 **Decision:** The LLM chooses labor codes and parts. Unit prices come from the database, and line totals and `estimate_total_cents` are computed fields that can't be supplied as input. The `estimate_math_correct` evaluator therefore checks that prices match the catalog, not the LLM's arithmetic: the LLM is removed from the math rather than evaluated on it.
 **Alternatives:** Letting the LLM write totals and catching mistakes with an evaluator, which measures a failure mode we can simply design away.
+
+## D-013: Five severity levels, one per counter action
+**Context:** The plan had three levels, with `cosmetic_or_adjustment` merging things that lead to different actions at the counter. Customers also regularly bring in bikes that are working as intended ("this doesn't look right" when it is right).
+**Decision:** `safety_critical` (don't ride it; stays in the shop), `needs_service` (book it in), `needs_adjustment` (quick fix), `cosmetic` (look it over, confirm it's only cosmetic, hand it back), `no_action_needed` (explain why it's normal). Damage that could hide structural damage (carbon after a crash) is never cosmetic. The safety gate stays binary, so it's unaffected.
+**Alternatives:** Three levels (merges different actions). Four, folding cosmetic into no-action (Justin: cosmetic complaints get their own counter flow). Cost of five: exact-match severity grading is noisier at the boundaries between adjacent levels.

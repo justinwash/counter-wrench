@@ -72,9 +72,13 @@ class PartCategory(StrEnum):
 
 
 class Severity(StrEnum):
-    SAFETY_CRITICAL = "safety_critical"
-    NEEDS_SERVICE = "needs_service"
-    COSMETIC_OR_ADJUSTMENT = "cosmetic_or_adjustment"
+    """One level per distinct counter action, most severe first."""
+
+    SAFETY_CRITICAL = "safety_critical"  # don't ride it; it stays in the shop
+    NEEDS_SERVICE = "needs_service"  # book it in
+    NEEDS_ADJUSTMENT = "needs_adjustment"  # quick fix, maybe while they wait
+    COSMETIC = "cosmetic"  # look it over, confirm it's only cosmetic, hand it back
+    NO_ACTION_NEEDED = "no_action_needed"  # working as intended; explain why it's normal
 
     @property
     def rank(self) -> int:
@@ -82,9 +86,11 @@ class Severity(StrEnum):
 
 
 _SEVERITY_RANK = {
-    Severity.COSMETIC_OR_ADJUSTMENT: 0,
-    Severity.NEEDS_SERVICE: 1,
-    Severity.SAFETY_CRITICAL: 2,
+    Severity.NO_ACTION_NEEDED: 0,
+    Severity.COSMETIC: 1,
+    Severity.NEEDS_ADJUSTMENT: 2,
+    Severity.NEEDS_SERVICE: 3,
+    Severity.SAFETY_CRITICAL: 4,
 }
 
 
@@ -145,8 +151,14 @@ class RowAssessment(Strict):
         description=(
             "safety_critical: unsafe to ride until fixed (braking, steering, fork, frame, or "
             "wheel retention at risk); the customer must be told not to ride it. "
-            "needs_service: needs shop work, but not an immediate safety risk. "
-            "cosmetic_or_adjustment: noise, wear, or settings that an adjustment fixes."
+            "needs_service: needs shop work (service labor or parts), but not an immediate "
+            "safety risk. "
+            "needs_adjustment: works, but a quick adjustment or settings change fixes it "
+            "(indexing, brake rub, suspension setup); no parts. "
+            "cosmetic: a real, visible issue that doesn't affect function or safety. Damage "
+            "that could hide structural damage (e.g. a carbon frame or fork after a crash) is "
+            "never cosmetic; treat it as safety_critical until inspected. "
+            "no_action_needed: working as intended; explain to the customer why it's normal."
         )
     )
     likely_causes: list[str] = Field(
