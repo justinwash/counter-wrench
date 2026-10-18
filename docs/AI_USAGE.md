@@ -27,3 +27,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 3a: Migrations and catalog schema
 **Assistant did:** Wrote the connection module, the migration runner (ordered files, per-migration transactions, checksums), the catalog migration and 27 tests run against throwaway databases. Diagnosed tests hanging on `localhost` (IPv6 `::1` vs compose's IPv4-only binding) and switched to `127.0.0.1`.
 **Justin checked / decided:** Approved splitting step 3 into 3a (schema) and 3b (Pydantic models); added the UDH column (SRAM Transmission compatibility); explained back fix-forward migrations, `NULLS NOT DISTINCT`, and why each migration runs in its own transaction. Brand choice for seed data deferred to step 4 (leaning Trek-primary plus common service brands, hand-curated rather than scraped).
+
+## Step 3b: Core Pydantic models and complaint taxonomy
+**Assistant did:** Drafted the complaint → suspected-area taxonomy for review, wrote `taxonomy.py`, `models.py` and 38 tests (including a test that reads the SQL `CHECK` lists from Postgres and compares them to the Python enums), and ran a live check that both models produce a valid `RowAssessment`.
+**Justin checked / decided:** Expanded the taxonomy with suspension-specific complaints (packing up, bouncing, bottoming, harsh, sticky, leaking, knock), dropper post and slow-leak complaints, because MTBs are most of a shop's service volume; approved code-computed prices and totals; decided that invalid triage output gets one retry, then goes to the review queue.

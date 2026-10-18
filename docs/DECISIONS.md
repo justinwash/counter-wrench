@@ -58,3 +58,13 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 **Context:** Tests hung connecting to `localhost`: it resolved to IPv6 `::1` first, while compose binds IPv4 `127.0.0.1` only. Separately, a hand-written `DATABASE_URL` had to be kept in sync with the `POSTGRES_*` values compose uses.
 **Decision:** The default host is `127.0.0.1`, and `DATABASE_URL` is optional: when blank it's built from the same `POSTGRES_*` values and defaults as compose.
 **Alternatives:** Binding compose to both IPv4 and IPv6 (wider exposure for no benefit).
+
+## D-011: The complaint taxonomy lives in Python
+**Context:** The taxonomy drives the UI picklists, the `ComplaintRow` validation, eval datasets and the `complaint_taxonomy` table, and it needs one source of truth.
+**Decision:** `taxonomy.py` holds `Complaint` and `SuspectedArea` enums plus the allowed-pairs map; `unsure` is always allowed and `other` allows every area. The enums flow into the API schema (and from there into TypeScript types). The SQL table is seeded from `pairs()`. The map lists plausible areas, not just likely ones, including deliberate cross-area options (creak → frame, suspension knock → headset) that feed the safety and staff-misattribution slices. 22 complaints, MTB-heavy, since MTBs make up most service work.
+**Alternatives:** A YAML file (editable without code, but runtime-built enums lose type checking and autocomplete). The database as the source (models would need a DB connection to validate a form, and every unit test would need Postgres).
+
+## D-012: The LLM drafts, code computes
+**Context:** Work orders carry prices and totals, and LLMs are unreliable at arithmetic and at recalling prices.
+**Decision:** The LLM chooses labor codes and parts. Unit prices come from the database, and line totals and `estimate_total_cents` are computed fields that can't be supplied as input. The `estimate_math_correct` evaluator therefore checks that prices match the catalog, not the LLM's arithmetic: the LLM is removed from the math rather than evaluated on it.
+**Alternatives:** Letting the LLM write totals and catching mistakes with an evaluator, which measures a failure mode we can simply design away.
