@@ -9,98 +9,98 @@
   brand: Shimano
   name: Deore CS-M6100 12-speed 10-51
   price_cents: 7500
-  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51, shift_family: shimano_mtb_12}
 
 - id: shimano-cs-m7100-10-51
   category: cassette
   brand: Shimano
   name: SLX CS-M7100 12-speed 10-51
   price_cents: 9500
-  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51, shift_family: shimano_mtb_12}
 
 - id: shimano-cs-m8100-10-51
   category: cassette
   brand: Shimano
   name: Deore XT CS-M8100 12-speed 10-51
   price_cents: 19000
-  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51, shift_family: shimano_mtb_12}
 
 - id: sram-pg-1210-11-50
   category: cassette
   brand: SRAM
   name: SX Eagle PG-1210 12-speed 11-50
   price_cents: 5500
-  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 50}
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 50, shift_family: sram_eagle_12}
 
 - id: sram-pg-1230-11-50
   category: cassette
   brand: SRAM
   name: NX Eagle PG-1230 12-speed 11-50
   price_cents: 7500
-  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 50}
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 50, shift_family: sram_eagle_12}
 
 - id: sram-xs-1275-10-52
   category: cassette
   brand: SRAM
   name: GX Eagle Transmission XS-1275 T-Type 12-speed 10-52
   price_cents: 25000
-  specs: {freehub: xd, speeds: 12, smallest_cog: 10, largest_cog: 52}
+  specs: {freehub: xd, speeds: 12, smallest_cog: 10, largest_cog: 52, shift_family: sram_t_type_axs}
 
 - id: sram-pg-1231-11-44
   category: cassette
   brand: SRAM
   name: XPLR PG-1231 12-speed 11-44
   price_cents: 9000
-  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 44}
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 44, shift_family: sram_xplr_12}
 
 - id: shimano-cs-r7101-11-34
   category: cassette
   brand: Shimano
   name: 105 CS-R7101 12-speed 11-34
   price_cents: 10000
-  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 34}
+  specs: {freehub: hg, speeds: 12, smallest_cog: 11, largest_cog: 34, shift_family: shimano_road_12}
 
 - id: shimano-cs-m8000-11-46
   category: cassette
   brand: Shimano
   name: Deore XT CS-M8000 11-speed 11-46
   price_cents: 12000
-  specs: {freehub: hg, speeds: 11, smallest_cog: 11, largest_cog: 46}
+  specs: {freehub: hg, speeds: 11, smallest_cog: 11, largest_cog: 46, shift_family: shimano_mtb_11}
 
 - id: shimano-cs-hg500-10-11-34
   category: cassette
   brand: Shimano
   name: CS-HG500-10 10-speed 11-34
   price_cents: 4500
-  specs: {freehub: hg, speeds: 10, smallest_cog: 11, largest_cog: 34}
+  specs: {freehub: hg, speeds: 10, smallest_cog: 11, largest_cog: 34, shift_family: shimano_road_10_4700}
 
 - id: shimano-cs-5700-12-27
   category: cassette
   brand: Shimano
   name: 105 CS-5700 10-speed 12-27
   price_cents: 6000
-  specs: {freehub: hg, speeds: 10, smallest_cog: 12, largest_cog: 27}
+  specs: {freehub: hg, speeds: 10, smallest_cog: 12, largest_cog: 27, shift_family: shimano_road_10}
 
 - id: shimano-cs-m4100-11-46
   category: cassette
   brand: Shimano
   name: Deore CS-M4100 10-speed 11-46
   price_cents: 4500
-  specs: {freehub: hg, speeds: 10, smallest_cog: 11, largest_cog: 46}
+  specs: {freehub: hg, speeds: 10, smallest_cog: 11, largest_cog: 46, shift_family: shimano_mtb_10}
 
 - id: shimano-cs-hg200-9-11-32
   category: cassette
   brand: Shimano
   name: CS-HG200 9-speed 11-32
   price_cents: 2500
-  specs: {freehub: hg, speeds: 9, smallest_cog: 11, largest_cog: 32}
+  specs: {freehub: hg, speeds: 9, smallest_cog: 11, largest_cog: 32, shift_family: shimano_9}
 
 - id: shimano-cs-lg300-11-46
   category: cassette
   brand: Shimano
   name: CUES CS-LG300 9-speed 11-46 (LinkGlide)
   price_cents: 4000
-  specs: {freehub: hg, speeds: 9, smallest_cog: 11, largest_cog: 46}
+  specs: {freehub: hg, speeds: 9, smallest_cog: 11, largest_cog: 46, shift_family: shimano_linkglide}
 
 # --- Chains (shops default to SRAM of the right speed; Shimano for customers who ask) ----------
 
@@ -224,6 +224,13 @@
   name: 105 RD-5701 10-speed
   price_cents: 5000
   specs: {speeds: 10, mount: hanger, max_cog: 28, shift_family: shimano_road_10}
+
+- id: shimano-rd-r7150
+  category: rear_derailleur
+  brand: Shimano
+  name: 105 Di2 RD-R7150 12-speed
+  price_cents: 25000
+  specs: {speeds: 12, mount: hanger, max_cog: 36, shift_family: shimano_road_12_di2}
 
 - id: shimano-rd-m3100-sgs
   category: rear_derailleur

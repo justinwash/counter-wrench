@@ -181,7 +181,7 @@ def test_max_severity_ordering(severities, worst):
 def test_incompatible_part_cannot_need_adapter():
     with pytest.raises(ValidationError):
         CompatResult(
-            part_id="sram-xg-1275", compatible=False, reasons=["XD only"], requires_adapter="x"
+            part_id="sram-xg-1275", status="incompatible", reasons=["XD only"], requires_adapter="x"
         )
 
 

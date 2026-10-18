@@ -39,3 +39,12 @@
 - {rule_type: caliper_pad, bike_value: Tektro HD-R280 flat mount, part_value: tektro_hd_r280, compatible: true}
 - {rule_type: caliper_pad, bike_value: Tektro R580 dual-pivot, part_value: road_rim_cartridge, compatible: true}
 - {rule_type: caliper_pad, bike_value: Tektro linear-pull (V-brake), part_value: v_brake, compatible: true}
+
+# --- Shift family (bike) <-> cassette family (part): cross-family exceptions only --------------
+# Same family always matches; anything not listed here is incompatible.
+
+- rule_type: shift_family_cassette
+  bike_value: shimano_road_12_di2
+  part_value: shimano_road_12
+  compatible: true
+  note: Di2 and mechanical Shimano 12-speed road share the same cassettes.

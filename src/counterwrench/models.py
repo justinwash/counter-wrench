@@ -222,16 +222,31 @@ class TriageResult(Strict):
 # --- Compatibility (deterministic engine output) --------------------------------------------
 
 
+class CompatStatus(StrEnum):
+    COMPATIBLE = "compatible"
+    INCOMPATIBLE = "incompatible"
+    # No rule or data covers the case. Never shown to a customer as a fit: a draft may only
+    # carry it flagged "unverified, mechanic to confirm".
+    UNKNOWN = "unknown"
+
+
+class WheelPosition(StrEnum):
+    FRONT = "front"
+    REAR = "rear"
+
+
 class CompatResult(Strict):
     part_id: Slug
-    compatible: bool
+    status: CompatStatus
     reasons: list[str] = Field(min_length=1)
     requires_adapter: str | None = None
+    # Set for parts checked per wheel (tires, tubes, rotors); a mullet differs front and rear.
+    position: WheelPosition | None = None
 
     @model_validator(mode="after")
     def _adapter_only_if_compatible(self) -> Self:
-        if self.requires_adapter and not self.compatible:
-            raise ValueError("an incompatible part can't require an adapter")
+        if self.requires_adapter and self.status is not CompatStatus.COMPATIBLE:
+            raise ValueError("only a compatible part can require an adapter")
         return self
 
 

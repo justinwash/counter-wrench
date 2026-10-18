@@ -98,3 +98,17 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 **Context:** Derailleurs only work with shifters of a compatible cable pull, which differs within brands (Shimano road 10 vs Tiagra 4700/GRX 10 vs MTB Dyna-Sys, CUES as its own family), not just Shimano vs SRAM. For chains, shops fit a SRAM chain of the right speed to nearly anything.
 **Decision:** `shift_family` (required) per bike and per derailleur; same family is compatible, and known cross-family exceptions would go in `compat_rules`. `required_chain_type` is set only for drivetrains that demand a specific chain (SRAM Flattop, T-Type); otherwise any chain of the right speed fits. Shop chain preference (SRAM by default) belongs in the shop policy doc, not the schema. Caliper-to-pad fit is data (`caliper_pad` rules keyed on the bike's caliper name), like freehub-to-cassette.
 **Alternatives:** A coarse `drivetrain_system` (Shimano/SRAM, mechanical/electronic), which would call a 105 5700 derailleur compatible with a GRX 400 shifter. A required chain type on every bike, which would contradict how shops actually fit chains.
+
+## D-019: Compatibility is three-way, strict, and never decided by the LLM
+**Context:** The engine is the trust anchor for every part the agent suggests; a confident wrong part is the worst failure.
+**Decision:** Results are `compatible`, `incompatible` or `unknown`; any incompatible finding wins, then any unknown, else compatible. Missing data is `unknown`, never a guess (e.g. tubes without the installed tire width, which gives the agent a real clarifying question). Rule tables list what fits: a known caliper or freehub with no rule for this part is incompatible; one with no rules at all is unknown. Shift families match strictly for derailleurs *and* cassettes; cross-family fits need an explicit rule. Per Justin: upgrade paths must be explicit in the data; if the answer would be solely the mechanic's call (e.g. a rotor size other than stock), it's incompatible. Wheel-position parts get one result per wheel. The LLM and retrieval never decide compatibility; an `unknown` part may only appear in a draft flagged "unverified, mechanic to confirm".
+**Alternatives:** Boolean results (can't represent "we don't know"). Treating unknown as compatible (fails open). Matching cassettes on freehub and speeds alone (offered a road cassette for an Eagle MTB; found by reading CLI output, not by the tests).
+
+## D-020: Known compatibility limitations (deliberate, documented)
+**Context:** Some fits need data the catalog doesn't have.
+**Decision:** Not modeled in v0, each with a planned eval case:
+- **Rim internal width:** no lower bound on tire width, so a 700x25 road tire shows as compatible on a 29" MTB rim. Spec sheets name rim models, not internal widths; modeling it would mean ~17 mostly inferred lookups. Kept as a showcase failure case.
+- **Derailleur capacity vs cassette range:** not checked directly; strict shift-family matching for cassettes covers the common cases.
+- **Tube valve vs rim drilling** (Presta vs Schrader): not checked.
+- **Frame-size wheel variants:** see D-017.
+**Alternatives:** Guessing rim widths from rim model names (data that looks authoritative but isn't).

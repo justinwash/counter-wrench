@@ -5,7 +5,7 @@
   brand: Sample Parts
   name: 12-speed cassette 10-51 (Microspline)
   price_cents: 12999
-  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51}
+  specs: {freehub: microspline, speeds: 12, smallest_cog: 10, largest_cog: 51, shift_family: shimano_mtb_12}
 
 - id: sample-chain-12s
   category: chain

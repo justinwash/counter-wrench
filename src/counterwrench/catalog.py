@@ -131,7 +131,9 @@ PositiveInt = Annotated[int, Field(gt=0)]
 # --- Bikes -------------------------------------------------------------------------------------
 
 
-class Bike(Strict):
+class BikeSpec(Strict):
+    """A bike as stored in the database and used by the compatibility engine."""
+
     id: Slug
     make: ShortText
     model: ShortText
@@ -158,8 +160,6 @@ class Bike(Strict):
     max_tire_mm: PositiveInt | None = None
     front_wheel_bsd_mm: WheelSize
     rear_wheel_bsd_mm: WheelSize
-    # Where the specs came from, for fact-checking. Seed files only; not stored in the DB.
-    source: HttpUrl
 
     @model_validator(mode="after")
     def _consistent(self) -> Self:
@@ -176,12 +176,22 @@ class Bike(Strict):
         return self
 
 
+class Bike(BikeSpec):
+    """A bike entry in bikes.yaml."""
+
+    # Where the specs came from, for fact-checking. Seed files only; not stored in the DB.
+    source: HttpUrl
+
+
 # --- Parts: one specs model per category -------------------------------------------------------
 
 
 class CassetteSpecs(Strict):
     freehub: Freehub
     speeds: Speeds
+    # Cog spacing and range belong to a shifting system, like derailleurs (strict match;
+    # explicit cross-family rules in compat_rules).
+    shift_family: ShiftFamily
     smallest_cog: PositiveInt
     largest_cog: PositiveInt
 
