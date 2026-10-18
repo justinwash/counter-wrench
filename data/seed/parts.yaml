@@ -1,6 +1,6 @@
 # Parts catalog. Chosen so each category has parts that fit some catalog bikes and
 # deliberately don't fit others. Prices are ballpark US list prices.
-# `# VERIFY` marks facts Claude is unsure of, for Justin's pass.
+# Facts not stated by a manufacturer were verified by Justin.
 
 # --- Cassettes ---------------------------------------------------------------------------------
 
@@ -209,7 +209,6 @@
   brand: Shimano
   name: Deore RD-M5120-SGS 10/11-speed
   price_cents: 4500
-  # VERIFY: sold as 10/11-speed; modeled as 10-speed Dyna-Sys for the 10-speed bikes
   specs: {speeds: 10, mount: hanger, max_cog: 46, shift_family: shimano_mtb_10}
 
 - id: shimano-rd-rx400
@@ -236,7 +235,7 @@
 - id: shimano-rd-u4020
   category: rear_derailleur
   brand: Shimano
-  name: CUES RD-U4020 9-speed  # VERIFY: model number
+  name: CUES RD-U4020 9-speed
   price_cents: 4000
   specs: {speeds: 9, mount: hanger, max_cog: 46, shift_family: shimano_linkglide}
 
@@ -266,7 +265,7 @@
 - id: shimano-g05s-resin
   category: brake_pads
   brand: Shimano
-  name: G05S resin pads (2-piston SLX/XT, 2011-2014)  # VERIFY: shape for SLX M666
+  name: G05S resin pads (2-piston SLX/XT, 2011-2014)
   price_cents: 2500
   specs: {pad_shape: shimano_g_type, compound: resin}
 
@@ -280,7 +279,7 @@
 - id: sram-level-4p-organic
   category: brake_pads
   brand: SRAM
-  name: Level 4-piston organic pads  # VERIFY: pad shape for Level Bronze 4-piston
+  name: Level 4-piston organic pads
   price_cents: 3000
   specs: {pad_shape: sram_level_4p, compound: resin}
 
@@ -308,14 +307,14 @@
 - id: trp-trail-evo-pads
   category: brake_pads
   brand: TRP
-  name: Trail EVO / DH-R EVO pads  # VERIFY: shared shape across TRP 4-piston
+  name: Trail EVO / DH-R EVO pads
   price_cents: 3000
   specs: {pad_shape: trp_trail_evo, compound: resin}
 
 - id: tektro-hd-r280-pads
   category: brake_pads
   brand: Tektro
-  name: Road flat mount pads for HD-R280  # VERIFY: pad model
+  name: Road flat mount pads for HD-R280
   price_cents: 2000
   specs: {pad_shape: tektro_hd_r280, compound: resin}
 
