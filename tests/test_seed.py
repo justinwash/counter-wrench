@@ -8,15 +8,17 @@ from psycopg import errors
 import counterwrench.db.seed as seed_module
 from counterwrench.catalog import Bike, WheelSize
 from counterwrench.db.migrate import migrate
-from counterwrench.db.seed import SEED_DIR, SeedError, load_seed, sync
+from counterwrench.db.seed import SeedError, load_seed, sync
 from counterwrench.taxonomy import pairs
+
+FIXTURE_DIR = Path(__file__).parent / "fixtures" / "seed"
 
 
 @pytest.fixture
 def seed_dir(tmp_path: Path) -> Path:
-    """A private copy of the real seed files that each test can edit."""
+    """A private copy of the test fixture seed files (not the real catalog) to edit."""
     target = tmp_path / "seed"
-    shutil.copytree(SEED_DIR, target)
+    shutil.copytree(FIXTURE_DIR, target)
     return target
 
 
@@ -55,6 +57,8 @@ def test_wheel_label_names_both_conventions():
     [
         ("bikes.yaml", lambda e: e[0].update(freehub="microsplne"), "freehub"),
         ("bikes.yaml", lambda e: e[0].update(rotor_mount=None), "rotor_mount"),
+        ("bikes.yaml", lambda e: e[0].pop("rear_rotor_mm"), "rear_rotor_mm"),
+        ("bikes.yaml", lambda e: e[1].update(front_rotor_mm=160), "rim brakes"),
         ("bikes.yaml", lambda e: e[0].update(front_wheel_bsd_mm=630), "front_wheel_bsd_mm"),
         ("bikes.yaml", lambda e: e[0].pop("udh"), "udh"),
         ("bikes.yaml", lambda e: e.append(dict(e[0])), "duplicate"),
@@ -74,7 +78,7 @@ def test_invalid_entry_names_file_and_entry(seed_dir, filename, change, message)
 
 
 def test_cassette_specs_are_typed_by_category():
-    cassette = next(p for p in load_seed().parts if p.category == "cassette")
+    cassette = next(p for p in load_seed(FIXTURE_DIR).parts if p.category == "cassette")
     assert cassette.specs.freehub == "microspline"
 
 
@@ -82,7 +86,7 @@ def test_cassette_specs_are_typed_by_category():
 
 
 def test_seed_loads_everything(catalog):
-    data = load_seed()
+    data = load_seed(FIXTURE_DIR)
     report = sync(catalog, data)
     assert report.changed
     assert count(catalog, "bikes") == len(data.bikes)
@@ -92,12 +96,12 @@ def test_seed_loads_everything(catalog):
 
 
 def test_second_seed_changes_nothing(catalog):
-    sync(catalog, load_seed())
-    assert not sync(catalog, load_seed()).changed
+    sync(catalog, load_seed(FIXTURE_DIR))
+    assert not sync(catalog, load_seed(FIXTURE_DIR)).changed
 
 
 def test_taxonomy_table_matches_code(catalog):
-    sync(catalog, load_seed())
+    sync(catalog, load_seed(FIXTURE_DIR))
     rows = catalog.execute(
         "SELECT complaint, suspected_area FROM complaint_taxonomy ORDER BY 1, 2"
     ).fetchall()
@@ -162,7 +166,7 @@ PRICE_SQL = "SELECT price_cents FROM parts WHERE id = 'sample-cassette-12s-ms'"
 
 
 def test_source_url_is_not_stored(catalog):
-    sync(catalog, load_seed())
+    sync(catalog, load_seed(FIXTURE_DIR))
     columns = catalog.execute(
         "SELECT column_name FROM information_schema.columns WHERE table_name = 'bikes'"
     ).fetchall()

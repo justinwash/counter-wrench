@@ -1,4 +1,4 @@
-# SAMPLE DATA (step 4a): placeholder prices. The real menu comes in step 4b.
+# TEST FIXTURE: made-up data owned by the tests (tests/test_seed.py), never the real catalog.
 
 - code: SEATPOST-ADJUST
   name: Seatpost clean, grease and re-torque

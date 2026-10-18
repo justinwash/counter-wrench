@@ -62,6 +62,7 @@ class CrankSpindle(StrEnum):
     DUB = "dub"  # SRAM 28.99 mm
     GXP = "gxp"  # SRAM 24/22 mm stepped
     MM30 = "30mm"
+    POWERSPLINE = "powerspline"  # SRAM/TruVativ splined, e.g. SX Eagle cranks
     SQUARE_TAPER = "square_taper"
 
 
@@ -74,8 +75,9 @@ class RearAxle(StrEnum):
 
 
 class Freehub(StrEnum):
-    HG = "hg"  # Shimano/SRAM HyperGlide, 8-11 speed
-    HG_L2 = "hg_l2"  # Shimano 12-speed road
+    HG = (
+        "hg"  # Shimano/SRAM HyperGlide: 8-11 speed, plus Shimano 12-speed road and SRAM 12-speed PG
+    )
     MICROSPLINE = "microspline"
     XD = "xd"
     XDR = "xdr"
@@ -135,7 +137,9 @@ class Bike(Strict):
     brake_type: BrakeType
     brake_caliper: ShortText | None = None
     rotor_mount: RotorMount | None = None
-    max_rotor_mm: PositiveInt | None = None
+    # Stock rotor sizes; front and rear commonly differ (e.g. 203/180).
+    front_rotor_mm: PositiveInt | None = None
+    rear_rotor_mm: PositiveInt | None = None
     max_tire_mm: PositiveInt | None = None
     front_wheel_bsd_mm: WheelSize
     rear_wheel_bsd_mm: WheelSize
@@ -144,8 +148,12 @@ class Bike(Strict):
 
     @model_validator(mode="after")
     def _consistent(self) -> Self:
-        if (self.brake_type is BrakeType.RIM) != (self.rotor_mount is None):
-            raise ValueError("disc brakes need a rotor_mount; rim brakes can't have one")
+        rim = self.brake_type is BrakeType.RIM
+        rotor_fields = (self.rotor_mount, self.front_rotor_mm, self.rear_rotor_mm)
+        if rim and any(f is not None for f in rotor_fields):
+            raise ValueError("rim brakes can't have rotor_mount or rotor sizes")
+        if not rim and any(f is None for f in rotor_fields):
+            raise ValueError("disc brakes need rotor_mount, front_rotor_mm and rear_rotor_mm")
         if self.spec_variant and not self.variant_note:
             raise ValueError("a spec_variant needs a variant_note saying how to tell it apart")
         return self

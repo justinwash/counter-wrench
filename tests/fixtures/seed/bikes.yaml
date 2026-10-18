@@ -1,5 +1,4 @@
-# SAMPLE DATA (step 4a): a made-up brand that proves the loader works.
-# Replaced with real, verified bikes in step 4b.
+# TEST FIXTURE: made-up data owned by the tests (tests/test_seed.py), never the real catalog.
 
 - id: sample-trailhound-2025
   make: Sample Cycles
@@ -16,7 +15,8 @@
   brake_type: hydraulic_disc
   brake_caliper: Sample 4-piston
   rotor_mount: 6-bolt
-  max_rotor_mm: 220
+  front_rotor_mm: 203
+  rear_rotor_mm: 180
   max_tire_mm: 66
   front_wheel_bsd_mm: 622
   rear_wheel_bsd_mm: 584

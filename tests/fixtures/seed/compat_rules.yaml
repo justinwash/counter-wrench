@@ -1,4 +1,4 @@
-# SAMPLE DATA (step 4a): a few freehub/cassette rules. Replaced in step 4b.
+# TEST FIXTURE: made-up data owned by the tests (tests/test_seed.py), never the real catalog.
 
 - {rule_type: freehub_cassette, bike_value: microspline, part_value: microspline, compatible: true}
 - {rule_type: freehub_cassette, bike_value: hg, part_value: microspline, compatible: false}

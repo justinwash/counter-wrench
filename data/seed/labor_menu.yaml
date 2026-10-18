@@ -1,0 +1,274 @@
+# Flat-rate service menu. Prices are a ballpark US draft for Justin to adjust.
+# "per wheel" / "per brake" / "per cable" items are priced per unit; work order lines carry
+# the quantity. Categories: inspection, adjustment, install, service, tune_up.
+
+# --- Inspection and tune-ups ---------------------------------------------------------------
+
+- code: INSPECT
+  name: Inspection and diagnosis
+  description: Look the bike over, confirm the issue, and explain findings. Waived if work is booked.
+  category: inspection
+  price_cents: 2500
+  est_minutes: 20
+
+- code: SAFETY-CHECK
+  name: Safety check
+  description: Brakes, wheel retention, headset, bolts to torque, tire condition.
+  category: inspection
+  price_cents: 3000
+  est_minutes: 20
+
+- code: TUNE-BASIC
+  name: Basic tune-up
+  description: Adjust shifting and brakes, true wheels on the bike, torque check, wipe-down.
+  category: tune_up
+  price_cents: 9500
+  est_minutes: 60
+
+- code: TUNE-STANDARD
+  name: Standard tune-up
+  description: Basic tune-up plus drivetrain clean, wheel truing off the bike, hub and headset adjustment.
+  category: tune_up
+  price_cents: 15000
+  est_minutes: 90
+
+- code: TUNE-OVERHAUL
+  name: Complete overhaul
+  description: Full strip, clean, and rebuild of all bearings and drivetrain; new cables and housing.
+  category: tune_up
+  price_cents: 30000
+  est_minutes: 240
+
+# --- Drivetrain ------------------------------------------------------------------------------
+
+- code: DRIVETRAIN-ADJUST
+  name: Shifting adjustment
+  description: Index derailleurs and set limits.
+  category: adjustment
+  price_cents: 2500
+  est_minutes: 15
+
+- code: HANGER-ALIGN
+  name: Derailleur hanger alignment
+  description: Check and straighten the derailleur hanger, then re-index.
+  category: adjustment
+  price_cents: 2000
+  est_minutes: 15
+
+- code: DRIVETRAIN-CLEAN
+  name: Drivetrain deep clean
+  description: Remove and degrease chain, cassette, and chainrings; re-lube.
+  category: service
+  price_cents: 6000
+  est_minutes: 45
+
+- code: CHAIN-INSTALL
+  name: Chain install
+  description: Size and install a chain.
+  category: install
+  price_cents: 1500
+  est_minutes: 10
+
+- code: CASSETTE-INSTALL
+  name: Cassette install
+  description: Remove and install a cassette.
+  category: install
+  price_cents: 1500
+  est_minutes: 10
+
+- code: DERAILLEUR-INSTALL
+  name: Rear derailleur install
+  description: Install and adjust a rear derailleur (cable or wireless).
+  category: install
+  price_cents: 3500
+  est_minutes: 30
+
+- code: SHIFT-CABLE
+  name: Shift cable and housing replacement
+  description: Replace one shift cable and its housing, then adjust. Per cable.
+  category: service
+  price_cents: 3000
+  est_minutes: 30
+
+- code: BB-INSTALL-THREADED
+  name: Threaded bottom bracket install
+  description: Remove crank, remove and install a threaded BB (BSA, T47, Italian), reinstall crank.
+  category: install
+  price_cents: 3500
+  est_minutes: 30
+
+- code: BB-INSTALL-PRESSFIT
+  name: Press-fit bottom bracket install
+  description: Remove crank, extract and press in a press-fit BB (PF92, BB86, PF30, BB30), reinstall crank.
+  category: install
+  price_cents: 5000
+  est_minutes: 45
+
+# --- Brakes ----------------------------------------------------------------------------------
+
+- code: BRAKE-ADJUST
+  name: Brake adjustment
+  description: Center caliper or adjust rim brake, set pad contact and lever feel. Per brake.
+  category: adjustment
+  price_cents: 2000
+  est_minutes: 15
+
+- code: BRAKE-PAD-INSTALL
+  name: Brake pad install
+  description: Install pads, bed in. Per brake.
+  category: install
+  price_cents: 1500
+  est_minutes: 10
+
+- code: ROTOR-INSTALL
+  name: Rotor install
+  description: Install a 6-bolt or Center Lock rotor. Per rotor.
+  category: install
+  price_cents: 1500
+  est_minutes: 10
+
+- code: ROTOR-TRUE
+  name: Rotor truing
+  description: True a bent rotor. Per rotor.
+  category: adjustment
+  price_cents: 1500
+  est_minutes: 10
+
+- code: BRAKE-BLEED
+  name: Hydraulic brake bleed
+  description: Bleed and refill a hydraulic brake. Per brake.
+  category: service
+  price_cents: 4000
+  est_minutes: 30
+
+- code: BRAKE-CABLE
+  name: Brake cable and housing replacement
+  description: Replace one brake cable and its housing, then adjust. Per brake.
+  category: service
+  price_cents: 3000
+  est_minutes: 30
+
+# --- Wheels and tires -----------------------------------------------------------------------
+
+- code: FLAT-REPAIR
+  name: Flat repair
+  description: Find the cause, install a tube. Per wheel.
+  category: install
+  price_cents: 1500
+  est_minutes: 15
+
+- code: TIRE-INSTALL
+  name: Tire install
+  description: Mount a tire with a tube. Per wheel.
+  category: install
+  price_cents: 1500
+  est_minutes: 15
+
+- code: TUBELESS-SETUP
+  name: Tubeless setup
+  description: Tape rim, install valve, mount tire, add sealant, seat bead. Per wheel.
+  category: install
+  price_cents: 3000
+  est_minutes: 25
+
+- code: SEALANT-REFRESH
+  name: Tubeless sealant refresh
+  description: Remove dried sealant, add fresh sealant, check valve core. Per wheel.
+  category: service
+  price_cents: 1500
+  est_minutes: 10
+
+- code: WHEEL-TRUE
+  name: Wheel truing
+  description: True and tension a wheel off the bike. Per wheel.
+  category: adjustment
+  price_cents: 3000
+  est_minutes: 30
+
+- code: SPOKE-REPLACE
+  name: Spoke replacement
+  description: Replace a broken spoke and true the wheel. Per spoke.
+  category: service
+  price_cents: 2500
+  est_minutes: 30
+
+- code: HUB-SERVICE
+  name: Hub service
+  description: Clean, regrease, and adjust or replace bearings; freehub service. Per hub.
+  category: service
+  price_cents: 5000
+  est_minutes: 45
+
+# --- Frame, cockpit, contact points -------------------------------------------------------
+
+- code: HEADSET-ADJUST
+  name: Headset adjustment
+  description: Remove play and set preload.
+  category: adjustment
+  price_cents: 1500
+  est_minutes: 10
+
+- code: HEADSET-SERVICE
+  name: Headset service
+  description: Remove fork, clean and grease or replace headset bearings.
+  category: service
+  price_cents: 4500
+  est_minutes: 45
+
+- code: SEATPOST-ADJUST
+  name: Seatpost clean, grease and re-torque
+  description: Remove, clean and grease a rigid seatpost and clamp; reinstall to torque spec.
+  category: adjustment
+  price_cents: 1500
+  est_minutes: 15
+
+- code: DROPPER-SERVICE
+  name: Dropper post service
+  description: Remove, disassemble, clean, re-lube and reinstall a dropper post.
+  category: service
+  price_cents: 9000
+  est_minutes: 75
+
+- code: PIVOT-SERVICE
+  name: Frame pivot bearing service
+  description: Disassemble rear suspension linkage, replace pivot bearings, reassemble to torque.
+  category: service
+  price_cents: 15000
+  est_minutes: 150
+
+# --- Suspension -----------------------------------------------------------------------------
+
+- code: SUSPENSION-SETUP
+  name: Suspension setup
+  description: Set sag, air pressure, rebound, and compression for the rider. Fork and shock.
+  category: adjustment
+  price_cents: 2500
+  est_minutes: 20
+
+- code: FORK-LOWER-SERVICE
+  name: Fork lower leg service
+  description: Remove lowers, clean, replace foam rings and oil, check seals.
+  category: service
+  price_cents: 9500
+  est_minutes: 60
+
+- code: FORK-FULL-SERVICE
+  name: Fork full service
+  description: Lower leg service plus damper and air spring rebuild with new seals.
+  category: service
+  price_cents: 18500
+  est_minutes: 120
+
+- code: SHOCK-AIRCAN-SERVICE
+  name: Rear shock air can service
+  description: Clean and replace air can seals; set pressure.
+  category: service
+  price_cents: 8500
+  est_minutes: 45
+
+- code: SHOCK-FULL-SERVICE
+  name: Rear shock full service
+  description: Damper rebuild with new seals and oil, nitrogen recharge where applicable.
+  category: service
+  price_cents: 22500
+  est_minutes: 120

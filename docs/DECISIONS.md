@@ -83,3 +83,13 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 **Context:** 700c and 29" are the same rim (622 mm), as are 650b and 27.5" (584 mm); shop staff know this cold. Mixed-wheel "mullet" MTBs are common.
 **Decision:** Store `front_wheel_bsd_mm` and `rear_wheel_bsd_mm` as ISO diameters (migration 002), and show the agent every name for a size (`WheelSize.label`: `622 mm (700c / 29")`). Tire and tube compatibility is checked per wheel position. Migration 002 also adds `crank_spindle` (BB fit depends on frame and crank) and `dropper_post` (a seated creak means different work on a dropper bike).
 **Alternatives:** Label strings ("29", "700c"), which would make a 29er tire look incompatible with a 700c rim. A single wheel size per bike, which can't represent mullets.
+
+## D-016: Stock rotor sizes front and rear, not a frame maximum (migration 003)
+**Context:** Spec sheets list the installed rotors (e.g. 203 mm front, 180 mm rear) and rarely a frame's maximum rotor; front and rear commonly differ.
+**Decision:** Replace `max_rotor_mm` with `front_rotor_mm` and `rear_rotor_mm`, required for disc brakes and absent for rim brakes. The migration backfills existing rows from the old column before adding the new rule, so it applies cleanly to a seeded database.
+**Alternatives:** Keeping a frame maximum (rarely published, so it would mostly be guessed). One rotor size per bike (wrong for most modern MTBs).
+
+## D-017: v0 models one wheel size per bike; frame-size variants are deferred on purpose
+**Context:** Many bikes change wheel size by frame size (e.g. Marlin 7 Gen 3: 26" XXS, 27.5" XS–S, 29" M and up), which matters for tire and tube quotes.
+**Decision:** Known simplification for the baseline: each bike row uses the wheel size of its medium-and-up frames. Small-frame eval cases (step 12) measure the cost; the fix (one row per wheel-size bracket via `spec_variant`, plus a frame-size clarifying question) is a planned improvement iteration (step 17), measured before and after. Documented here from the start, so the README presents it as a deliberate scoping decision, not a surprise discovery.
+**Alternatives:** Modeling frame-size variants from day one (no measured before/after, and more catalog work before the agent exists). Ignoring it (small-frame customers would get wrong tire sizes with no record of why).

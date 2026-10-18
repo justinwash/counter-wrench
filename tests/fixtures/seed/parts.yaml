@@ -1,4 +1,4 @@
-# SAMPLE DATA (step 4a): made-up parts, one per kind of spec. Replaced in step 4b.
+# TEST FIXTURE: made-up data owned by the tests (tests/test_seed.py), never the real catalog.
 
 - id: sample-cassette-12s-ms
   category: cassette

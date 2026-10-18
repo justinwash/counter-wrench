@@ -5,7 +5,13 @@ import pytest
 from psycopg import errors
 
 from counterwrench.db.connection import database_url
-from counterwrench.db.migrate import Migration, MigrationError, discover, migrate
+from counterwrench.db.migrate import (
+    MIGRATIONS_DIR,
+    Migration,
+    MigrationError,
+    discover,
+    migrate,
+)
 
 
 def write(directory: Path, name: str, sql: str) -> None:
@@ -113,18 +119,20 @@ BIKE = {
     "brake_type": "hydraulic_disc",
     "brake_caliper": "Shimano GRX RX400",
     "rotor_mount": "centerlock",
-    "max_rotor_mm": 160,
     "max_tire_mm": 45,
     # Added by 002_bike_fit.sql
     "front_wheel_bsd_mm": 622,
     "rear_wheel_bsd_mm": 622,
     "crank_spindle": "hollowtech_24",
     "dropper_post": False,
+    # Added by 003_rotor_sizes.sql
+    "front_rotor_mm": 160,
+    "rear_rotor_mm": 160,
 }
 
 
-def insert_bike(conn: psycopg.Connection, **overrides) -> None:
-    row = {**BIKE, **overrides}
+def insert_bike(conn: psycopg.Connection, base: dict = BIKE, **overrides) -> None:
+    row = {**base, **overrides}
     columns = ", ".join(row)
     placeholders = ", ".join(f"%({key})s" for key in row)
     conn.execute(f"INSERT INTO bikes ({columns}) VALUES ({placeholders})", row)
@@ -152,7 +160,8 @@ def test_valid_bike_inserts(catalog):
         {"category": "unicycle"},
         {"id": "Not A Slug"},
         {"drivetrain_speeds": 14},
-        {"brake_type": "rim"},  # rim brake with a rotor mount
+        {"brake_type": "rim"},  # rim brake with a rotor mount and rotors
+        {"rear_rotor_mm": None},  # disc brake missing a rear rotor size
         {"rotor_mount": None},  # disc brake without a rotor mount
         {"spec_variant": "late"},  # variant without a note saying how to tell
     ],
@@ -207,3 +216,16 @@ def test_database_url_prefers_explicit_value():
     assert database_url({"DATABASE_URL": "postgresql://x", "POSTGRES_USER": "u"}) == (
         "postgresql://x"
     )
+
+
+def test_rotor_split_backfills_existing_disc_bikes(conn, tmp_path):
+    # Build the database as it was before 003, with a disc bike already in it...
+    for path in sorted(MIGRATIONS_DIR.glob("00[12]_*.sql")):
+        (tmp_path / path.name).write_text(path.read_text("utf-8"), "utf-8")
+    migrate(conn, tmp_path)
+    old_bike = {k: v for k, v in BIKE.items() if k not in ("front_rotor_mm", "rear_rotor_mm")}
+    insert_bike(conn, base=old_bike, max_rotor_mm=180)
+    # ...then apply the real migrations: 003 must carry the rotor size over, not reject the row.
+    assert [m.name for m in migrate(conn)] == ["003_rotor_sizes.sql"]
+    row = conn.execute("SELECT front_rotor_mm, rear_rotor_mm FROM bikes").fetchone()
+    assert row == (180, 180)

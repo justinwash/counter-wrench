@@ -1,0 +1,387 @@
+# Bike catalog. Every entry names one model year and links the spec page it came from.
+# Values not stated by the source were inferred from component models and verified by Justin.
+#
+# Known v0 simplification (DECISIONS D-017): wheel sizes are for medium-and-up frames.
+# Small frames on several of these bikes use smaller wheels; that's deliberately deferred.
+#
+# Max tire widths are converted from inches and rounded: 2.4" = 61, 2.5" = 64, 2.6" = 66 mm.
+
+# --- Trek MTB --------------------------------------------------------------------------------
+
+- id: trek-fuel-ex-8-gen-6-2023
+  make: Trek
+  model: Fuel EX 8 Gen 6
+  year: 2023
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: hollowtech_24
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano Deore M6120 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 203
+  rear_rotor_mm: 180
+  max_tire_mm: 64
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://vitalmtb.com/product/guide/Bikes,3/Trek/Fuel-EX-8-Gen-6,37643
+
+- id: trek-slash-9-8-xt-gen-6-2024
+  make: Trek
+  model: Slash 9.8 XT Gen 6
+  year: 2024
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: hollowtech_24
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano Deore XT M8120 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 203
+  rear_rotor_mm: 203
+  max_tire_mm: 64
+  # Mullet on ML-XL (source); MD is listed as both mullet and 29".
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 584
+  source: https://www.vitalmtb.com/product/guide/bikes/trek/slash-41836
+
+- id: trek-marlin-7-gen-3-2025
+  make: Trek
+  model: Marlin 7 Gen 3
+  year: 2025
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: powerspline  # source: TruVativ Powerspline BB, SRAM SX Eagle crank
+  rear_axle: qr_135
+  freehub: hg  # SX Eagle PG-1210 12-speed cassette on an HG driver (source)
+  drivetrain_speeds: 12
+  udh: false
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano MT200 2-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 180  # MD-XL; XS/SM run 160 (source)
+  rear_rotor_mm: 160
+  max_tire_mm: 61
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/bikes/trek/marlin-65751
+
+# Same model name, earlier year, different drivetrain: 10-speed Deore, square taper, no dropper.
+- id: trek-marlin-7-gen-3-2023
+  make: Trek
+  model: Marlin 7 Gen 3
+  year: 2023
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: square_taper
+  rear_axle: qr_135
+  freehub: hg  # Shimano 8/9/10 freehub (source)
+  drivetrain_speeds: 10
+  udh: false
+  dropper_post: false  # source: rigid Bontrager seatpost (frame has dropper routing)
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano MT200 2-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 160
+  rear_rotor_mm: 160
+  max_tire_mm: 61
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.cahabacycles.com/products/trek-marlin-7-gen-3
+
+- id: trek-roscoe-7-2023
+  make: Trek
+  model: Roscoe 7
+  year: 2023
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: hollowtech_24
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: false
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano MT200 2-piston
+  rotor_mount: centerlock
+  front_rotor_mm: 180
+  rear_rotor_mm: 180
+  max_tire_mm: 66
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/Bikes,3/Trek/Roscoe-7,37396
+
+- id: trek-top-fuel-8-xt-2024
+  make: Trek
+  model: Top Fuel 8 XT
+  year: 2024
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: hollowtech_24
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano M6120 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 180
+  rear_rotor_mm: 160
+  max_tire_mm: 64
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/bikes/trek/top-fuel-44101
+
+# SRAM Transmission (T-Type): direct-mount derailleur, needs the UDH frame.
+- id: trek-supercaliber-sl-9-7-gx-axs-gen-2-2025
+  make: Trek
+  model: Supercaliber SL 9.7 GX AXS T-Type Gen 2
+  year: 2025
+  category: mtb
+  bb_standard: pf92
+  crank_spindle: dub
+  rear_axle: 12x148
+  freehub: xd
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: SRAM Level Bronze 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 180
+  rear_rotor_mm: 160
+  max_tire_mm: 61
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/bikes/trek/supercaliber-58526
+
+# --- Other brands, MTB -------------------------------------------------------------------------
+
+- id: specialized-stumpjumper-15-comp-alloy-2025
+  make: Specialized
+  model: Stumpjumper 15 Comp Alloy
+  year: 2025
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: hollowtech_24
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: TRP Trail EVO 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 203
+  rear_rotor_mm: 203  # S3-S6; S1/S2 run 180 rear (source)
+  front_wheel_bsd_mm: 622  # S3-S6 are 29/29; S1/S2 are mullets (source)
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/bikes/specialized/stumpjumper-15-56446
+
+# HG driver with a 12-speed SRAM PG cassette: a Micro Spline or XD cassette won't fit.
+- id: santa-cruz-hightower-r-carbon-c-2024
+  make: Santa Cruz
+  model: Hightower R Carbon C
+  year: 2024
+  category: mtb
+  bb_standard: bsa
+  crank_spindle: dub
+  rear_axle: 12x148
+  freehub: hg
+  drivetrain_speeds: 12
+  udh: true
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: SRAM G2 R 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 200
+  rear_rotor_mm: 180
+  max_tire_mm: 64
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/bikes/santa-cruz/hightower-42946
+
+- id: giant-trance-29-2-2022
+  make: Giant
+  model: Trance 29 2
+  year: 2022
+  category: mtb
+  bb_standard: pf92
+  crank_spindle: hollowtech_24
+  rear_axle: 12x148
+  freehub: microspline
+  drivetrain_speeds: 12
+  udh: false
+  dropper_post: true
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano Deore MT420 4-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 180
+  rear_rotor_mm: 180
+  max_tire_mm: 66
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.vitalmtb.com/product/guide/Bikes,3/Giant/Trance-29-2,35689
+
+# --- Gravel, road, commuter ------------------------------------------------------------------
+
+# 12-speed SRAM XPLR cassette on a Shimano 11-speed (HG) freehub.
+- id: trek-checkpoint-alr-5-gen-3-2026
+  make: Trek
+  model: Checkpoint ALR 5 Gen 3
+  year: 2026
+  category: gravel
+  bb_standard: t47
+  crank_spindle: dub  # source: SRAM DUB Wide
+  rear_axle: 12x142
+  freehub: hg
+  drivetrain_speeds: 12
+  udh: true  # source: frame "T47, UDH"
+  dropper_post: false  # source: Bontrager alloy rigid seatpost
+  brake_type: hydraulic_disc
+  brake_caliper: SRAM Apex D1 flat mount
+  rotor_mount: centerlock
+  front_rotor_mm: 160
+  rear_rotor_mm: 160
+  max_tire_mm: 50
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.bicyclebluebook.com/value-guide/road/trek/checkpoint-alr-5-gen-3/2026
+
+- id: cannondale-topstone-2-2023
+  make: Cannondale
+  model: Topstone 2
+  year: 2023  # some databases list this spec as 2024
+  category: gravel
+  bb_standard: bsa
+  crank_spindle: square_taper
+  rear_axle: 12x142
+  freehub: hg
+  drivetrain_speeds: 10
+  udh: false
+  dropper_post: false
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano GRX RX400 flat mount
+  rotor_mount: centerlock
+  front_rotor_mm: 160
+  rear_rotor_mm: 160
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://bikeattack.com/cannondale-topstone-2-2023/
+
+- id: trek-emonda-sl-6-2023
+  make: Trek
+  model: Émonda SL 6
+  year: 2023
+  category: road
+  bb_standard: t47  # source: Praxis T47 threaded, internal bearing
+  crank_spindle: hollowtech_24
+  rear_axle: 12x142
+  freehub: hg
+  drivetrain_speeds: 12
+  udh: false
+  dropper_post: false
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano 105 flat mount
+  rotor_mount: centerlock
+  front_rotor_mm: 160
+  rear_rotor_mm: 160
+  max_tire_mm: 28
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://www.tour-magazin.de/en/brands/trek/model/emonda-sl-6-655e692626f547878a58b4c0/
+
+- id: trek-fx-2-gen-4-2025
+  make: Trek
+  model: FX 2 Gen 4
+  year: 2025
+  category: commuter
+  bb_standard: bsa  # source: sealed cartridge, 68 mm
+  crank_spindle: square_taper
+  rear_axle: qr_135
+  freehub: hg  # source: Shimano 8/9/10 freehub
+  drivetrain_speeds: 9  # Shimano LinkGlide LG300 11-46 (source)
+  udh: false
+  dropper_post: false
+  brake_type: hydraulic_disc
+  brake_caliper: Tektro HD-R280 flat mount
+  rotor_mount: 6-bolt
+  front_rotor_mm: 160
+  rear_rotor_mm: 160
+  max_tire_mm: 40
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://comorsports.com/products/trek-fx-2-gen-4-bike-2025-matte-trek-black
+
+# --- Historical: the older bikes that make up much of a service counter's day ---------------
+
+# Same model name as the 2023 Gen 6, entirely different standards: 26", QR, 3x10, no dropper.
+- id: trek-fuel-ex-8-2012
+  make: Trek
+  model: Fuel EX 8
+  year: 2012
+  category: mtb
+  bb_standard: pf92
+  crank_spindle: hollowtech_24
+  rear_axle: qr_135  # source: "135x5"
+  freehub: hg  # Shimano M525 hub, HG62 10-speed cassette (source)
+  drivetrain_speeds: 10
+  udh: false
+  dropper_post: false  # source: Bontrager Rhythm Elite rigid post
+  brake_type: hydraulic_disc
+  brake_caliper: Shimano SLX M666 2-piston
+  rotor_mount: 6-bolt
+  front_rotor_mm: 180
+  rear_rotor_mm: 160
+  front_wheel_bsd_mm: 559
+  rear_wheel_bsd_mm: 559
+  source: https://www.vitalmtb.com/product/guide/Bikes,3/Trek/Fuel-EX-8,9081
+
+# Rim brakes and BB30, a press-fit standard known for creaking.
+- id: cannondale-caad10-5-105-2014
+  make: Cannondale
+  model: CAAD10 5 105
+  year: 2014
+  category: road
+  bb_standard: bb30
+  crank_spindle: 30mm  # source: FSA Gossamer Pro BB30
+  rear_axle: qr_130
+  freehub: hg
+  drivetrain_speeds: 10
+  udh: false
+  dropper_post: false
+  brake_type: rim
+  brake_caliper: Tektro R580 dual-pivot
+  max_tire_mm: 25
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://bikeindex.org/bikes/28318
+
+# V-brake hybrid commuter, 3x9.
+- id: trek-7-3-fx-2014
+  make: Trek
+  model: 7.3 FX
+  year: 2014
+  category: commuter
+  bb_standard: bsa
+  crank_spindle: square_taper
+  rear_axle: qr_135
+  freehub: hg  # Shimano HG20 11-32 9-speed cassette (source)
+  drivetrain_speeds: 9
+  udh: false
+  dropper_post: false
+  brake_type: rim
+  brake_caliper: Tektro linear-pull (V-brake)
+  front_wheel_bsd_mm: 622
+  rear_wheel_bsd_mm: 622
+  source: https://bikeindex.org/bikes/33307
