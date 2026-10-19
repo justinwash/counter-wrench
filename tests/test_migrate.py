@@ -232,6 +232,7 @@ def test_rotor_split_backfills_existing_disc_bikes(conn, tmp_path):
     }
     insert_bike(conn, base=old_bike, max_rotor_mm=180)
     # ...then apply the real migrations: 003 must carry the rotor size over, not reject the row.
-    assert [m.name for m in migrate(conn)] == ["003_rotor_sizes.sql", "004_drivetrain.sql"]
+    # Later migrations apply too; what matters is that 003 is among them and succeeds.
+    assert "003_rotor_sizes.sql" in [m.name for m in migrate(conn)]
     row = conn.execute("SELECT front_rotor_mm, rear_rotor_mm FROM bikes").fetchone()
     assert row == (180, 180)

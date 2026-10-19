@@ -59,3 +59,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 6b: Diagnosis guides and "that's normal" doc
 **Assistant did:** Drafted 6 diagnosis guides covering all 21 specific complaints (noises, drivetrain, brakes, wheels and tires, suspension, dropper) and a "that's normal" doc backing `no_action_needed`; marked safety-critical symptoms explicitly (cracked frame, loose headset, pads worn to the backing plate, lever to the bar, contamination, oil on the rotor); added a test that every complaint has a diagnosis guide; flagged 6 uncertain facts.
 **Justin checked / decided:** Reviewed and approved all 7 docs, including the 6 flagged facts, every safety call, and the adjustment-vs-service splits (rigid seatpost vs dropper, rebound setup vs damper service, indexing vs new cassette); kept `SHIFT-CABLE` for dropper cables.
+
+## Step 7: Ingestion and hybrid retrieval
+**Assistant did:** Wrote migration 005, chunk building (doc sections plus generated labor and bike chunks), local embeddings with an offline test double, idempotent ingestion, and `search_knowledge` in three modes with RRF fusion; measured the real model on Justin's machine (65 MB, ~5 s first load). Ran sanity queries in all modes and reported that 4/5 were too easy to trust, since the assistant wrote both the docs and the queries, and that a terse bike-fact query missed while a natural one hit.
+**Justin checked / decided:** Approved building all three modes with a vector-only v0 baseline, so hybrid search is a measured improvement rather than a default.
