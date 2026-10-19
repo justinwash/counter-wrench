@@ -34,7 +34,7 @@ def call(tools, name, **args):
 def test_tool_names_match_the_plan(tools):
     assert set(tools) == {
         "lookup_bike", "search_knowledge", "find_compatible_parts",
-        "get_labor_item", "search_labor_menu",
+        "get_labor_item", "search_labor_menu", "draft_work_order",
     }  # fmt: skip
 
 

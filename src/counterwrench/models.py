@@ -268,6 +268,16 @@ class PartLine(Strict):
     part_id: Slug
     qty: int = Field(ge=1, le=10)
     unit_price_cents: int = Field(ge=0, description="From the parts catalog, never from the LLM.")
+    position: WheelPosition | None = None
+    # A fit the engine couldn't confirm, and why; the reviewing mechanic must check it.
+    unverified: bool = False
+    unverified_reason: str | None = None
+
+    @model_validator(mode="after")
+    def _reason_iff_unverified(self) -> Self:
+        if self.unverified != (self.unverified_reason is not None):
+            raise ValueError("unverified parts need an unverified_reason, and only they have one")
+        return self
 
     @computed_field
     @property
@@ -275,8 +285,17 @@ class PartLine(Strict):
         return self.qty * self.unit_price_cents
 
 
+class WorkOrderStatus(StrEnum):
+    DRAFT = "draft"
+    AWAITING_REVIEW = "awaiting_review"  # where every agent draft lands
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    COMPLETED = "completed"
+
+
 class WorkOrderDraft(Strict):
     bike_id: Slug | None = None
+    bike_freetext: ShortText | None = None
     severity: Severity
     labor_lines: list[LaborLine] = Field(default_factory=list)
     part_lines: list[PartLine] = Field(default_factory=list)

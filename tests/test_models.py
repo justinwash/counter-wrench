@@ -18,6 +18,7 @@ from counterwrench.models import (
     Severity,
     TriageResult,
     WorkOrderDraft,
+    WorkOrderStatus,
     max_severity,
 )
 from counterwrench.taxonomy import Complaint, SuspectedArea, allowed_areas, is_allowed, pairs
@@ -226,6 +227,8 @@ def check_values(conn, table: str, column: str) -> set[str]:
         ("bikes", "brake_type", BrakeType),
         ("bikes", "rotor_mount", RotorMount),
         ("parts", "category", PartCategory),
+        ("work_orders", "severity", Severity),
+        ("work_orders", "status", WorkOrderStatus),
         ("bikes", "front_wheel_bsd_mm", WheelSize),
         ("bikes", "rear_wheel_bsd_mm", WheelSize),
     ],

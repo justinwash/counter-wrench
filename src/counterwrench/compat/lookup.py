@@ -36,6 +36,18 @@ def load_parts(conn: psycopg.Connection, category: PartCategory) -> list:
     return _PARTS.validate_python(rows)
 
 
+def load_part(conn: psycopg.Connection, part_id: str):
+    row = (
+        conn.cursor(row_factory=dict_row)
+        .execute(
+            "SELECT id, category, brand, name, price_cents, specs FROM parts WHERE id = %s",
+            (part_id,),
+        )
+        .fetchone()
+    )
+    return _PARTS.validate_python([row])[0] if row else None
+
+
 def load_rules(conn: psycopg.Connection) -> Rules:
     rows = conn.cursor(row_factory=dict_row).execute("SELECT * FROM compat_rules").fetchall()
     return Rules(CompatRule.model_validate(row) for row in rows)

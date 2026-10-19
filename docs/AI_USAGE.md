@@ -71,3 +71,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 9a: Read-only agent tools
 **Assistant did:** Wrote the five read-only tools, their output shapes and 23 tests over a fully seeded test database, and demoed each tool against the real database and embedding model.
 **Justin checked / decided:** Approved splitting step 9 so the work-order write (9b) gets its own review, and the tool designs (ambiguity as a result, unverified labeling, incompatible parts omitted).
+
+## Step 9b: Draft work orders
+**Assistant did:** Wrote migration 006 (work orders and lines with database-enforced review, foreign keys, generated priority), the `draft_work_order` tool (validation, compatibility re-check, catalog pricing, all-or-nothing save), and 22 tests, including the database refusing an unreviewed approval and `make seed` refusing to delete a part an order uses; demoed a rejected then a saved draft on the real database and removed the demo row.
+**Justin checked / decided:** Approved the design; proposed web-assisted best guesses for non-catalog bikes, which was scoped as a planned step-17 improvement (baseline: labor only for those bikes), with `unverified_reason` added now so it needs no later migration.

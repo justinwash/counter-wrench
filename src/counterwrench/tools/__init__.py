@@ -11,7 +11,7 @@ from langchain_core.tools import BaseTool, StructuredTool
 from pydantic import BaseModel, Field
 
 from counterwrench.rag.search import search_knowledge as _search
-from counterwrench.tools import bikes, labor, parts
+from counterwrench.tools import bikes, labor, parts, work_orders
 from counterwrench.tools.context import ToolContext
 
 
@@ -75,6 +75,12 @@ def make_tools(ctx: ToolContext | None = None) -> list[BaseTool]:
         with ctx.connect() as conn:
             return labor.search_labor_menu(conn, query).model_dump_json(exclude_none=True)
 
+    def draft_work_order(**kwargs) -> str:
+        args = work_orders.DraftWorkOrderArgs.model_validate(kwargs)
+        with ctx.connect() as conn:
+            result = work_orders.draft_work_order(conn, args)
+        return result.model_dump_json(exclude_none=True)
+
     return [
         StructuredTool.from_function(
             lookup_bike, args_schema=LookupBikeArgs,
@@ -100,5 +106,12 @@ def make_tools(ctx: ToolContext | None = None) -> list[BaseTool]:
             search_labor_menu, args_schema=LaborSearchArgs,
             description="Find service menu items by describing the job. Use the codes it "
             "returns; never invent codes.",
+        ),
+        StructuredTool.from_function(
+            draft_work_order, name="draft_work_order",
+            args_schema=work_orders.DraftWorkOrderArgs,
+            description="Save the draft work order for mechanic review. Give labor codes, "
+            "part ids and quantities only: prices and the total come from the catalog. Every "
+            "part is re-checked; a rejected draft saves nothing and lists what to fix.",
         ),
     ]  # fmt: skip
