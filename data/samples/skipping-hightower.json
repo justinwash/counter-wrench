@@ -1,0 +1,11 @@
+{
+  "bike_id": "santa-cruz-hightower-r-carbon-c-2024",
+  "rows": [
+    {
+      "row_id": "r1",
+      "complaint": "skipping",
+      "suspected_area": "chain",
+      "note": "Put a new chain on last month. Now it skips in the middle gears when climbing."
+    }
+  ]
+}

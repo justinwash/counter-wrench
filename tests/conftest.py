@@ -32,3 +32,18 @@ def db_url() -> Iterator[str]:
 def conn(db_url: str) -> Iterator[psycopg.Connection]:
     with psycopg.connect(db_url, autocommit=True) as connection:
         yield connection
+
+
+@pytest.fixture
+def seeded_db(conn):
+    """A test database with the real catalog seeded and the knowledge base ingested
+    (fake embeddings, so no model download)."""
+    from counterwrench.db.migrate import migrate
+    from counterwrench.db.seed import load_seed, sync
+    from counterwrench.rag.embed import FakeEmbedder
+    from counterwrench.rag.ingest import build_chunks, ingest
+
+    migrate(conn)
+    sync(conn, load_seed())
+    ingest(conn, build_chunks(conn), FakeEmbedder())
+    return conn

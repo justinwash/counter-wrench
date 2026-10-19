@@ -79,3 +79,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 9c: Prompt builder
 **Assistant did:** Wrote the deterministic intake renderer (untrusted tags, escaping) and the per-row retrieval query, with snapshot tests including an injection attempt; showed on the real index that the note is what retrieves the grinding safety section. The taxonomy validator caught an invalid example pair in the assistant's own test data (`squeak` + `brake_pads`).
 **Justin checked / decided:** Approved the design.
+
+## Step 10a: Triage graph
+**Assistant did:** Built the triage graph (bike resolution, retrieval, parallel per-row triage with validation and one retry, deterministic routing and escalation), the triage prompt, a CLI, four sample intakes, graph tests with a scripted fake model, and the guard test that only `config.py` builds chat models. Ran all four samples live on Haiku 5.5 and reviewed them critically: all four handled their traps, but the run exposed an undefined rule ("disagreeing" with a staff pick of `unsure`) and two borderline severity calls, and four clean samples prove little.
+**Justin checked / decided:** Approved splitting step 10 and running retrieval before triage.

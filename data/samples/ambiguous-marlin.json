@@ -1,0 +1,11 @@
+{
+  "bike_freetext": "Trek Marlin 7, not sure what year",
+  "rows": [
+    {
+      "row_id": "r1",
+      "complaint": "poor_shifting",
+      "suspected_area": "rear_derailleur",
+      "note": "Won't shift into the biggest cog. Bike fell over in the garage last week."
+    }
+  ]
+}

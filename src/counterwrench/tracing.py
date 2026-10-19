@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import os
 import subprocess
+import time
+import warnings
 from collections.abc import MutableMapping
 from functools import cache
 from pathlib import Path
@@ -64,3 +66,42 @@ def run_metadata(config, **extra: Any) -> dict[str, Any]:
         **git_version(),
         **extra,
     }
+
+
+# read_run/get_run_url are deprecated in favor of client.runs.retrieve()/get_url(), which need
+# a project ID, trace ID and field list. The old calls work until 2027-01-31; migrate before then.
+def read_run(client, run_id):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        return client.read_run(run_id)
+
+
+def run_url(client, run) -> str:
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        return client.get_run_url(run=run)
+
+
+def wait_for_run(run_id, timeout_s: float = 60):
+    """Flush pending traces, then poll LangSmith until the run is readable. None on timeout."""
+    from langchain_core.tracers.langchain import wait_for_all_tracers
+    from langsmith import Client
+    from langsmith.utils import LangSmithNotFoundError
+
+    wait_for_all_tracers()
+    client, deadline = Client(), time.monotonic() + timeout_s
+    while True:
+        try:
+            return client, read_run(client, run_id)
+        except LangSmithNotFoundError:
+            if time.monotonic() > deadline:
+                return client, None
+            time.sleep(2)
+
+
+def trace_url(run_id, timeout_s: float = 60) -> str | None:
+    """Link to a run's trace, or None when tracing is off or the run never arrived."""
+    if os.environ.get("LANGSMITH_TRACING") != "true":
+        return None
+    client, run = wait_for_run(run_id, timeout_s)
+    return run_url(client, run) if run else None

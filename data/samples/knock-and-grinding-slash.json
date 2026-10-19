@@ -1,0 +1,17 @@
+{
+  "bike_id": "trek-slash-9-8-xt-gen-6-2024",
+  "rows": [
+    {
+      "row_id": "r1",
+      "complaint": "suspension_knock",
+      "suspected_area": "fork",
+      "note": "Clunk from the front over bumps, and a knock when I grab the front brake hard."
+    },
+    {
+      "row_id": "r2",
+      "complaint": "squeak",
+      "suspected_area": "unsure",
+      "note": "Rear makes a metal on metal grinding noise when braking."
+    }
+  ]
+}

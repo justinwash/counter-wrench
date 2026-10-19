@@ -1,0 +1,11 @@
+{
+  "bike_id": "trek-checkpoint-alr-5-gen-3-2026",
+  "rows": [
+    {
+      "row_id": "r1",
+      "complaint": "creak",
+      "suspected_area": "bottom_bracket",
+      "note": "Only creaks when I'm sitting down. Goes away when I stand and pedal hard."
+    }
+  ]
+}
