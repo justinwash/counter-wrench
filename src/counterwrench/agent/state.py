@@ -33,6 +33,14 @@ class GraphState(TypedDict, total=False):
     escalation_message: str | None
     questions: dict[str, str]
     outcome: Outcome
+    # Supplied by the caller: the LangSmith run id, so the saved order links to its trace.
+    run_id: str | None
+    # Drafting (step 10b).
+    tool_calls: list[dict]  # the drafting agent's tool calls, in order (trajectory evals)
+    draft: dict | None  # draft_work_order's result when saved
+    work_order_id: int | None
+    draft_error: str | None
+    review: dict | None  # the mechanic's decision, after the graph resumes
 
 
 class RowTask(TypedDict):

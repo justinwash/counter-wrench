@@ -16,3 +16,6 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+
+# LangGraph Studio local state (make studio)
+.langgraph_api/

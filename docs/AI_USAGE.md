@@ -83,3 +83,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 10a: Triage graph
 **Assistant did:** Built the triage graph (bike resolution, retrieval, parallel per-row triage with validation and one retry, deterministic routing and escalation), the triage prompt, a CLI, four sample intakes, graph tests with a scripted fake model, and the guard test that only `config.py` builds chat models. Ran all four samples live on Haiku 5.5 and reviewed them critically: all four handled their traps, but the run exposed an undefined rule ("disagreeing" with a staff pick of `unsure`) and two borderline severity calls, and four clean samples prove little.
 **Justin checked / decided:** Approved splitting step 10 and running retrieval before triage.
+
+## Step 10b: Drafting agent and human review
+**Assistant did:** Built the drafting tool loop with code-injected bike, severity, intake and trace link; the review interrupt and `apply_review`; CLI review flags; LangGraph Studio setup; and 13 tests with scripted fake models. Ran two samples end to end on Haiku and reviewed the drafts critically, reporting three line-coherence errors (stock-component downgrade, missing install labor with contradictory truing, a dropped headset adjustment) rather than presenting the runs as clean. Also broke and then repaired two source files while editing them through nested string escapes.
+**Justin checked / decided:** Approved the design (approve/reject now, line edits in the API).

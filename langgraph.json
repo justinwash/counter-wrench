@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "counterwrench": "./src/counterwrench/agent/studio.py:graph"
+  },
+  "env": ".env"
+}

@@ -1,44 +1,18 @@
 """Graph logic with a scripted fake model: every path, no network."""
 
-import threading
+import uuid
 from contextlib import nullcontext
 
 import pytest
-from langchain_core.messages import AIMessage
-from pydantic import ValidationError
+from fakes import FakeTriage
+from langgraph.checkpoint.memory import InMemorySaver
 
 from counterwrench.agent.graph import build_graph
 from counterwrench.agent.nodes import Deps
-from counterwrench.models import IntakeForm, RowAssessment
+from counterwrench.models import IntakeForm
 from counterwrench.rag.embed import FakeEmbedder
 
 SLASH = "trek-slash-9-8-xt-gen-6-2024"
-
-
-class FakeTriage:
-    """Stands in for the triage chat model. `scripts` maps row_id to the responses that row's
-    calls return, in order: a dict (validated as RowAssessment) or a string (a parse error)."""
-
-    def __init__(self, scripts: dict[str, list]):
-        self.scripts = {row_id: list(items) for row_id, items in scripts.items()}
-        self.calls: dict[str, list] = {}
-        self._lock = threading.Lock()
-
-    def with_structured_output(self, schema, include_raw):
-        return self
-
-    def invoke(self, messages):
-        row_id = messages[1].content.rsplit('Assess row "', 1)[1].split('"', 1)[0]
-        with self._lock:
-            self.calls.setdefault(row_id, []).append(messages)
-            item = self.scripts[row_id].pop(0)
-        if isinstance(item, str):
-            return {"raw": AIMessage(item), "parsed": None, "parsing_error": ValueError(item)}
-        try:
-            parsed = RowAssessment.model_validate(item)
-            return {"raw": AIMessage("ok"), "parsed": parsed, "parsing_error": None}
-        except ValidationError as exc:
-            return {"raw": AIMessage("bad"), "parsed": None, "parsing_error": exc}
 
 
 def assessment(row_id="r1", **overrides):
@@ -59,7 +33,10 @@ def run(db, scripts, **intake):
     fake = FakeTriage(scripts)
     deps = Deps(connect=lambda: nullcontext(db), embedder=FakeEmbedder(), triage_model=lambda: fake)
     form = IntakeForm.model_validate({"bike_id": SLASH, "rows": [row()], **intake})
-    return build_graph(deps).invoke({"intake": form}), fake
+    # These tests cover triage and routing, so stop before drafting (tested in test_draft.py).
+    graph = build_graph(deps, checkpointer=InMemorySaver(), interrupt_before=["draft"])
+    config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+    return graph.invoke({"intake": form}, config=config), fake
 
 
 def test_each_row_is_triaged_in_its_own_branch(seeded_db):

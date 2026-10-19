@@ -1,26 +1,36 @@
 """Graph nodes. Code does everything code can (bike resolution, retrieval, routing,
-escalation); the LLM only triages. Dependencies are injected so tests can fake them."""
+escalation, pricing, the review update); the LLM triages each row and, in the drafting loop,
+picks lines with tools. Dependencies are injected so tests can fake them."""
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
+from uuid import UUID
 
 import psycopg
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.tools import StructuredTool
+from langgraph.types import interrupt
+from pydantic import ValidationError
 
 from counterwrench.agent.prompt_builder import build_intake_message, label, retrieval_query
+from counterwrench.agent.review import ReviewDecision, apply_review
 from counterwrench.agent.state import GraphState, RowTask
 from counterwrench.compat.lookup import load_bike
 from counterwrench.db.connection import connect
-from counterwrench.models import RowAssessment, Severity
+from counterwrench.models import RowAssessment, Severity, max_severity
 from counterwrench.rag.embed import Embedder
 from counterwrench.rag.search import SearchHit, search_knowledge
 from counterwrench.taxonomy import SuspectedArea
+from counterwrench.tools import make_tools
 from counterwrench.tools.bikes import lookup_bike
+from counterwrench.tools.context import ToolContext
+from counterwrench.tools.work_orders import DraftWorkOrderArgs, draft_work_order
 
 PROMPTS = Path(__file__).parent / "prompts"
 CHUNKS_PER_ROW = 5
@@ -38,8 +48,9 @@ class Deps:
         default=lambda: connect()
     )
     embedder: Embedder | None = None  # None: the real local embedding model
-    # Returns the triage chat model; built only through config.py.
+    # Return the chat models; built only through config.py.
     triage_model: Callable[[], object] | None = None
+    agent_model: Callable[[], object] | None = None
 
 
 # --- resolve_bike ----------------------------------------------------------------------------
@@ -191,3 +202,123 @@ def route(state: GraphState) -> dict:
                 "outcome": "needs_mechanic"}  # fmt: skip
     return {"escalated": False, "escalation_message": None, "questions": {},
             "outcome": "ready_to_draft"}  # fmt: skip
+
+
+# --- draft -----------------------------------------------------------------------------------
+
+MAX_DRAFT_STEPS = 10  # model turns; stops a looping model cleanly
+
+
+def _triage_block(state: GraphState) -> str:
+    rows = {
+        row_id: a.model_dump(mode="json", exclude_none=True)
+        for row_id, a in state.get("assessments", {}).items()
+    }
+    lines = ["<triage>", json.dumps(rows, indent=1)]
+    if state.get("failed_rows"):
+        lines.append(
+            f"Rows the triage couldn't assess (mechanic review): {sorted(state['failed_rows'])}"
+        )
+    if state.get("escalation_message"):
+        lines.append(state["escalation_message"])
+    lines.append("</triage>")
+    return "\n".join(lines)
+
+
+def draft(state: GraphState, deps: Deps) -> dict:
+    """Tool-calling loop: the model picks parts and lines; code injects what it must not choose
+    (bike, overall severity, intake, trace link) and records every tool call."""
+    intake, bike = state["intake"], state.get("bike")
+    assessments = state.get("assessments", {})
+    severity = max_severity(a.severity for a in assessments.values()) if assessments else None
+    failed_note = (
+        f"Triage couldn't assess rows {sorted(state['failed_rows'])}: check them in person."
+        if state.get("failed_rows")
+        else None
+    )
+    saved: dict = {}
+
+    def save_draft(**kwargs) -> str:
+        args = DraftWorkOrderArgs.model_validate(kwargs)
+        overrides = {"bike_id": bike.id if bike else None, "bike_freetext": intake.bike_freetext}
+        if severity is not None:
+            overrides["severity"] = severity
+        if failed_note:
+            overrides["mechanic_notes"] = "\n".join(
+                filter(None, [args.mechanic_notes, failed_note])
+            )
+        args = args.model_copy(update=overrides)
+        run_id = UUID(state["run_id"]) if state.get("run_id") else None
+        with deps.connect() as conn:
+            result = draft_work_order(
+                conn, args, intake=intake.model_dump(mode="json"), langsmith_run_id=run_id
+            )
+        if result.status == "saved":
+            saved["result"] = result
+        return result.model_dump_json(exclude_none=True)
+
+    ctx = ToolContext(connect=deps.connect, embedder=deps.embedder)
+    readers = [t for t in make_tools(ctx) if t.name in
+               {"find_compatible_parts", "get_labor_item", "search_labor_menu"}]  # fmt: skip
+    writer = StructuredTool.from_function(
+        save_draft, name="draft_work_order", args_schema=DraftWorkOrderArgs,
+        description="Save the draft work order for mechanic review (codes, part ids and "
+        "quantities only; prices and total come from the catalog). Lists problems if rejected.",
+    )  # fmt: skip
+    tools = {t.name: t for t in [*readers, writer]}
+    model = deps.agent_model().bind_tools(list(tools.values()))
+
+    bike_line = f"Catalog bike id: {bike.id}" if bike else "Bike not in the catalog: no parts."
+    messages = [
+        SystemMessage(prompt("draft")),
+        HumanMessage(
+            build_intake_message(intake, bike) + "\n\n" + _triage_block(state)
+            + f"\n\n{bike_line}\nBuild and save the draft work order."
+        ),
+    ]  # fmt: skip
+    trajectory: list[dict] = []
+    for _ in range(MAX_DRAFT_STEPS):
+        reply = model.invoke(messages)
+        messages.append(reply)
+        if not reply.tool_calls:
+            break
+        for call in reply.tool_calls:
+            trajectory.append({"tool": call["name"], "args": call["args"]})
+            tool = tools.get(call["name"])
+            try:
+                output = tool.invoke(call["args"]) if tool else f"No tool named {call['name']!r}."
+            except (ValidationError, ValueError) as exc:
+                output = f"Invalid arguments: {exc}"
+            messages.append(ToolMessage(str(output), tool_call_id=call["id"]))
+        if saved:
+            break
+
+    if saved:
+        result = saved["result"]
+        return {"draft": result.model_dump(mode="json"), "work_order_id": result.work_order_id,
+                "tool_calls": trajectory, "draft_error": None}  # fmt: skip
+    return {
+        "draft": None, "work_order_id": None, "tool_calls": trajectory, "outcome": "needs_mechanic",
+        "draft_error": "The drafting agent ended without a saved draft; a mechanic must write it.",
+    }  # fmt: skip
+
+
+# --- human_review --------------------------------------------------------------------------------
+
+
+def human_review(state: GraphState, deps: Deps) -> dict:
+    """Pause until a mechanic decides. Resume with {"decision", "reviewer", "notes"}."""
+    draft_result = state["draft"]
+    answer = interrupt(
+        {
+            "work_order_id": state["work_order_id"],
+            "estimate_total": draft_result["estimate_total"],
+            "unverified_parts": draft_result.get("unverified_parts", []),
+            "escalated": state.get("escalated", False),
+            "action": "Approve or reject this draft (rejections need notes).",
+        }
+    )
+    review = ReviewDecision.model_validate(answer)
+    with deps.connect() as conn:
+        status = apply_review(conn, state["work_order_id"], review)
+    return {"review": {**review.model_dump(), "status": status}}
