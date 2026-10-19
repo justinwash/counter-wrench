@@ -67,3 +67,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 8: LangSmith tracing
 **Assistant did:** Wrote automatic tracing configuration, run metadata (models, provider pinning, search mode, git commit and dirty flag), a doctor check that the LangSmith key is actually valid, and `make trace-check`, which reads the run back from LangSmith; checked the new LangSmith API before deciding to keep the deprecated calls until their removal date.
 **Justin checked / decided:** Approved the design; supplied the LangSmith key.
+
+## Step 9a: Read-only agent tools
+**Assistant did:** Wrote the five read-only tools, their output shapes and 23 tests over a fully seeded test database, and demoed each tool against the real database and embedding model.
+**Justin checked / decided:** Approved splitting step 9 so the work-order write (9b) gets its own review, and the tool designs (ambiguity as a result, unverified labeling, incompatible parts omitted).
