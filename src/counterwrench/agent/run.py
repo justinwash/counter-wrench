@@ -17,6 +17,7 @@ from langgraph.types import Command
 
 from counterwrench.agent.graph import build_graph, default_deps
 from counterwrench.config import load_config
+from counterwrench.guardrails import apply_guardrails
 from counterwrench.models import IntakeForm
 from counterwrench.tracing import run_metadata, trace_url
 
@@ -79,17 +80,29 @@ def main() -> int:
     args = parser.parse_args()
 
     config = load_config()
-    intake = IntakeForm.model_validate_json(args.intake.read_text("utf-8"))
+    # Guardrails run before the graph: LangSmith records the graph's input, so only the
+    # redacted intake may go in.
+    guarded = apply_guardrails(IntakeForm.model_validate_json(args.intake.read_text("utf-8")))
+    intake = guarded.intake
     run_id = uuid.uuid4()
     graph = build_graph(default_deps(config), checkpointer=InMemorySaver())
     run_config = {
         "run_id": run_id,
         "run_name": "counterwrench",
         "tags": ["cli", args.intake.stem],
-        "metadata": run_metadata(config, intake_file=args.intake.name),
+        "metadata": run_metadata(
+            config,
+            intake_file=args.intake.name,
+            pii_redacted=guarded.pii_counts,
+            guardrail_flags=sorted({f.kind for f in guarded.flags}),
+        ),
         "configurable": {"thread_id": str(run_id)},
     }
-    result = graph.invoke({"intake": intake, "run_id": str(run_id)}, config=run_config)
+    if guarded.pii_counts or guarded.flags:
+        kinds = [f.kind for f in guarded.flags] or "none"
+        print(f"Guardrails: redacted {guarded.pii_counts or 'nothing'}; flags {kinds}")
+    state = {"intake": intake, "run_id": str(run_id), "guardrail_note": guarded.mechanic_note()}
+    result = graph.invoke(state, config=run_config)
     paused = bool(result.get("__interrupt__"))
     if paused and args.review:
         decision = {"decision": args.review, "reviewer": args.reviewer, "notes": args.notes}

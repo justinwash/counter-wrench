@@ -87,3 +87,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 10b: Drafting agent and human review
 **Assistant did:** Built the drafting tool loop with code-injected bike, severity, intake and trace link; the review interrupt and `apply_review`; CLI review flags; LangGraph Studio setup; and 13 tests with scripted fake models. Ran two samples end to end on Haiku and reviewed the drafts critically, reporting three line-coherence errors (stock-component downgrade, missing install labor with contradictory truing, a dropped headset adjustment) rather than presenting the runs as clean. Also broke and then repaired two source files while editing them through nested string escapes.
 **Justin checked / decided:** Approved the design (approve/reject now, line edits in the API).
+
+## Step 11: Guardrails
+**Assistant did:** Wrote pattern-based PII redaction and injection/scope flags, applied at the boundary before the graph; added the flag to mechanic notes by code; 43 tests including bike names, part numbers and serials that must not be redacted; verified live by reading back all 27 runs of a trace and the saved order and finding no raw PII. Broke a test file again through string escapes in a shell heredoc and switched to direct file edits.
+**Justin checked / decided:** Approved flag-don't-block and regex-only redaction for v0.

@@ -39,7 +39,7 @@ DRAFT_ARGS = {
 }
 
 
-def run(db, triage_scripts, agent_turns, bike_id=HIGHTOWER, resume=None):
+def run(db, triage_scripts, agent_turns, bike_id=HIGHTOWER, resume=None, guardrail_note=None):
     agent = FakeAgent(agent_turns)
     deps = Deps(
         connect=lambda: nullcontext(db),
@@ -54,7 +54,8 @@ def run(db, triage_scripts, agent_turns, bike_id=HIGHTOWER, resume=None):
         {"bike_id": bike_id, "rows": [{"row_id": "r1", "complaint": "skipping",
                                        "suspected_area": "chain"}]}
     )  # fmt: skip
-    result = graph.invoke({"intake": intake, "run_id": run_id}, config=config)
+    state = {"intake": intake, "run_id": run_id, "guardrail_note": guardrail_note}
+    result = graph.invoke(state, config=config)
     if resume is not None:
         result = graph.invoke(Command(resume=resume), config=config)
     return result, agent
@@ -192,3 +193,16 @@ def test_review_only_applies_to_orders_awaiting_review(seeded_db):
         apply_review(
             seeded_db, result["work_order_id"], ReviewDecision(decision="approve", reviewer="x")
         )
+
+
+def test_guardrail_note_is_added_to_mechanic_notes_by_code(seeded_db):
+    result, _ = run(
+        seeded_db,
+        {"r1": [triage_ok()]},
+        [[("draft_work_order", {**DRAFT_ARGS, "mechanic_notes": "Check chain wear."})]],
+        guardrail_note="Guardrail: instruction-like text in rows.r1.note",
+    )
+    notes = seeded_db.execute(
+        "SELECT mechanic_notes FROM work_orders WHERE id = %s", (result["work_order_id"],)
+    ).fetchone()[0]
+    assert notes == "Check chain wear.\nGuardrail: instruction-like text in rows.r1.note"

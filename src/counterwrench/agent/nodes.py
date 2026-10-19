@@ -243,9 +243,10 @@ def draft(state: GraphState, deps: Deps) -> dict:
         overrides = {"bike_id": bike.id if bike else None, "bike_freetext": intake.bike_freetext}
         if severity is not None:
             overrides["severity"] = severity
-        if failed_note:
+        code_notes = [failed_note, state.get("guardrail_note")]
+        if any(code_notes):
             overrides["mechanic_notes"] = "\n".join(
-                filter(None, [args.mechanic_notes, failed_note])
+                filter(None, [args.mechanic_notes, *code_notes])
             )
         args = args.model_copy(update=overrides)
         run_id = UUID(state["run_id"]) if state.get("run_id") else None

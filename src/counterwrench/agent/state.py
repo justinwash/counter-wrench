@@ -35,6 +35,8 @@ class GraphState(TypedDict, total=False):
     outcome: Outcome
     # Supplied by the caller: the LangSmith run id, so the saved order links to its trace.
     run_id: str | None
+    # Supplied by the caller from apply_guardrails: a note for the reviewing mechanic.
+    guardrail_note: str | None
     # Drafting (step 10b).
     tool_calls: list[dict]  # the drafting agent's tool calls, in order (trajectory evals)
     draft: dict | None  # draft_work_order's result when saved
