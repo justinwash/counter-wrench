@@ -83,3 +83,16 @@ def test_parser_rejects_bad_docs(text, message):
 
 def test_anchor():
     assert anchor("Soft lever: air vs. worn pads") == "soft-lever-air-vs-worn-pads"
+
+
+# --- Coverage ----------------------------------------------------------------------------------
+
+
+def test_every_complaint_has_a_diagnosis_guide():
+    # `other` is free text by definition; every specific complaint needs a guide to retrieve.
+    from counterwrench.rag.docs import DocType
+    from counterwrench.taxonomy import Complaint
+
+    covered = {c for d in DOCS if d.meta.doc_type is DocType.DIAGNOSIS for c in d.meta.complaints}
+    missing = set(Complaint) - {Complaint.OTHER} - covered
+    assert not missing, f"no diagnosis guide covers: {sorted(missing)}"
