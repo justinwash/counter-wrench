@@ -1,0 +1,22 @@
+<intake>
+<bike source="catalog" id="trek-slash-9-8-xt-gen-6-2024">
+2024 Trek Slash 9.8 XT Gen 6, mtb bike.
+Wheels: front 622 mm (700c / 29"), rear 584 mm (650b / 27.5").
+Max tire width: 64 mm.
+Drivetrain: 12-speed, shift family shimano_mtb_12, microspline freehub, 12x148 rear axle.
+Bottom bracket: bsa shell, hollowtech_24 crank spindle.
+Brakes: hydraulic disc (Shimano Deore XT M8120 4-piston); 6-bolt rotors, 203 mm front, 203 mm rear.
+UDH frame: yes. Dropper post: yes.
+</bike>
+<row id="r1">
+  complaint: Creak
+  staff suspected area: Bottom bracket
+  <customer_note untrusted="true">Only when seated. Started after a crash last month.</customer_note>
+  <staff_answer untrusted="true">Customer says the crash was on the left side, bike slid on gravel.</staff_answer>
+</row>
+<row id="r2">
+  complaint: Soft brake lever
+  staff suspected area: Unsure
+</row>
+<general_notes untrusted="true">Customer rides lift-assisted downhill most weekends.</general_notes>
+</intake>

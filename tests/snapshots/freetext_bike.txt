@@ -1,0 +1,10 @@
+<intake>
+<bike source="customer">
+<description untrusted="true">Old blue Huffy, maybe 15 years old</description>
+Not in the catalog: no parts can be checked for compatibility.
+</bike>
+<row id="r1">
+  complaint: Flat tire
+  staff suspected area: Tube
+</row>
+</intake>

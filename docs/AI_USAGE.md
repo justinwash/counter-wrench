@@ -75,3 +75,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 9b: Draft work orders
 **Assistant did:** Wrote migration 006 (work orders and lines with database-enforced review, foreign keys, generated priority), the `draft_work_order` tool (validation, compatibility re-check, catalog pricing, all-or-nothing save), and 22 tests, including the database refusing an unreviewed approval and `make seed` refusing to delete a part an order uses; demoed a rejected then a saved draft on the real database and removed the demo row.
 **Justin checked / decided:** Approved the design; proposed web-assisted best guesses for non-catalog bikes, which was scoped as a planned step-17 improvement (baseline: labor only for those bikes), with `unverified_reason` added now so it needs no later migration.
+
+## Step 9c: Prompt builder
+**Assistant did:** Wrote the deterministic intake renderer (untrusted tags, escaping) and the per-row retrieval query, with snapshot tests including an injection attempt; showed on the real index that the note is what retrieves the grinding safety section. The taxonomy validator caught an invalid example pair in the assistant's own test data (`squeak` + `brake_pads`).
+**Justin checked / decided:** Approved the design.
