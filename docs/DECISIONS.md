@@ -111,4 +111,5 @@ Architectural decisions and tradeoffs, one short entry each. Newest at the botto
 - **Derailleur capacity vs cassette range:** not checked directly; strict shift-family matching for cassettes covers the common cases.
 - **Tube valve vs rim drilling** (Presta vs Schrader): not checked.
 - **Frame-size wheel variants:** see D-017.
+- **Customer-modified bikes:** the catalog is the factory spec. A bike with swapped parts (say SRAM brakes or a new freehub body) gets checked against parts it no longer has. Raised by Justin; the intake note is where modifications show up, so the agent must not trust the stock spec when the note says otherwise.
 **Alternatives:** Guessing rim widths from rim model names (data that looks authoritative but isn't).
