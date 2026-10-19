@@ -12,7 +12,7 @@ New cables stretch and housing settles in the first few rides, so shifting drift
 
 ## Poor shifting after a crash or tip-over
 
-If shifting went bad after the bike fell on its drive side, suspect a bent derailleur hanger. A bent hanger makes the derailleur sit crooked, so no amount of barrel-adjuster fiddling fixes it. Straightening it is `HANGER-ALIGN`; a badly bent or cracked hanger needs replacing, matched by photo. Also check the derailleur itself and its cage for damage. A derailleur that's been pushed into the spokes is a safety issue until checked.
+If shifting went bad after the bike fell on its drive side, suspect a bent derailleur hanger. A bent hanger makes the derailleur sit crooked, so no amount of barrel-adjuster fiddling fixes it. Straightening it is `HANGER-ALIGN`; a badly bent or cracked hanger needs replacing, matched by photo. Also check the derailleur itself and its cage for damage. Poor shifting after a tip-over is usually needs-service. Only a derailleur that's actually in or touching the spokes is safety-critical: the bike shouldn't be ridden until it's checked.
 
 ## Skipping under load
 

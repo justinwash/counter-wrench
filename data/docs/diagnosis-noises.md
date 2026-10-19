@@ -16,7 +16,7 @@ A creak under pedaling load, especially standing, points at the drivetrain's loa
 
 ## Creak from the front of the bike
 
-A creak when pulling on the bar or braking hard can come from the headset, the stem or bar clamps, or a loose front thru-axle. A loose headset is a safety issue; check for play by holding the front brake and rocking the bike. Headset play is usually an adjustment (`HEADSET-ADJUST`); worn bearings need a service (`HEADSET-SERVICE`).
+A creak when pulling on the bar or braking hard can come from the headset, the stem or bar clamps, or a loose front thru-axle. Check for play by holding the front brake and rocking the bike. Slight play is needs-service, usually an adjustment (`HEADSET-ADJUST`); worn bearings need a service (`HEADSET-SERVICE`). Bars or a fork that visibly move are safety-critical.
 
 ## A creak that could be a cracked frame
 

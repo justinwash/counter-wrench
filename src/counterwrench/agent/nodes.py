@@ -19,6 +19,7 @@ from counterwrench.db.connection import connect
 from counterwrench.models import RowAssessment, Severity
 from counterwrench.rag.embed import Embedder
 from counterwrench.rag.search import SearchHit, search_knowledge
+from counterwrench.taxonomy import SuspectedArea
 from counterwrench.tools.bikes import lookup_bike
 
 PROMPTS = Path(__file__).parent / "prompts"
@@ -135,6 +136,12 @@ def triage_row(task: RowTask, deps: Deps) -> dict:
         if assessment is not None and not problems:
             problems = check_assessment(assessment, row_id, menu_codes, chunk_ids)
         if not problems:
+            if row.suspected_area == SuspectedArea.UNSURE:
+                # Staff didn't commit to an area, so agreement doesn't apply. Enforced in code,
+                # whatever the model said.
+                assessment = assessment.model_copy(
+                    update={"agrees_with_suspected_area": None, "disagreement_reason": None}
+                )
             return {"assessments": {row_id: assessment}, "triage_retries": retries}
         last_error = "; ".join(problems)
         if attempt + 1 < MAX_TRIAGE_ATTEMPTS:

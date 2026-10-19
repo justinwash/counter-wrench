@@ -127,6 +127,15 @@ ASSESSMENT = {
 }
 
 
+def test_agreement_can_be_not_applicable():
+    a = RowAssessment.model_validate(
+        {**ASSESSMENT, "agrees_with_suspected_area": None, "disagreement_reason": None}
+    )
+    assert a.agrees_with_suspected_area is None
+    with pytest.raises(ValidationError):
+        RowAssessment.model_validate({**ASSESSMENT, "agrees_with_suspected_area": None})
+
+
 def test_valid_assessment():
     assert RowAssessment.model_validate(ASSESSMENT).severity is Severity.NEEDS_SERVICE
 

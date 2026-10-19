@@ -18,7 +18,12 @@ def print_result(result: dict) -> None:
     for row_id, a in result.get("assessments", {}).items():
         print(f"\n[{row_id}] {a.severity.upper()}")
         print(f"  likely causes: {'; '.join(a.likely_causes)}")
-        stance = "agrees" if a.agrees_with_suspected_area else f"DISAGREES: {a.disagreement_reason}"
+        if a.agrees_with_suspected_area is None:
+            stance = "n/a (staff unsure)"
+        elif a.agrees_with_suspected_area:
+            stance = "agrees"
+        else:
+            stance = f"DISAGREES: {a.disagreement_reason}"
         print(f"  staff's suspected area: {stance}")
         if a.question_for_customer:
             print(f"  question: {a.question_for_customer}")

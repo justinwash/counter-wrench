@@ -11,7 +11,7 @@ We don't hand back a bike, or tell a customer it's fine to ride, when any of the
 
 - Brakes that don't stop the bike reliably: lever to the bar, contaminated pads or rotors, leaking hydraulics, worn-through pads.
 - A cracked, dented or crash-damaged frame or fork. Carbon is the big one: damage can hide under a "scratch".
-- A loose headset, or a steerer or stem that moves.
+- A headset, steerer or stem loose enough that the bars or fork visibly move. Slight headset play is a needs-service adjustment, not a safety stop.
 - Wheel retention problems: a quick release or thru-axle that won't stay tight, cracked dropouts.
 - A damaged rim or a tire with a cut sidewall or exposed casing.
 - Oil on a brake rotor or pads from a leaking fork or brake.

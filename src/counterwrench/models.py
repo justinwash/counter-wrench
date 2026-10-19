@@ -166,8 +166,11 @@ class RowAssessment(Strict):
         max_length=5,
         description="Most likely causes, most likely first. Short phrases.",
     )
-    agrees_with_suspected_area: bool = Field(
-        description="Whether the evidence supports the suspected area the staff member picked."
+    agrees_with_suspected_area: bool | None = Field(
+        description=(
+            "Whether the evidence supports the suspected area the staff member picked. Null when "
+            "staff picked 'unsure': there's nothing to agree or disagree with."
+        )
     )
     disagreement_reason: str | None = Field(
         default=None,
@@ -198,10 +201,11 @@ class RowAssessment(Strict):
 
     @model_validator(mode="after")
     def _reason_matches_agreement(self) -> Self:
-        if self.agrees_with_suspected_area and self.disagreement_reason is not None:
-            raise ValueError("disagreement_reason must be null when agreeing")
-        if not self.agrees_with_suspected_area and not self.disagreement_reason:
+        disagrees = self.agrees_with_suspected_area is False
+        if disagrees and not self.disagreement_reason:
             raise ValueError("disagreement_reason is required when disagreeing")
+        if not disagrees and self.disagreement_reason is not None:
+            raise ValueError("disagreement_reason must be null unless disagreeing")
         return self
 
 

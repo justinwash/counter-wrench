@@ -16,7 +16,7 @@ If the wheel moves side to side at the axle when the frame is held still, the hu
 
 ## A wobbly feel when riding
 
-If the bike feels wobbly or vague when riding but the wheels spin true, check the headset for play: hold the front brake and rock the bike. Headset play is a safety issue until fixed (`HEADSET-ADJUST`). A fork or frame that's bent or cracked can also cause it; that's safety-critical, and the bike shouldn't be ridden.
+If the bike feels wobbly or vague when riding but the wheels spin true, check the headset for play: hold the front brake and rock the bike. Slight headset play is needs-service: adjust it soon (`HEADSET-ADJUST`). A headset or stem loose enough that the bars or fork visibly move is safety-critical. A fork or frame that's bent or cracked can also cause it; that's safety-critical, and the bike shouldn't be ridden.
 
 ## Flat tires
 

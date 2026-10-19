@@ -155,3 +155,14 @@ def test_unknown_catalog_id_still_triages(seeded_db, bike_id):
     result, _ = run(seeded_db, {"r1": [assessment()]}, bike_id=bike_id)
     assert result["bike"] is None and "not found" in result["bike_note"]
     assert "r1" in result["assessments"]
+
+
+def test_unsure_staff_pick_means_agreement_does_not_apply(seeded_db):
+    # Even if the model "disagrees" with an unsure pick, code sets agreement to n/a.
+    result, _ = run(
+        seeded_db,
+        {"r1": [assessment(agrees_with_suspected_area=False, disagreement_reason="It's the pads")]},
+        rows=[row("r1", "squeak", "unsure", "grinding when braking")],
+    )
+    a = result["assessments"]["r1"]
+    assert a.agrees_with_suspected_area is None and a.disagreement_reason is None

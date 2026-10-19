@@ -36,4 +36,4 @@ Oil on the stanchions or a fork that loses air means failed seals: a service (`F
 
 ## Knocking from the front
 
-A knock or clunk from the front of the bike is often blamed on the fork, but a loose headset feels and sounds almost the same. Check headset play first by holding the front brake and rocking the bike; a loose headset is a safety issue and a quick fix (`HEADSET-ADJUST`). A genuine fork knock usually means worn bushings, a service. A knock from the rear can be worn frame pivots (`PIVOT-SERVICE`) or shock bushings.
+A knock or clunk from the front of the bike is often blamed on the fork, but a loose headset feels and sounds almost the same. Check headset play first by holding the front brake and rocking the bike; slight headset play is needs-service and a quick fix (`HEADSET-ADJUST`), while a headset loose enough that the fork visibly moves is safety-critical. A genuine fork knock usually means worn bushings, a service. A knock from the rear can be worn frame pivots (`PIVOT-SERVICE`) or shock bushings.

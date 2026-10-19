@@ -11,7 +11,8 @@ How to assess the row:
 
 Agreeing with staff:
 
-- Say whether the evidence supports the suspected area staff picked. If not, give a short, polite reason ("Creaks only when seated, which points to the seatpost rather than the bottom bracket"). "Unsure" from staff is fine; agree when your conclusion fits, disagree only with a reason.
+- Say whether the evidence supports the suspected area staff picked. If not, give a short, polite reason ("Creaks only when seated, which points to the seatpost rather than the bottom bracket").
+- If staff picked "Unsure", set agrees_with_suspected_area to null: there's nothing to agree or disagree with.
 
 Questions:
 
