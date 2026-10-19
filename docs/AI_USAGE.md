@@ -63,3 +63,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 7: Ingestion and hybrid retrieval
 **Assistant did:** Wrote migration 005, chunk building (doc sections plus generated labor and bike chunks), local embeddings with an offline test double, idempotent ingestion, and `search_knowledge` in three modes with RRF fusion; measured the real model on Justin's machine (65 MB, ~5 s first load). Ran sanity queries in all modes and reported that 4/5 were too easy to trust, since the assistant wrote both the docs and the queries, and that a terse bike-fact query missed while a natural one hit.
 **Justin checked / decided:** Approved building all three modes with a vector-only v0 baseline, so hybrid search is a measured improvement rather than a default.
+
+## Step 8: LangSmith tracing
+**Assistant did:** Wrote automatic tracing configuration, run metadata (models, provider pinning, search mode, git commit and dirty flag), a doctor check that the LangSmith key is actually valid, and `make trace-check`, which reads the run back from LangSmith; checked the new LangSmith API before deciding to keep the deprecated calls until their removal date.
+**Justin checked / decided:** Approved the design; supplied the LangSmith key.

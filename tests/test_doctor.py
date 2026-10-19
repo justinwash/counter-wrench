@@ -35,17 +35,29 @@ def test_base_url_override_only_reported_when_set():
     assert not any("BASE_URL" in line for line in describe_env({"OPENROUTER_API_KEY": "x"}))
 
 
+ON = {"LANGSMITH_TRACING": "true"}
+
+
+def _ok() -> None:
+    pass
+
+
+def _rejected() -> None:
+    raise PermissionError("401")
+
+
 @pytest.mark.parametrize(
-    ("env", "ok"),
+    ("env", "validate", "ok", "text"),
     [
-        ({"LANGSMITH_TRACING": "true"}, False),
-        ({"LANGSMITH_TRACING": "true", "LANGSMITH_API_KEY": "lsv2"}, True),
-        ({"LANGSMITH_TRACING": "false"}, True),
-        ({}, True),
+        ({**ON, "LANGSMITH_API_KEY": "k", "LANGSMITH_PROJECT": "p"}, _ok, True, "key valid"),
+        ({**ON, "LANGSMITH_API_KEY": "bad"}, _rejected, False, "rejected"),
+        ({"LANGSMITH_TRACING": "false", "LANGSMITH_API_KEY": "k"}, _rejected, True, "tracing off"),
+        ({"LANGSMITH_TRACING": "false"}, _rejected, True, "no LANGSMITH_API_KEY"),
     ],
-)
-def test_tracing_on_without_key_fails(env, ok):
-    assert langsmith_status(env)[1] is ok
+)  # fmt: skip
+def test_langsmith_status(env, validate, ok, text):
+    description, status_ok = langsmith_status(env, validate)
+    assert status_ok is ok and text in description
 
 
 def _http_error(status: int) -> httpx.HTTPStatusError:

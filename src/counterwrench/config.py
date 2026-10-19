@@ -17,6 +17,8 @@ from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
+from counterwrench.tracing import configure_tracing
+
 logger = logging.getLogger(__name__)
 
 Role = Literal["agent", "triage", "judge"]
@@ -167,6 +169,7 @@ def build_chat_model(model: str, config: ModelConfig) -> BaseChatModel:
 def load_config() -> ModelConfig:
     """Load .env into the process environment (real env vars win), then resolve."""
     load_dotenv(override=False)
+    configure_tracing(os.environ)
     config = resolve_models(os.environ)
     for warning in config.warnings:
         logger.warning(warning)

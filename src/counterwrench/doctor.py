@@ -12,7 +12,7 @@ import os
 import re
 import sys
 import time
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
 import httpx
@@ -30,6 +30,7 @@ from counterwrench.config import (
     split_model,
 )
 from counterwrench.models import Severity
+from counterwrench.tracing import configure_tracing
 
 # Overrides that silently redirect provider SDKs (e.g. a local proxy inherited from the shell).
 BASE_URL_VARS = ("ANTHROPIC_BASE_URL", "ANTHROPIC_API_URL", "OPENAI_BASE_URL", "OPENAI_API_BASE")
@@ -90,20 +91,26 @@ def describe_env(env: Mapping[str, str]) -> list[str]:
     return lines
 
 
-def langsmith_status(env: Mapping[str, str]) -> tuple[str, bool]:
-    """Return (description, ok). Tracing on without a key fails every upload with a 401."""
-    has_key = bool(env.get("LANGSMITH_API_KEY", "").strip())
-    tracing = env.get("LANGSMITH_TRACING", "").strip().lower() == "true"
-    project = env.get("LANGSMITH_PROJECT", "").strip() or "default"
-    if tracing and not has_key:
-        return (
-            "LANGSMITH_TRACING=true but LANGSMITH_API_KEY is blank: every trace upload will fail. "
-            "Add the key or set LANGSMITH_TRACING=false.",
-            False,
-        )
-    if tracing:
-        return f"tracing on, project '{project}'", True
-    return "tracing off (fine for running the agent; evals need it)", True
+def _validate_langsmith_key() -> None:
+    """One lightweight authenticated call; raises if the key is rejected."""
+    from langsmith import Client
+
+    next(iter(Client().list_projects(limit=1)), None)
+
+
+def langsmith_status(
+    env: Mapping[str, str], validate: Callable[[], None] = _validate_langsmith_key
+) -> tuple[str, bool]:
+    """Return (description, ok), after configure_tracing() has run."""
+    if env.get("LANGSMITH_TRACING") != "true":
+        if env.get("LANGSMITH_API_KEY", "").strip():
+            return "tracing off (LANGSMITH_TRACING=false)", True
+        return "tracing off: no LANGSMITH_API_KEY (fine for running the agent; evals need it)", True
+    try:
+        validate()
+    except Exception as exc:
+        return f"LANGSMITH_API_KEY was rejected ({type(exc).__name__}); check it in .env", False
+    return f"tracing on, key valid, project '{env.get('LANGSMITH_PROJECT')}'", True
 
 
 def fix_hint(exc: BaseException, model: str) -> str:
@@ -215,6 +222,7 @@ def verify_pinning(results: list[CheckResult], config: ModelConfig) -> None:
 def main() -> int:
     env_path = find_dotenv(usecwd=True)
     load_dotenv(env_path, override=False)
+    configure_tracing(os.environ)
     env = os.environ
 
     print("CounterWrench doctor\n")

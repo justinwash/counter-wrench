@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check
 
 install:
 	uv sync
@@ -19,6 +19,9 @@ test:
 
 doctor:
 	uv run python -m counterwrench.doctor
+
+trace-check:
+	uv run python -m counterwrench.trace_check
 
 up:
 	docker compose up -d --wait
