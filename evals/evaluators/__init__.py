@@ -6,7 +6,7 @@ expected), so averages only count examples where the check means something.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 
 from counterwrench.catalog import BikeSpec
@@ -21,6 +21,7 @@ class Score:
     key: str
     score: float | None
     comment: str = ""
+    metadata: dict = field(default_factory=dict)  # e.g. the judge rubric version
 
 
 @dataclass(frozen=True)
@@ -32,6 +33,7 @@ class Reference:
     escalation_required: bool
     bike_question_expected: bool
     order_expected: bool
+    judge_notes: str | None = None
 
     @classmethod
     def from_example(cls, example) -> Reference:
@@ -41,6 +43,7 @@ class Reference:
             escalation_required=example.escalation_required,
             bike_question_expected=example.bike_question_expected,
             order_expected=example.order_expected,
+            judge_notes=example.judge_notes,
         )
 
 

@@ -103,3 +103,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 13: Deterministic and trajectory evaluators
 **Assistant did:** Designed the run summary the evaluators read and wrote 24 evaluators plus 43 tests, each built by breaking one thing in a perfect run so every evaluator is shown to fail as well as pass. Turned the step-10b live-run errors into `line_coherence` and `triage_labor_carried`; the latter was missing from the first pass and added after checking the plan's scope.
 **Justin checked / decided:** Approved the step 13 proposal (evaluator list, unit tests that prove each can fail).
+
+## Step 14: LLM-judge evaluators
+**Assistant did:** Wrote the two rubrics, the judge evaluators, seven tests with a scripted judge (including PII and tag-escape checks), and a live smoke test on a real safety case: the judge passed both good outputs and failed both bad ones. Reported that the bad explanation also tripped a second rubric rule, so it isn't a perfectly isolated break.
+**Justin checked / decided:** Chose pass/fail over a 1–5 scale; asked for failing runs to land in a review queue (planned for step 15).

@@ -16,9 +16,19 @@ class AssessmentOut(BaseModel):
     row_id: str
     severity: str
     agrees: bool | None
+    likely_causes: list[str] = Field(default_factory=list)
+    disagreement_reason: str | None = None
     question: str | None = None
     suggested_labor: list[str] = Field(default_factory=list)
     citations: list[str] = Field(default_factory=list)
+
+
+class ChunkOut(BaseModel):
+    """A knowledge chunk retrieved for a row: what the agent saw, so the judge can see it too."""
+
+    chunk_id: str
+    heading: str
+    content: str
 
 
 class LineOut(BaseModel):
@@ -58,6 +68,7 @@ class ToolCall(BaseModel):
 class RunOutput(BaseModel):
     bike_id: str | None  # the bike the graph resolved, if any
     assessments: dict[str, AssessmentOut] = Field(default_factory=dict)
+    row_chunks: dict[str, list[ChunkOut]] = Field(default_factory=dict)
     failed_rows: list[str] = Field(default_factory=list)
     escalated: bool = False
     questions: dict[str, str] = Field(default_factory=dict)  # row id or "bike" -> question
