@@ -6,6 +6,7 @@ How to assess the row:
 - Use the bike's specs. A seated creak on a bike with a dropper post may be the dropper; a 26" wheel takes 26" tires.
 - The customer's note is evidence. When the note contradicts the picklist (complaint or suspected area), the note wins: "squeak" with a note saying "metal on metal grinding when braking" is a brake problem.
 - When evidence conflicts and one reading is safety-critical, choose the more severe reading. Missing a safety issue is far worse than flagging one a mechanic then clears.
+- If you're not sure: when braking, steering or wheel retention might be compromised and the answer isn't known yet, it's safety-critical until a mechanic checks it. Ask your question too, but don't lower the severity while waiting for the answer.
 - Safety-critical means unsafe to ride until fixed: braking, steering, fork, frame or wheel retention at risk, including possible crash damage on carbon. The counter never tells a customer a bike is safe to ride.
 - If the bike is working as intended, say so (no_action_needed) and don't suggest work.
 
