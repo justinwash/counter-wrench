@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 
 from dotenv import find_dotenv, load_dotenv
 from langsmith import Client
@@ -21,13 +22,24 @@ SLICES = ["normal", "edge", "staff_misattribution", "note_contradicts_picklist",
           "adversarial"]  # fmt: skip
 
 
+def run_scores(client: Client, run_id) -> dict[str, float | None]:
+    # One run per query: list_feedback over many run ids pages unstably (duplicates some
+    # feedback and drops other), which silently corrupted the first E-001 table.
+    return {f.key: f.score for f in client.list_feedback(run_ids=[run_id])}
+
+
 def collect(client: Client, experiment: str) -> list[dict]:
-    """One dict per run: case, slice, repetition (by start time within the case), scores."""
+    """One dict per run: case, slice, repetition (by start time within the case), scores.
+    Raises if any run is missing an evaluator's score, rather than report partial data."""
     examples = {str(example_uuid(E2E_DATASET, e.id)): e for e in load_e2e()}
     runs = list(client.list_runs(project_name=experiment, is_root=True))
-    scores: dict[str, dict] = defaultdict(dict)
-    for f in client.list_feedback(run_ids=[r.id for r in runs]):
-        scores[str(f.run_id)][f.key] = f.score
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        fetched = pool.map(lambda r: run_scores(client, r.id), runs)
+    scores = {str(r.id): s for r, s in zip(runs, fetched, strict=True)}
+    expected = set().union(*scores.values()) - {"queue_note"}
+    incomplete = [run_id for run_id, s in scores.items() if not expected <= set(s)]
+    if incomplete:
+        raise RuntimeError(f"{len(incomplete)} runs are missing scores (ingestion lag?); retry")
     rows, seen = [], defaultdict(int)
     for run in sorted(runs, key=lambda r: r.start_time):
         example = examples[str(run.reference_example_id)]

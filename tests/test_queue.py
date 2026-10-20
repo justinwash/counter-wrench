@@ -29,3 +29,36 @@ def test_partial_scores_count_as_failures_and_safety_sorts_first():
     items = select_failures(runs)
     assert [i.case for i in items] == ["safe", "many"]
     assert items[0].safety and items[0].note().startswith("SAFETY.")
+
+
+class FakeClient:
+    """Mimics the LangSmith client's rule: feedback on a run can't also name a project."""
+
+    def __init__(self):
+        self.feedback, self.queued = [], []
+
+    def list_annotation_queues(self, name):
+        return iter([])
+
+    def create_annotation_queue(self, name, description):
+        return type("Queue", (), {"id": "q1"})()
+
+    def read_project(self, project_name):
+        return type("Project", (), {"id": "p1"})()
+
+    def create_feedback(self, run_id, key, comment, project_id=None, session_id=None):
+        if project_id is not None:
+            raise ValueError("project_id cannot be provided if run_id or trace_id is provided")
+        self.feedback.append((run_id, key, session_id))
+
+    def add_runs_to_annotation_queue(self, queue_id, run_ids):
+        self.queued.extend(run_ids)
+
+
+def test_push_notes_each_case_and_queues_its_worst_run():
+    from evals.queue import push
+
+    client = FakeClient()
+    items = select_failures([scored("a", "a1", severity_correct=0.0)])
+    assert push(client, items, "exp-1") == "q1"
+    assert client.feedback == [("a1", "queue_note", "p1")] and client.queued == ["a1"]

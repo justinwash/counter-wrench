@@ -26,6 +26,7 @@
       part_categories:
       - cassette
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: true
   order_expected: false
   judge_notes: 'The 2012 and 2023 Fuel EX 8 take different cassettes (10-speed HG vs 12-speed Micro Spline);
@@ -51,9 +52,11 @@
       question_expected: true
       labor_required:
       - FLAT-REPAIR
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'Not in the catalog, so no parts can be checked; labor only. Expected question for r1 (Justin):
@@ -79,7 +82,8 @@
       question_expected: true
       labor_required:
       - TIRE-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - tire
       forbidden_parts:
@@ -87,6 +91,7 @@
       - maxxis-dhr2-29x2-4
       - maxxis-dhf-29x2-5
       - maxxis-rekon-29x2-6
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'XS/S Marlin 7 Gen 3 frames use 27.5" wheels; the catalog only models the 29" (D-017),
@@ -112,10 +117,12 @@
       question_expected: false
       labor_required:
       - FLAT-REPAIR
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - tube
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: '700c and 29" are the same 622 mm rim, so the size is right if the tube''s width range
@@ -143,7 +150,8 @@
       question_expected: false
       labor_required:
       - TIRE-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - tire
       forbidden_parts:
@@ -151,6 +159,7 @@
       - maxxis-dhf-29x2-5
       - maxxis-ardent-29x2-4
       - maxxis-rekon-29x2-6
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'The Slash is a mullet; the front is 29" and the rear is 27.5", so "same as the front"
@@ -183,6 +192,7 @@
       - shimano-cs-m7100-10-51
       - shimano-cs-m6100-10-51
       - shimano-cs-m8100-10-51
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'HG freehub and SRAM Eagle shifting; a Micro Spline Shimano cassette doesn''t fit. Changing
@@ -209,7 +219,8 @@
       labor_required:
       - CASSETTE-INSTALL
       - CHAIN-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - cassette
       - chain
@@ -217,6 +228,7 @@
       - shimano-cs-m7100-10-51
       - sram-pg-1230-11-50
       - sram-nx-eagle-chain
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -239,7 +251,7 @@
       note: Brakes squeal when it rains, quiet when dry.
   rows:
     r1:
-      severity: needs_adjustment
+      severity: needs_service
       agrees: true
       question_expected: false
       labor_required:
@@ -249,18 +261,17 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
     r2:
-      severity: needs_service
+      severity: no_action_needed
       agrees: true
       question_expected: false
-      labor_required:
-      - BRAKE-PAD-INSTALL
+      labor_required: []
       labor_acceptable:
-      - BRAKE-ADJUST
       - INSPECT
-      part_categories:
-      - brake_pads
+      part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: missing parts and service entries for the second line. brake pads install and
@@ -287,10 +298,12 @@
       labor_required: []
       labor_acceptable:
       - TIRE-INSTALL
+      - INSPECT
       part_categories: []
       forbidden_parts:
       - continental-gp5000-700x25
       - continental-gp5000-700x28
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: '25 mm road tires don''t suit a 30 mm internal MTB rim. The compatibility engine can''t
@@ -316,11 +329,13 @@
       question_expected: false
       labor_required:
       - BRAKE-PAD-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts:
       - shimano-d03s-resin
       - shimano-n04c-metal
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'The catalog has stock Shimano calipers; the note says SRAM Code. Shimano pads quoted from
@@ -353,6 +368,7 @@
       part_categories:
       - tire
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: Max tire clearance isn't on file for this bike, so a 45 mm tire is unverified until a mechanic
@@ -377,11 +393,13 @@
       question_expected: false
       labor_required:
       - DRIVETRAIN-ADJUST
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts:
       - sram-nx-eagle-rd
       - sram-sx-eagle-rd
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -405,10 +423,12 @@
       question_expected: true
       labor_required:
       - FLAT-REPAIR
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - tube
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'The installed tire width isn''t known, so the right tube can''t be confirmed without it.
@@ -439,6 +459,8 @@
       - HEADSET-SERVICE
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
+      agreement_scored: false
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin''s call (D-027) is needs_service unless the bars or fork visibly move. Expected
@@ -465,13 +487,15 @@
       question_expected: false
       labor_required:
       - CHAIN-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - chain
       forbidden_parts:
       - sram-nx-eagle-chain
       - shimano-cn-m7100
       - sram-rival-flattop-chain
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'SRAM Transmission needs a T-Type chain; a cheaper standard 12-speed chain won''t work.
@@ -496,13 +520,15 @@
       agrees: true
       question_expected: false
       labor_required: []
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - chain
       forbidden_parts:
       - sram-nx-eagle-chain
       - shimano-cn-m7100
       - sram-gx-t-type-chain
+      labor_forbidden: []
   bike_question_expected: false
-  order_expected: true
-  judge_notes: null
+  order_expected: false
+  judge_notes: 'Parts-only purchase (Justin): no work order; offer guidance on what to buy.'

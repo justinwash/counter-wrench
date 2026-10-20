@@ -138,6 +138,12 @@ def test_agreement_na_must_stay_na():
     assert score(agreement_correct, run(), reference) == 0.0  # said "disagree" to "unsure"
 
 
+def test_agreement_not_scored_when_it_needs_an_inspection():
+    reference = ref(rows={"r1": {"severity": "needs_service", "agrees": True,
+                                 "agreement_scored": False}})  # fmt: skip
+    assert score(agreement_correct, run(), reference) is None  # agent said False; not scored
+
+
 def test_clarification_counts_both_directions():
     asked = run(questions={"r1": "Which gears skip?"})
     assert score(clarification_correct, asked) == 0.5  # unneeded question; bike check right

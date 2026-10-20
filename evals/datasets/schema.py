@@ -36,6 +36,8 @@ class RowExpectation(Strict):
     severity: Severity
     # true/false, or null when staff picked "unsure" (agreement doesn't apply).
     agrees: bool | None
+    # False when agreement can't be judged at the counter (needs an inspection first).
+    agreement_scored: bool = True
     question_expected: bool = False
     # Labor is a range, not one answer: shops reasonably differ on extras like SAFETY-CHECK.
     labor_required: list[LaborCode] = Field(default_factory=list)

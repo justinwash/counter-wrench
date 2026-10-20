@@ -19,10 +19,12 @@
       question_expected: false
       labor_required:
       - SEATPOST-ADJUST
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts:
       - sram-dub-t47
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: staff area should be seatpost or saddle if it only creaks while seated Correct
@@ -52,6 +54,8 @@
       - BRAKE-ADJUST
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
+      agreement_scored: false
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: This could also be the brake caliper coming loose'
@@ -79,6 +83,7 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -101,11 +106,13 @@
       question_expected: false
       labor_required:
       - CASSETTE-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - cassette
       forbidden_parts:
       - sram-pg-1230-11-50
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Correct area: cassette (most likely worn along with the old chain). A wrong chain installed
@@ -134,6 +141,7 @@
       part_categories: []
       forbidden_parts:
       - shimano-rt66-180-6b
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -162,6 +170,7 @@
       part_categories:
       - bottom_bracket
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -180,14 +189,15 @@
       note: Brakes squeal, but only when it's wet.
   rows:
     r1:
-      severity: needs_service
-      agrees: true
+      severity: no_action_needed
+      agrees: false
       question_expected: false
-      labor_required:
+      labor_required: []
+      labor_acceptable:
       - INSPECT
-      labor_acceptable: []
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: we should inspect the brake pads and rotors for contamination'
@@ -212,8 +222,10 @@
       - WHEEL-TRUE
       labor_acceptable:
       - SPOKE-REPLACE
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: staff area: front wheel Correct area: front wheel.'

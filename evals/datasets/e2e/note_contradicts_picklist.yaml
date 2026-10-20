@@ -22,10 +22,12 @@
       labor_acceptable:
       - INSPECT
       - ROTOR-INSTALL
+      - SAFETY-CHECK
       part_categories:
       - brake_pads
       forbidden_parts:
       - shimano-d03s-resin
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Expected question for r1 (Justin): Are the pads visibly worn?'
@@ -43,7 +45,7 @@
       note: Squeaks every time I use the front brake, not when pedaling.
   rows:
     r1:
-      severity: needs_service
+      severity: safety_critical
       agrees: false
       question_expected: false
       labor_required:
@@ -51,10 +53,12 @@
       labor_acceptable:
       - BRAKE-ADJUST
       - INSPECT
+      - SAFETY-CHECK
       part_categories:
       - brake_pads
       forbidden_parts:
       - sram-nx-eagle-chain
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: check pads for contamination or wear'
@@ -74,16 +78,21 @@
     r1:
       severity: safety_critical
       agrees: false
-      question_expected: false
+      question_expected: true
       labor_required:
       - TIRE-INSTALL
-      labor_acceptable: []
+      labor_acceptable:
+      - TUBELESS-SETUP
+      - INSPECT
+      - SAFETY-CHECK
       part_categories:
       - tire
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
-  judge_notes: 'Justin: staff area: tire Correct area: tire.'
+  judge_notes: 'Justin: staff area: tire Correct area: tire. Expected question for r1 (Justin): Is the
+    tire tubeless or set up with a tube? High-end bikes are usually tubeless, entry-level ones use tubes.'
 - id: c04-checkpoint-creak-is-wheel
   slice: note_contradicts_picklist
   tags: []
@@ -99,7 +108,7 @@
   rows:
     r1:
       severity: needs_service
-      agrees: true
+      agrees: false
       question_expected: true
       labor_required:
       - INSPECT
@@ -108,6 +117,7 @@
       - SPOKE-REPLACE
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'Expected question for r1 (Justin): Are any spokes broken or missing?'
@@ -133,8 +143,11 @@
       labor_acceptable:
       - BRAKE-PAD-INSTALL
       - INSPECT
+      - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
+      agreement_scored: false
   bike_question_expected: false
   order_expected: true
   judge_notes: null

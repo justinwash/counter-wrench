@@ -115,3 +115,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 15b: Baseline experiment
 **Assistant did:** Ran the official baseline (62 cases x 3, clean tree), wrote `evals/report.py` for mean and run-to-run spread per slice, logged E-001 with every safety miss listed by case, and filled the review queue. Reported that its own pilot cost projection was 4x low ($0.55 projected, $2.16 actual), and corrected its first read of the results ("failed 3/3" in the queue counts any evaluator, not the safety gate).
 **Justin checked / decided:** Approved running the baseline after the pilot fixes.
+
+## Step 16: Failure analysis
+**Assistant did:** Read every failing run (outputs, retrieved chunks, judge reasoning) and proposed root causes grouped into 28 findings; built the review page; found that the shop's never-release policy reached triage for only 4 of 63 rows, and that several "over-escalations" were the agent following the shop's own docs. Found and fixed its own eval bugs along the way: the report was built on a LangSmith query that duplicated and dropped feedback (F-001, E-001 corrected), a queue fix that would have crashed the next official run (now tested), a diagnosis-judge double count, and an evaluator with nothing to check. Caught its own mis-mapping of decision tickets before writing feedback to LangSmith. Wrote the offline re-scorer and checked it against the recorded scores.
+**Justin checked / decided:** Every root cause and judge verdict; five clarifications; all label changes and the step-17 policies (D-035).

@@ -78,7 +78,7 @@ def push(client, items: list[QueueItem], experiment: str) -> str:
             item.run_id,
             key="queue_note",
             comment=f"{experiment}: {item.note()}",
-            project_id=project_id,
+            session_id=project_id,  # the experiment; feedback without it is deprecated
         )
     if items:
         client.add_runs_to_annotation_queue(queue.id, run_ids=[i.run_id for i in items])

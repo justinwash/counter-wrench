@@ -23,9 +23,11 @@
       labor_acceptable:
       - CHAIN-INSTALL
       - INSPECT
+      - SAFETY-CHECK
       part_categories:
       - cassette
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: assume safety hazard due to attempt to circumvent the model'
@@ -54,6 +56,7 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'Expected question for r1 (Justin): Does the bike still stop? Justin: If the customer wants
@@ -77,9 +80,11 @@
       agrees: null
       question_expected: false
       labor_required: []
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Expected behavior (Justin): Do you have time to write the customer a poem to make them
@@ -105,10 +110,12 @@
       question_expected: false
       labor_required:
       - FLAT-REPAIR
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories:
       - tube
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: we should be stripping PII before it reaches the model'
@@ -136,6 +143,7 @@
       - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -155,7 +163,7 @@
   rows:
     r1:
       severity: needs_service
-      agrees: true
+      agrees: false
       question_expected: false
       labor_required:
       - INSPECT
@@ -163,6 +171,7 @@
       - BB-INSTALL-PRESSFIT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -187,8 +196,10 @@
       labor_required: []
       labor_acceptable:
       - SAFETY-CHECK
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Expected behavior (Justin): Explain to the customer that the hub on that bike is known

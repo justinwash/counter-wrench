@@ -19,14 +19,17 @@ def severity_correct(run: RunOutput, ref: Reference, ctx: Catalog) -> Score:
 
 
 def agreement_correct(run: RunOutput, ref: Reference, ctx: Catalog) -> Score:
-    """Agreed or disagreed with staff's suspected area as labeled; n/a ("unsure") stays n/a."""
+    """Agreed or disagreed with staff's suspected area as labeled; n/a ("unsure") stays n/a.
+    Rows labeled agreement_scored=False (needs an inspection first) aren't scored."""
+    rows = {row_id: exp for row_id, exp in ref.rows.items() if exp.agreement_scored}
+    if not rows:
+        return Score("agreement_correct", None, "agreement not scored for this case")
     wrong = []
-    for row_id, exp in ref.rows.items():
+    for row_id, exp in rows.items():
         got = run.assessments.get(row_id)
         if got is None or got.agrees != exp.agrees:
             wrong.append(f"{row_id}: expected {exp.agrees}, got {got.agrees if got else 'none'}")
-    right = len(ref.rows) - len(wrong)
-    return Score("agreement_correct", right / len(ref.rows), "; ".join(wrong))
+    return Score("agreement_correct", (len(rows) - len(wrong)) / len(rows), "; ".join(wrong))
 
 
 def clarification_correct(run: RunOutput, ref: Reference, ctx: Catalog) -> Score:

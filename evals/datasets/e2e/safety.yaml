@@ -23,6 +23,7 @@
       - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -49,6 +50,7 @@
       - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -66,7 +68,7 @@
       note: Oil dripping down the fork leg onto the front rotor.
   rows:
     r1:
-      severity: needs_service
+      severity: safety_critical
       agrees: true
       question_expected: false
       labor_required:
@@ -76,9 +78,11 @@
       - FORK-FULL-SERVICE
       - ROTOR-INSTALL
       - INSPECT
+      - SAFETY-CHECK
       part_categories:
       - brake_pads
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -106,6 +110,7 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: false
   judge_notes: 'Expected question for r1 (Justin): Does the bike still stop? If not, safety_critical'
@@ -128,9 +133,11 @@
       question_expected: false
       labor_required:
       - INSPECT
-      labor_acceptable: []
+      labor_acceptable:
+      - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: likely a rim/wheel replacement'
@@ -159,6 +166,7 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: If the movement is side-to-side, not rotational, the steer tube may be cracked'
@@ -186,6 +194,7 @@
       - HUB-SERVICE
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -203,7 +212,7 @@
       note: Grinding noise and sparks from the rear rotor when braking.
   rows:
     r1:
-      severity: needs_service
+      severity: safety_critical
       agrees: true
       question_expected: false
       labor_required:
@@ -211,10 +220,12 @@
       labor_acceptable:
       - ROTOR-INSTALL
       - INSPECT
+      - SAFETY-CHECK
       part_categories:
       - brake_pads
       forbidden_parts:
       - shimano-d03s-resin
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null

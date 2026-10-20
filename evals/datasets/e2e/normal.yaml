@@ -24,6 +24,7 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -52,6 +53,7 @@
       part_categories:
       - tube
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: e should be inspected to make sure a tube swap is all that i required and not
@@ -82,6 +84,7 @@
       - CASSETTE-INSTALL
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: Could also be chain or cassette wear. Inspect'
@@ -109,6 +112,7 @@
       - FORK-LOWER-SERVICE
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: should check seals/bushings for play before recommending basic service'
@@ -128,7 +132,7 @@
     r1:
       severity: needs_service
       agrees: true
-      question_expected: true
+      question_expected: false
       labor_required:
       - DRIVETRAIN-ADJUST
       labor_acceptable:
@@ -136,10 +140,10 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
-  judge_notes: 'Expected question for r1 (Justin): Are there signs of chainring or chain wear? Does the
-    derailer spring and clutch seem tight? Justin: could also be derailer or chainrings'
+  order_expected: true
+  judge_notes: 'Justin: could also be derailer or chainrings'
 - id: n06-caad10-worn-rim-pads
   slice: normal
   tags: []
@@ -161,10 +165,13 @@
       - BRAKE-PAD-INSTALL
       labor_acceptable:
       - BRAKE-ADJUST
+      - INSPECT
+      - SAFETY-CHECK
       part_categories:
       - brake_pads
       forbidden_parts:
       - shimano-d03s-resin
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -192,6 +199,7 @@
       - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -211,15 +219,17 @@
     r1:
       severity: needs_service
       agrees: true
-      question_expected: true
+      question_expected: false
       labor_required:
       - DROPPER-SERVICE
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
-  judge_notes: 'Expected question for r1 (Justin): Has it ever been serviced?'
+  order_expected: true
+  judge_notes: null
 - id: n09-hightower-rotor-rub
   slice: normal
   tags: []
@@ -241,8 +251,10 @@
       - ROTOR-TRUE
       labor_acceptable:
       - BRAKE-ADJUST
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -269,6 +281,7 @@
       - BB-INSTALL-THREADED
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: inspect crank bolts are torqued to spec, pedals tight, then BB'
@@ -291,9 +304,11 @@
       question_expected: false
       labor_required:
       - SEALANT-REFRESH
-      labor_acceptable: []
+      labor_acceptable:
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -312,14 +327,16 @@
   rows:
     r1:
       severity: needs_service
-      agrees: true
+      agrees: false
       question_expected: false
       labor_required:
       - SHIFT-CABLE
       labor_acceptable:
       - DRIVETRAIN-ADJUST
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -344,8 +361,10 @@
       - FORK-LOWER-SERVICE
       labor_acceptable:
       - FORK-FULL-SERVICE
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -371,6 +390,7 @@
       labor_acceptable: []
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -395,8 +415,10 @@
       - DRIVETRAIN-ADJUST
       labor_acceptable:
       - HANGER-ALIGN
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null
@@ -427,6 +449,7 @@
       forbidden_parts:
       - sram-nx-eagle-chain
       - shimano-cn-m7100
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: with a chain that old we should also check the chainrings and cassette'
@@ -455,6 +478,7 @@
       part_categories:
       - tube
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: 'Justin: inspect tire as well'
@@ -479,8 +503,10 @@
       - SUSPENSION-SETUP
       labor_acceptable:
       - SHOCK-FULL-SERVICE
+      - INSPECT
       part_categories: []
       forbidden_parts: []
+      labor_forbidden: []
   bike_question_expected: false
   order_expected: true
   judge_notes: null

@@ -1,0 +1,170 @@
+{
+ "source": "Failure Review Bench (claude.ai artifact 3mTStmXDqLozGFFMaZqAks), collection 'review', exported verbatim",
+ "experiment": "4b0e975-e2e-987f108b",
+ "reviewed_by": "justin",
+ "date": "2026-10-20",
+ "answers": {
+  "D1": {
+   "cases": {},
+   "note": "",
+   "verdict": "docs"
+  },
+  "D2": {
+   "cases": {},
+   "note": "c04: I was wrong, c05: iffy, could be worn bads but probably also needs a bleed, m05: rotor is right, but could also be labeled wheel for a misalignment, m02 could go either way, e14 could go either way since it could be fork bushings, a06 agent is right, n12 agent is right, m07 agent is right",
+   "verdict": "mixed"
+  },
+  "D3": {
+   "cases": {},
+   "note": "but we may inspect just to appease the customer",
+   "verdict": "relabel"
+  },
+  "D4": {
+   "cases": {},
+   "note": "we may need to add \"tube\" as a generic part. we can worry about specific sizes in the catalog later",
+   "verdict": "separate"
+  },
+  "D5": {
+   "cases": {},
+   "note": "",
+   "verdict": "both"
+  },
+  "D6": {
+   "cases": {},
+   "note": "except e08, that on the agent is correct",
+   "verdict": "keep"
+  },
+  "D7": {
+   "cases": {},
+   "note": "",
+   "verdict": "dont"
+  },
+  "J1": {
+   "cases": {},
+   "note": "",
+   "verdict": "right"
+  },
+  "J2": {
+   "cases": {},
+   "note": "",
+   "verdict": "right"
+  },
+  "J3": {
+   "cases": {},
+   "note": "",
+   "verdict": "right"
+  },
+  "J4": {
+   "cases": {},
+   "note": "",
+   "verdict": "wrong"
+  },
+  "J5": {
+   "cases": {},
+   "note": "",
+   "verdict": "right"
+  },
+  "J6": {
+   "cases": {},
+   "note": "we need a tube on any flat fix or tire install, even if its a generic non-sized part",
+   "verdict": "wrong"
+  },
+  "K1": {
+   "cases": {},
+   "note": "",
+   "verdict": "right"
+  },
+  "K2": {
+   "cases": {},
+   "note": "",
+   "verdict": "right"
+  },
+  "P1": {
+   "cases": {},
+   "note": "safety critical, tire, and tire install, are all correct. we should also include tube or tubeless setup depending on the bike",
+   "verdict": "partly"
+  },
+  "P10": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P11": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P2": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P3": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P4": {
+   "cases": {},
+   "note": "i think these are mostly reasonable followup questions we would want the answer to ",
+   "verdict": "partly"
+  },
+  "P5": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P6": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P7": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P8": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "P9": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  },
+  "X1": {
+   "cases": {},
+   "note": "if the customer is just buying a part we don't need a draft at all, then can just buy it and take it home, but the agent can offer guidance on what to purchase",
+   "verdict": "disagree"
+  },
+  "X2": {
+   "cases": {},
+   "note": "",
+   "verdict": "agree"
+  }
+ },
+ "clarifications": [
+  {
+   "question": "1. X2 vs K2: (a) a bug, clarification_correct covers missed questions, or (b) missing the question is also a diagnosis flaw, count it twice?",
+   "answer": "b"
+  },
+  {
+   "question": "2. P4 vs D7: questions are worth asking but shouldn't stop the work order; draft goes through with the question attached. Is that the policy?",
+   "answer": "yes that seems reasonable"
+  },
+  {
+   "question": "3. D2 'could go either way' (m02, e14, c05): accept either answer, or pick one?",
+   "answer": "its in actuality something that needs inspecting before any work can be written up, however we want to handle that"
+  },
+  {
+   "question": "4. J5: judge right even about 'inspection fee is waived if you book the repair'?",
+   "answer": "i don't think i understand your question, but it is correct that we waive the fee if the work is put in"
+  },
+  {
+   "question": "5. P1/c03: tube or tubeless on the Roscoe 7?",
+   "answer": "we can assume tubeless for high-end bikes, tubes for low-end ones, but really should probably ask a followup question here to be sure what to put down"
+  }
+ ]
+}
