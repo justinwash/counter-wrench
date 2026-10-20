@@ -111,3 +111,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 15a: Eval runner and pilot
 **Assistant did:** Wrote the runner, the state-to-output bridge (tested on real graph runs), the per-case review-queue selection, and migration 007 tagging eval orders. Ran a 6-case pilot and checked every failure against its run before trusting the scores; found that its own diagnosis rubric double-counted agreement with staff (and contradicted a label), and that the explanation judge lacked a shop policy. Fixed both, and flagged a label inconsistency for Justin rather than changing it.
 **Justin checked / decided:** One queue item per case; eval orders kept but tagged; corrected the m04 label (cassette, with a wrong-chain second cause); approved adding the policy fact now and leaving judge strictness to calibration.
+
+## Step 15b: Baseline experiment
+**Assistant did:** Ran the official baseline (62 cases x 3, clean tree), wrote `evals/report.py` for mean and run-to-run spread per slice, logged E-001 with every safety miss listed by case, and filled the review queue. Reported that its own pilot cost projection was 4x low ($0.55 projected, $2.16 actual), and corrected its first read of the results ("failed 3/3" in the queue counts any evaluator, not the safety gate).
+**Justin checked / decided:** Approved running the baseline after the pilot fixes.

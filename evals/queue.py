@@ -42,7 +42,8 @@ class QueueItem:
     def note(self) -> str:
         kind = "SAFETY. " if self.safety else ""
         return (
-            f"{kind}Failed {self.failed_runs}/{self.total_runs} repetitions; this is the worst. "
+            f"{kind}Something failed in {self.failed_runs}/{self.total_runs} repetitions "
+            "(worst shown). "
             f"Failing: {', '.join(self.failing)}"
         )
 
@@ -71,9 +72,13 @@ def push(client, items: list[QueueItem], experiment: str) -> str:
             description="Failing eval cases, one per case (worst repetition). Classify the root "
             "cause; for judge failures, record whether the judge was right.",
         )
+    project_id = client.read_project(project_name=experiment).id  # the experiment's runs
     for item in items:
         client.create_feedback(
-            item.run_id, key="queue_note", comment=f"{experiment}: {item.note()}"
+            item.run_id,
+            key="queue_note",
+            comment=f"{experiment}: {item.note()}",
+            project_id=project_id,
         )
     if items:
         client.add_runs_to_annotation_queue(queue.id, run_ids=[i.run_id for i in items])

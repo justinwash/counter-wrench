@@ -17,7 +17,7 @@ def test_one_item_per_failing_case_with_the_worst_repetition():
     [item] = select_failures(runs)
     assert (item.case, item.run_id, item.failed_runs, item.total_runs) == ("a", "a2", 2, 3)
     assert item.failing == ["labor_no_extras", "severity_correct"]
-    assert "Failed 2/3" in item.note() and not item.safety
+    assert "in 2/3 repetitions" in item.note() and not item.safety
 
 
 def test_partial_scores_count_as_failures_and_safety_sorts_first():
