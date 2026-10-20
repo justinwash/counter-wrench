@@ -347,3 +347,42 @@ What moved, and why: the safety list fixed two of the three missed escalations (
 | triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
 
 **Safety:** zero over-escalations; one miss left, `c02-stumpjumper-squeak-is-brakes` 3/3: the agent asks whether the front brake has felt weaker and holds at needs service, where the policy says safety-critical until answered. E-007 puts the policy in the triage prompt.
+
+## E-007: Triage told to default to safety when unsure (inconclusive)
+**Change:** one line in the triage prompt: when braking, steering or wheel retention might be compromised and nobody knows yet, it's safety-critical until a mechanic checks; ask the question too, but don't lower the severity while waiting (Justin's F-016 policy). While analyzing it, one more label was brought in line with the policy: `s04-fuelex-lever-to-bar` (lever to the bar, stopping unknown, the same situation as a02) is now safety-critical (dataset tag `git-b8cc154`). Both E-006 and E-007 were re-scored on those labels; the table is E-007 re-scored.
+**Config:** as E-001; commit `0e070fe` (clean). 186 runs, 0 errors (2 diagnosis-judge scores missing), 12.9 min, $2.42.
+**LangSmith:** `0e070fe-e2e-542765c8`.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 0.96 ±0.06 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | – | 1.00 ±0.00 |
+| no_unsafe_release | 1.00 ±0.00 | 0.67 ±0.50 | 1.00 ±0.00 | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 0.67 ±0.50 | 1.00 ±0.00 | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.72 ±0.00 | 0.87 ±0.07 | 0.48 ±0.14 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| clarification_correct | 0.84 ±0.11 | 0.78 ±0.05 | 0.69 ±0.12 | 0.77 ±0.10 | 0.98 ±0.06 | 0.88 ±0.14 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.78 ±0.11 | 0.83 ±0.21 | 0.75 ±0.25 | 0.80 ±0.40 | 0.88 ±0.00 | 0.95 ±0.14 |
+| explanation_quality | 0.20 ±0.17 | 0.18 ±0.07 | 0.21 ±0.12 | 0.47 ±0.20 | 0.08 ±0.25 | 0.24 ±0.29 |
+| first_try_valid | 0.98 ±0.06 | 0.94 ±0.12 | 0.83 ±0.12 | 1.00 ±0.00 | 0.92 ±0.12 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.91 ±0.07 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 0.98 ±0.06 | 0.87 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.79 ±0.12 | 1.00 ±0.00 |
+| labor_required_present | 0.93 ±0.06 | 0.88 ±0.09 | 0.86 ±0.00 | 0.93 ±0.20 | 0.79 ±0.12 | 1.00 ±0.00 |
+| line_coherence | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 1.00 ±0.00 | 0.94 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_all_compatible | 1.00 ±0.00 | 0.88 ±0.00 | 1.00 ±0.00 | 0.94 ±0.17 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_categories_present | 1.00 ±0.00 | 0.83 ±0.12 | 0.50 ±0.00 | 0.89 ±0.33 | 1.00 ±0.00 | 1.00 ±0.00 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.94 ±0.11 | 0.78 ±0.12 | 0.88 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Compared with E-006 on the same labels:**
+- Missed escalations: 6 runs to 5. Fixed `s04` (3/3 to 0/3). Not fixed: `c02` (squeak only on the front brake), still asked about and held at needs service 3/3, the case the change was aimed at. New: `e10` ("pads are worn out") missed 2/3, though it escalated 3/3 in E-005 and E-006.
+- Over-escalation: 0 to 2 runs (`n07`, a wobble after a pothole, labeled needs service).
+- `clarification_correct` fell on most slices: the rule says to ask as well, and the agent asks more.
+
+**Takeaway:** inconclusive. The net safety change (one fewer missed run, two more over-escalated) is within the run-to-run variation seen between experiments (E-006). Kept for now because it states Justin's policy; decision for Justin: keep, revert, or re-run once to separate the effect from noise (about $2.40).

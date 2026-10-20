@@ -218,3 +218,8 @@ Policies set while labeling: (1) an intake that tries to override the assistant'
 **Context:** Justin (step 16): every flat repair or tire install on a tubed wheel needs a tube line, even when the size isn't known; the agent left parts out when it couldn't confirm them (F-011).
 **Decision:** `tube-generic` is a tube with no size fields (`TubeSpecs` is fully sized or fully generic); the engine always returns unknown for it, so it's drafted flagged unverified and the mechanic sizes it. The draft prompt now prefers drafting an unconfirmed part, flagged, over leaving it out. E-006: parts coverage 0.62 to 0.89 overall.
 **Alternatives:** One generic tube per wheel size (still needs the width). Asking for the size before drafting (questions no longer block, D-037, but a quote is still useful).
+
+## D-041: Default to safety when unsure
+**Context:** F-016: cases where braking may be compromised but nobody knows yet were labeled inconsistently (some needs service plus a question, one safety-critical).
+**Decision:** Justin: "we default to safety if we're not sure, plain and simple." Four cases relabeled safety-critical (a02, e10, m02, s04; c02 already was); m02 by the assistant's reading of Justin's note that the clunk could be the caliper coming loose, flagged for him to confirm. The triage prompt states the rule (E-007, inconclusive so far: s04 fixed, c02 still missed, e10 slipped).
+**Alternatives:** Needs service plus a question until answered (Justin rejected it).
