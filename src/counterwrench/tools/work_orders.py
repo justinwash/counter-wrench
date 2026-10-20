@@ -62,6 +62,38 @@ class DraftWorkOrderArgs(BaseModel):
     )
 
 
+# Shop rules for a coherent order (F-009): every part has the labor that fits it, and nothing
+# works on a part that's being replaced. evals/evaluators/draft.py checks the saved orders
+# against its own copy of these rules, so a bug here can't hide from the evals.
+INSTALL_LABOR: dict[str, set[str]] = {
+    "cassette": {"CASSETTE-INSTALL"},
+    "chain": {"CHAIN-INSTALL"},
+    "rear_derailleur": {"DERAILLEUR-INSTALL"},
+    "brake_pads": {"BRAKE-PAD-INSTALL"},
+    "rotor": {"ROTOR-INSTALL"},
+    "bottom_bracket": {"BB-INSTALL-THREADED", "BB-INSTALL-PRESSFIT"},
+    "tire": {"TIRE-INSTALL", "TUBELESS-SETUP"},
+    "tube": {"FLAT-REPAIR", "TIRE-INSTALL"},
+}
+WORKS_ON: dict[str, str] = {"ROTOR-TRUE": "rotor"}  # labor code -> the part it adjusts
+
+
+def coherence_problems(categories: dict[str, str], codes: set[str]) -> list[str]:
+    """`categories` maps each drafted part_id to its category."""
+    problems = []
+    for part_id, category in categories.items():
+        options = INSTALL_LABOR.get(category, set())
+        if options and not codes & options:
+            problems.append(
+                f"{part_id}: add the labor that fits it ({' or '.join(sorted(options))})."
+            )
+    replaced = set(categories.values())
+    for code in sorted(codes):
+        if WORKS_ON.get(code) in replaced:
+            problems.append(f"{code} works on a {WORKS_ON[code]} that's being replaced; remove it.")
+    return problems
+
+
 class DraftResult(BaseModel):
     status: Literal["saved", "rejected"]
     work_order_id: int | None = None
@@ -97,6 +129,7 @@ def _validate(
         labor_lines.append(LaborLine(code=code, qty=req.qty, unit_price_cents=row["price_cents"]))
 
     part_lines = []
+    categories: dict[str, str] = {}
     if args.part_lines and bike is None:
         problems.append(
             "Parts need a catalog bike so the compatibility engine can check them. For a bike "
@@ -120,6 +153,7 @@ def _validate(
                 problems.append(f"{req.part_id}{where} doesn't fit: {result.reasons[0]}")
                 continue
             unverified = result.status is CompatStatus.UNKNOWN
+            categories[part.id] = str(part.category)
             part_lines.append(
                 PartLine(
                     part_id=part.id, qty=req.qty, unit_price_cents=part.price_cents,
@@ -128,6 +162,8 @@ def _validate(
                 )
             )  # fmt: skip
 
+    if not problems:
+        problems = coherence_problems(categories, {line.code for line in labor_lines})
     if problems:
         return None, problems
     draft = WorkOrderDraft(

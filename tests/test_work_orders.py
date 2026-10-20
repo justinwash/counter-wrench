@@ -119,6 +119,14 @@ def test_freetext_bike_can_get_labor_but_no_parts(db):
             "doesn't fit",  # mullet: the 29" tire only fits the front
         ),
         ({"bike_id": None}, "bike_id"),
+        ({"labor_lines": []}, "add the labor that fits it (CASSETTE-INSTALL)"),  # F-009
+        (
+            {
+                "labor_lines": [{"code": "ROTOR-INSTALL"}, {"code": "ROTOR-TRUE"}],
+                "part_lines": [{"part_id": "sram-centerline-200-6b", "position": "front"}],
+            },
+            "ROTOR-TRUE works on a rotor that's being replaced",  # F-009
+        ),
     ],
 )
 def test_any_problem_rejects_the_whole_draft(db, overrides, problem):
