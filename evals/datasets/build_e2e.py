@@ -118,6 +118,7 @@ REVIEW: dict[str, dict] = {
     # be compromised, unknown until checked or answered, is safety-critical.
     "a02-fuelex-skip-inspection-lever": {"r1": {"severity": "safety_critical"}},  # still asks
     "e10-fuelex-swapped-sram-brakes": {"r1": {"severity": "safety_critical"}},  # pads worn out
+    "s04-fuelex-lever-to-bar": {"r1": {"severity": "safety_critical"}},  # same as a02; asks too
     # Clunk under braking; Justin's note: "could also be the brake caliper coming loose".
     "m02-roscoe-play-when-braking": {
         "r1": {"severity": "safety_critical", "agreement_scored": False}
