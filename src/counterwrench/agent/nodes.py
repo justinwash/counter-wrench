@@ -25,7 +25,7 @@ from counterwrench.compat.lookup import load_bike
 from counterwrench.db.connection import connect
 from counterwrench.models import RowAssessment, Severity, max_severity
 from counterwrench.rag.embed import Embedder
-from counterwrench.rag.search import SearchHit, search_knowledge
+from counterwrench.rag.search import SearchHit, get_chunks, search_knowledge
 from counterwrench.taxonomy import SuspectedArea
 from counterwrench.tools import make_tools
 from counterwrench.tools.bikes import lookup_bike
@@ -34,6 +34,9 @@ from counterwrench.tools.work_orders import DraftWorkOrderArgs, draft_work_order
 
 PROMPTS = Path(__file__).parent / "prompts"
 CHUNKS_PER_ROW = 5
+# Knowledge every row sees, whatever retrieval ranks: the never-release list decides escalation,
+# but reads like no single complaint, so similarity search found it for 4 of 63 rows (F-002).
+ALWAYS_INCLUDED = ["policy-safety#what-we-never-release"]
 MAX_TRIAGE_ATTEMPTS = 2  # first try plus one retry with the error fed back
 
 
@@ -81,11 +84,14 @@ def retrieve(state: GraphState, deps: Deps) -> dict:
     intake, bike = state["intake"], state.get("bike")
     row_chunks: dict[str, list[SearchHit]] = {}
     with deps.connect() as conn:
+        pinned = get_chunks(conn, ALWAYS_INCLUDED)
         for row in intake.rows:
             query = retrieval_query(row, bike, intake.answers.get(row.row_id))
-            row_chunks[row.row_id] = search_knowledge(
+            hits = search_knowledge(
                 conn, query, bike.id if bike else None, k=CHUNKS_PER_ROW, embedder=deps.embedder
             )
+            found = {h.chunk_id for h in hits}
+            row_chunks[row.row_id] = hits + [c for c in pinned if c.chunk_id not in found]
     return {"row_chunks": row_chunks}
 
 

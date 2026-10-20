@@ -116,6 +116,22 @@ def search_knowledge(
     ]  # fmt: skip
 
 
+def get_chunks(conn: psycopg.Connection, chunk_ids: list[str]) -> list[SearchHit]:
+    """Chunks by id, in the order given (missing ids are skipped). For knowledge that must reach
+    the model whatever the query, rather than whatever similarity search ranks highest."""
+    rows = conn.execute(
+        "SELECT id, title, heading, content FROM doc_chunks WHERE id = ANY(%s)", (chunk_ids,)
+    ).fetchall()
+    by_id = {r[0]: r for r in rows}
+    return [
+        SearchHit(
+            chunk_id=i, title=by_id[i][1], heading=by_id[i][2], content=by_id[i][3], score=0.0
+        )
+        for i in chunk_ids
+        if i in by_id
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="python -m counterwrench.rag.search")
     parser.add_argument("query")

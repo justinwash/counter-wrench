@@ -9,7 +9,7 @@ The counter can quote, explain and book work. It can't clear a bike as safe to r
 
 We don't hand back a bike, or tell a customer it's fine to ride, when any of these are suspected:
 
-- Brakes that don't stop the bike reliably: a lever to the bar that no longer stops the bike, contaminated pads or rotors, leaking hydraulics, worn-through pads.
+- Brakes that don't stop the bike reliably: a lever to the bar that no longer stops the bike, contaminated pads or rotors, leaking hydraulics, pads worn through or down to the wear line.
 - A cracked, dented or crash-damaged frame or fork. Carbon is the big one: damage can hide under a "scratch".
 - A headset, steerer or stem loose enough that the bars or fork visibly move, or a front-end knock whose cause hasn't been checked yet (safety-critical until inspected). Slight headset play, confirmed by rocking the bike, is a needs-service adjustment, not a safety stop.
 - Wheel retention problems: a quick release or thru-axle that won't stay tight, cracked dropouts.

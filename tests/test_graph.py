@@ -63,6 +63,18 @@ def test_each_branch_gets_only_its_own_chunks(seeded_db):
     assert not any(f'chunk_id="{c}"' in r1_prompt for c in r2_only)
 
 
+def test_every_row_sees_the_never_release_list(seeded_db):
+    result, fake = run(
+        seeded_db,
+        {"r1": [assessment("r1")], "r2": [assessment("r2")]},
+        rows=[row("r1"), row("r2", "brake_rub", "rotor")],
+    )
+    for row_id in ("r1", "r2"):
+        ids = [h.chunk_id for h in result["row_chunks"][row_id]]
+        assert ids.count("policy-safety#what-we-never-release") == 1
+        assert 'chunk_id="policy-safety#what-we-never-release"' in fake.calls[row_id][0][1].content
+
+
 def test_invalid_output_is_retried_with_the_error_fed_back(seeded_db):
     bad = assessment(agrees_with_suspected_area=False)  # disagreeing without a reason
     result, fake = run(seeded_db, {"r1": [bad, assessment()]})
