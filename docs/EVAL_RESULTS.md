@@ -252,3 +252,66 @@ Experiment log. One variable changes per experiment so before/after comparisons 
 - Side effect on severity: `e10-fuelex-swapped-sram-brakes` ("pads are worn out") now escalates 3/3 and `a02` 3/3 (was 2/3). Both fit the wear-line rule added in E-002 and the never-release list; both are labeled needs service. Prompt changes shift triage beyond the field they target.
 
 **Takeaway:** kept. Follow-ups: related-area groups for agreement (derailleur and hanger), and labels for "pads worn out" and open braking questions (see the questions for Justin after E-006).
+
+## E-006: A generic tube, and unverified parts are drafted instead of left out
+**Change:** a generic tube (`tube-generic`, sized at the bench; the compatibility engine always reports it unknown, so it's drafted flagged unverified); the flats doc says every tubed flat repair or tire install needs a tube, and high-end bikes usually run tubeless (ask when it matters); the draft prompt says to draft a part whose fit can't be confirmed rather than leave it out (F-011). Same labels as E-005.
+**Config:** as E-001; commit `8d43b45` (clean). 186 runs, 3 errored (OpenRouter dropped the connection mid-response, F-015), so 183 scored; 2 diagnosis-judge scores were lost the same way. 11.6 min, $2.31.
+**LangSmith:** `8d43b45-e2e-454b7b83`.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 1.00 ±0.00 | 0.93 ±0.00 | 0.88 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.80 ±0.00 |
+| no_unsafe_release | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.75 ±0.06 | 0.83 ±0.07 | 0.52 ±0.14 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| clarification_correct | 0.94 ±0.01 | 0.83 ±0.06 | 0.85 ±0.19 | 0.67 ±0.10 | 1.00 ±0.00 | 0.93 ±0.00 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.80 ±0.09 | 0.78 ±0.17 | 0.79 ±0.12 | 0.80 ±0.40 | 0.92 ±0.25 | 0.86 ±0.29 |
+| explanation_quality | 0.08 ±0.11 | 0.27 ±0.13 | 0.08 ±0.12 | 0.53 ±0.40 | 0.25 ±0.25 | 0.38 ±0.14 |
+| first_try_valid | 0.98 ±0.07 | 0.94 ±0.12 | 0.96 ±0.12 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.84 ±0.07 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 1.00 ±0.00 | 0.80 ±0.13 | 0.92 ±0.12 | 0.93 ±0.20 | 0.92 ±0.12 | 1.00 ±0.00 |
+| labor_required_present | 0.92 ±0.06 | 0.91 ±0.00 | 0.76 ±0.14 | 1.00 ±0.00 | 0.79 ±0.12 | 1.00 ±0.00 |
+| line_coherence | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 1.00 ±0.00 | 0.94 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_all_compatible | 1.00 ±0.00 | 0.87 ±0.11 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_categories_present | 0.90 ±0.25 | 0.88 ±0.00 | 0.50 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.96 ±0.06 | 0.85 ±0.06 | 0.75 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 0.86 ±0.00 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Compared with E-005:**
+- Target met: `parts_categories_present` 0.50 to 0.90 on normal, 0.67 to 0.88 on edge and 0.50 to 1.00 on adversarial; the flat repairs now carry a tube line.
+- `diagnosis_reasonable` on normal fell 0.94 to 0.80 on cases this change can't touch (rotor rub `n09`, rusty cables `n12`, a pedal click `n14`): E-005's 0.94 was the outlier (0.72 to 0.80 in every other experiment). Within-experiment spread understates between-experiment variation for the judge columns; treat one-experiment judge moves with suspicion.
+- Safety unchanged from E-005.
+
+**Takeaway:** kept.
+
+## Step 17 summary: every experiment on today's labels
+All six experiments re-scored against the current dataset (`make eval-rescore` logic; judge scores as recorded), so the columns compare directly. Means over all slices.
+
+| Evaluator (all slices, current labels) | E-001b baseline | E-002 +safety list | E-003 +questions | E-004 +coherence | E-005 +agreement | E-006 +parts |
+|---|---|---|---|---|---|---|
+| safety_escalated | 0.84 | 0.93 | 0.93 | 0.93 | 0.93 | 0.93 |
+| no_over_escalation | 0.98 | 0.96 | 0.96 | 0.96 | 0.94 | 0.93 |
+| no_unsafe_release | 0.84 | 1.00 | 0.93 | 0.93 | 0.93 | 0.93 |
+| severity_correct | 0.87 | 0.91 | 0.91 | 0.90 | 0.88 | 0.89 |
+| agreement_correct | 0.83 | 0.81 | 0.84 | 0.80 | 0.83 | 0.82 |
+| clarification_correct | 0.91 | 0.90 | 0.89 | 0.91 | 0.89 | 0.89 |
+| order_created_when_expected | 0.88 | 0.90 | 0.98 | 0.98 | 0.98 | 0.98 |
+| labor_required_present | 0.92 | 0.91 | 0.87 | 0.90 | 0.92 | 0.89 |
+| labor_no_extras | 0.90 | 0.91 | 0.93 | 0.88 | 0.93 | 0.92 |
+| line_coherence | 0.91 | 0.94 | 0.93 | 1.00 | 1.00 | 1.00 |
+| parts_categories_present | 0.69 | 0.60 | 0.62 | 0.62 | 0.67 | 0.89 |
+| parts_all_compatible | 0.97 | 0.93 | 0.95 | 0.94 | 0.96 | 0.95 |
+| diagnosis_reasonable | 0.80 | 0.78 | 0.82 | 0.82 | 0.88 | 0.82 |
+| explanation_quality | 0.17 | 0.16 | 0.16 | 0.20 | 0.14 | 0.22 |
+| safety runs failed (missed / over-escalated / unsafe release) | 7 / 3 / 7 | 3 / 5 / 0 | 3 / 5 / 3 | 3 / 5 / 3 | 3 / 9 / 3 | 3 / 9 / 3 |
+| runs scored | 186 | 186 | 186 | 186 | 186 | 183 |
+
+What moved, and why: the safety list fixed two of the three missed escalations (c03, n06) and removed the unsafe releases they caused; letting questions travel with the draft made orders exist almost everywhere they should (0.88 to 0.98) and exposed one under-call the old stop was hiding (c02); code-enforced coherence took `line_coherence` to 1.00; computed agreement removed the self-contradicting cases but is too strict for adjacent areas, so the overall figure barely moved; the generic tube and the "draft it unverified" rule took parts coverage from 0.62 to 0.89. Over-escalation rose from 3 to 9 runs: three cases (m02, a02, e10) where the agent escalates while the shop's labels say ask or service. That, not the missed escalations, is now the main safety-adjacent problem, and it needs a policy decision (see FAILURES F-016).

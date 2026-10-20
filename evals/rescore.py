@@ -27,8 +27,9 @@ JUDGES = ("diagnosis_reasonable", "explanation_quality")
 def rescore(client: Client, experiment: str) -> list[dict]:
     examples = {str(example_uuid(E2E_DATASET, e.id)): e for e in load_e2e()}
     runs = sorted(
-        client.list_runs(project_name=experiment, is_root=True), key=lambda r: r.start_time
-    )
+        (r for r in client.list_runs(project_name=experiment, is_root=True) if not r.error),
+        key=lambda r: r.start_time,
+    )  # an errored run has no output to score (report.py lists them)
     with ThreadPoolExecutor(max_workers=8) as pool:
         recorded = list(pool.map(lambda r: run_scores(client, r.id), runs))
     ctx, rows, seen = load_catalog(), [], {}
@@ -39,8 +40,8 @@ def rescore(client: Client, experiment: str) -> list[dict]:
         scores = {s.key: s.score for s in (f(out, ref, ctx) for f in DETERMINISTIC)}
         missing = [k for k in JUDGES if k not in old]
         if missing:
-            raise RuntimeError(f"run {run.id} has no recorded {missing}; retry later")
-        scores.update({k: old[k] for k in JUDGES})
+            print(f"MISSING {run.id}: {', '.join(missing)} (not recorded)", file=sys.stderr)
+        scores.update({k: old[k] for k in JUDGES if k in old})
         rep = seen.get(example.id, 0)
         seen[example.id] = rep + 1
         rows.append({"case": example.id, "slice": example.slice, "rep": rep, "scores": scores})

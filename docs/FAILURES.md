@@ -98,3 +98,15 @@ The entries below come from step 16: the assistant proposed a root cause for eac
 **What happened:** Justin sided with the explanation judge on invented findings, unexplained jargon and mentioning checks that aren't on the order, but not on hedged likely causes ("this usually means...") or on promising a tube for a flat repair. It also failed true shop facts it wasn't given (the inspection fee is waived when work is booked).
 **Root cause:** judge rubric (too strict on hedges; missing shop facts and the tube rule).
 **Fix:** unfixed; step 18 calibration. Changing the rubric now would break comparability with E-001b.
+
+## F-015: A dropped connection lost three runs, and the reports choked on it
+**Found in:** E-006 (`8d43b45-e2e-454b7b83`).
+**What happened:** OpenRouter closed connections mid-response for a few seconds; three agent runs and two diagnosis-judge calls failed. Their evaluators recorded error entries under their own names (`deterministic`, and `adapter` for the judges, a naming bug), and `report.py`, which expected every run to have every key that any run had, then called all 183 good runs incomplete.
+**Root cause:** other (eval tooling, plus no retry on transient network errors in the agent).
+**Fix:** `report.py` and `rescore.py` leave out errored runs and list them; expected scores are the keys most runs have; `--allow-missing` reports with each gap listed; judge adapters carry their real names. Unfixed: the agent doesn't retry a dropped connection (a step 17 candidate on reliability, separate from quality).
+
+## F-016: Over-escalation while a braking question is still open
+**Found in:** E-002 to E-006 / `a02-fuelex-skip-inspection-lever` (3/3), `e10-fuelex-swapped-sram-brakes` (3/3), `m02-roscoe-play-when-braking` (3/3); the mirror case `c02-stumpjumper-squeak-is-brakes` (missed 3/3).
+**What happened:** With the never-release list always in view, the agent escalates a lever to the bar while asking whether the bike still stops (a02), and "pads are worn out" as worn to the wear line (e10). The labels say needs service plus a question for a02, needs service for e10, needs service for m02 (D-031), but safety-critical for c02, where whether braking is affected is equally unknown.
+**Root cause:** label question: the labels don't follow one rule for "braking may be compromised, unknown until answered".
+**Fix:** needs Justin's policy (one rule for these four), then labels or prompt follow it.

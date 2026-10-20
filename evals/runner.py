@@ -122,7 +122,7 @@ def judge_adapters(judge_model) -> list:
             ref = Reference.from_langsmith(example.inputs, example.outputs)
             return _result(judge(out, ref, load_catalog()))
 
-        adapter.__name__ = judge.__name__
+        adapter.__name__ = adapter.__qualname__ = judge.__name__  # LangSmith names errors by it
         adapters.append(adapter)
     return adapters
 

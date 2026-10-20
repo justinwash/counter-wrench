@@ -8,7 +8,7 @@ case by case, never averaged away.
 from __future__ import annotations
 
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 from dotenv import find_dotenv, load_dotenv
@@ -28,18 +28,34 @@ def run_scores(client: Client, run_id) -> dict[str, float | None]:
     return {f.key: f.score for f in client.list_feedback(run_ids=[run_id])}
 
 
-def collect(client: Client, experiment: str) -> list[dict]:
+def collect(client: Client, experiment: str, allow_missing: bool = False) -> list[dict]:
     """One dict per run: case, slice, repetition (by start time within the case), scores.
-    Raises if any run is missing an evaluator's score, rather than report partial data."""
+
+    Runs that errored (e.g. a dropped connection) have no output to score: they're listed and
+    left out. Any completed run missing a score raises, rather than report partial data (usually
+    ingestion lag: retry), unless allow_missing: then each gap is printed."""
     examples = {str(example_uuid(E2E_DATASET, e.id)): e for e in load_e2e()}
     runs = list(client.list_runs(project_name=experiment, is_root=True))
+    for run in runs:
+        if run.error:
+            print(f"ERRORED {run.id} (left out): {run.error[:100]}", file=sys.stderr)
+    runs = [r for r in runs if not r.error]
     with ThreadPoolExecutor(max_workers=8) as pool:
         fetched = pool.map(lambda r: run_scores(client, r.id), runs)
     scores = {str(r.id): s for r, s in zip(runs, fetched, strict=True)}
-    expected = set().union(*scores.values()) - {"queue_note"}
-    incomplete = [run_id for run_id, s in scores.items() if not expected <= set(s)]
-    if incomplete:
-        raise RuntimeError(f"{len(incomplete)} runs are missing scores (ingestion lag?); retry")
+    # Expected: the keys most runs have. A failed evaluator leaves an error entry under its own
+    # name on just that run, which must not make every other run look incomplete.
+    counts = Counter(k for s in scores.values() for k in s)
+    expected = {k for k, n in counts.items() if n > len(scores) / 2} - {"queue_note"}
+    incomplete = {run_id: sorted(expected - set(s)) for run_id, s in scores.items()
+                  if not expected <= set(s)}  # fmt: skip
+    if incomplete and not allow_missing:
+        raise RuntimeError(
+            f"{len(incomplete)} completed runs are missing scores (ingestion lag? retry; "
+            "or an evaluator failed: check the experiment, then pass --allow-missing)"
+        )
+    for run_id, missing in incomplete.items():
+        print(f"MISSING {run_id}: {', '.join(missing)}", file=sys.stderr)
     rows, seen = [], defaultdict(int)
     for run in sorted(runs, key=lambda r: r.start_time):
         example = examples[str(run.reference_example_id)]
@@ -89,11 +105,12 @@ def safety_misses(rows: list[dict]) -> str:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print("usage: python -m evals.report <experiment name>")
+    args = [a for a in sys.argv[1:] if a != "--allow-missing"]
+    if len(args) != 1:
+        print("usage: python -m evals.report <experiment name> [--allow-missing]")
         return 2
     load_dotenv(find_dotenv(usecwd=True))
-    rows = collect(Client(), sys.argv[1])
+    rows = collect(Client(), args[0], allow_missing="--allow-missing" in sys.argv)
     print(f"{len(rows)} runs\n\nMean ±spread (max - min of the per-repetition means):\n")
     print(table(rows))
     print("\nSafety misses:\n")

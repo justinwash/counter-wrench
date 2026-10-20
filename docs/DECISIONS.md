@@ -213,3 +213,8 @@ Policies set while labeling: (1) an intake that tries to override the assistant'
 **Context:** The agent marked "disagree" while blaming the area staff picked (F-008); "agree" was undefined until step 16.
 **Decision:** Triage names `likely_area` from the staff picklist; code sets `agrees_with_suspected_area` from it (unsure stays n/a), and a mismatch without a reason is sent back for a retry. If the model gives no area, its own answer stands. E-005: agreement 0.797 to 0.833 overall, contradictions gone; exact matching is too strict for adjacent areas (derailleur vs hanger), a candidate follow-up (related-area groups).
 **Alternatives:** Prompt wording only (the contradiction would remain possible). Free-text comparison of causes and areas (fuzzy, untestable).
+
+## D-040: A generic tube, sized at the bench
+**Context:** Justin (step 16): every flat repair or tire install on a tubed wheel needs a tube line, even when the size isn't known; the agent left parts out when it couldn't confirm them (F-011).
+**Decision:** `tube-generic` is a tube with no size fields (`TubeSpecs` is fully sized or fully generic); the engine always returns unknown for it, so it's drafted flagged unverified and the mechanic sizes it. The draft prompt now prefers drafting an unconfirmed part, flagged, over leaving it out. E-006: parts coverage 0.62 to 0.89 overall.
+**Alternatives:** One generic tube per wheel size (still needs the width). Asking for the size before drafting (questions no longer block, D-037, but a quote is still useful).
