@@ -135,3 +135,42 @@ Experiment log. One variable changes per experiment so before/after comparisons 
 - Over-escalation runs overall: 3 to 5.
 
 **Takeaway:** the targeted fix worked on both target cases. Its cost is the predicted one: more safety context makes the lean-severe rule fire on cases that need a question first. Other moves are within run-to-run spread except `parts_categories_present` on the 5-case note-vs-picklist slice, explained by c03: it now escalates correctly but drafts TIRE-INSTALL without a tire (F-011, change #5). Kept.
+
+## E-003: Row questions go on the draft instead of stopping the run
+**Change:** `route` stops only for an unresolved bike; a row's question for the customer goes into the draft's mechanic notes ("Ask the customer before work starts: ...") and drafting proceeds (Justin's step-16 policy, F-005). The labels follow the same policy: `order_expected` is now false only when the bike itself needs a question (7 cases changed, dataset tag `git-3fca1d3`). For a fair comparison E-002 was re-scored against these labels (`make eval-rescore`); the deltas below are against that.
+**Config:** as E-001; commit `3fca1d3` (clean). 186 runs, 0 errors, 10.9 min, $2.37.
+**LangSmith:** `3fca1d3-e2e-4e515072`.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 1.00 ±0.00 | 1.00 ±0.00 | 0.88 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.87 ±0.20 |
+| no_unsafe_release | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.80 ±0.06 | 0.71 ±0.13 | 0.86 ±0.00 | 1.00 ±0.00 | 0.92 ±0.12 | 1.00 ±0.00 |
+| clarification_correct | 0.97 ±0.06 | 0.80 ±0.03 | 0.94 ±0.00 | 0.60 ±0.00 | 1.00 ±0.00 | 0.93 ±0.00 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.72 ±0.11 | 0.80 ±0.06 | 0.79 ±0.12 | 0.93 ±0.20 | 0.88 ±0.00 | 1.00 ±0.00 |
+| explanation_quality | 0.13 ±0.06 | 0.13 ±0.13 | 0.08 ±0.12 | 0.40 ±0.40 | 0.12 ±0.25 | 0.24 ±0.29 |
+| first_try_valid | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.92 ±0.12 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 1.00 ±0.00 | 0.91 ±0.07 | 0.92 ±0.12 | 0.93 ±0.20 | 0.83 ±0.12 | 0.95 ±0.14 |
+| labor_required_present | 0.98 ±0.06 | 0.91 ±0.00 | 0.76 ±0.14 | 0.73 ±0.20 | 0.67 ±0.06 | 1.00 ±0.00 |
+| line_coherence | 1.00 ±0.00 | 0.93 ±0.00 | 0.92 ±0.12 | 0.80 ±0.40 | 0.79 ±0.12 | 1.00 ±0.00 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 1.00 ±0.00 | 0.94 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_all_compatible | 1.00 ±0.00 | 0.88 ±0.07 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_categories_present | 0.58 ±0.25 | 0.62 ±0.00 | 0.50 ±0.00 | 0.56 ±0.33 | 1.00 ±0.00 | 0.50 ±0.00 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.96 ±0.06 | 0.94 ±0.00 | 0.75 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 0.90 ±0.14 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Compared with E-002 (re-scored):**
+- Target met: `order_created_when_expected` rose on every slice, beyond the run-to-run spread on edge (0.85 to 0.94), note vs picklist (0.80 to 1.00) and safety (0.88 to 1.00).
+- New finding, safety: `c02-stumpjumper-squeak-is-brakes` now fails `no_unsafe_release` 3/3. Its question ("does the front brake feel weaker?") used to stop the run; now the draft goes through at the agent's needs-service severity, with the question and "if it does, escalate" in the mechanic notes. The question was hiding an under-call. Whether an open question about braking should hold a case at safety-critical until answered is a policy question for Justin: `a02` (lever to the bar, stopping unknown) is labeled needs service plus a question, while `c02` (squeak, contamination unknown) is labeled safety-critical.
+- Errors that stopping used to hide: cases that now draft expose drafting mistakes (`forbidden_parts_absent` on edge: `e10` picks Shimano pads for the customer's swapped SRAM brakes; `e03` drafts a 29" tire on an XS frame, D-017), and more drafts are missing install labor (`line_coherence` on safety, `labor_required_present` on note vs picklist), which change #3 targets.
+
+**Takeaway:** kept. The order now exists in every case where it should; the cost is that the safety gate sees under-called drafts it used to miss entirely, which is the honest picture.
