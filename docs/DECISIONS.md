@@ -208,3 +208,8 @@ Policies set while labeling: (1) an intake that tries to override the assistant'
 **Context:** Parts drafted without their install labor, and truing a rotor being replaced, appeared in step 10b and again in the baseline (F-009).
 **Decision:** `draft_work_order` rejects incoherent drafts with a precise fix ("add CASSETTE-INSTALL", "remove ROTOR-TRUE"), like any other validation problem, so nothing incoherent can be saved; the agent retries. The rule table lives in `tools/work_orders.py`; `evals/evaluators/draft.py` keeps its own copy so a bug in one shows up in the other. E-004: `line_coherence` 1.00 on every slice.
 **Alternatives:** Silently adding missing labor in code (the agent wouldn't learn, and choosing between BB-INSTALL-THREADED and -PRESSFIT needs the bike). Prompt only (reduces, doesn't remove).
+
+## D-039: Agreement with staff is computed, not asserted
+**Context:** The agent marked "disagree" while blaming the area staff picked (F-008); "agree" was undefined until step 16.
+**Decision:** Triage names `likely_area` from the staff picklist; code sets `agrees_with_suspected_area` from it (unsure stays n/a), and a mismatch without a reason is sent back for a retry. If the model gives no area, its own answer stands. E-005: agreement 0.797 to 0.833 overall, contradictions gone; exact matching is too strict for adjacent areas (derailleur vs hanger), a candidate follow-up (related-area groups).
+**Alternatives:** Prompt wording only (the contradiction would remain possible). Free-text comparison of causes and areas (fuzzy, untestable).

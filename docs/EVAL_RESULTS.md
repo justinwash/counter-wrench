@@ -213,3 +213,42 @@ Experiment log. One variable changes per experiment so before/after comparisons 
 - Safety unchanged: same three cases as E-003.
 
 **Takeaway:** kept. A guarantee in code beats a prompt request: the error class is gone rather than reduced.
+
+## E-005: Agreement with staff comes from the agent's own area pick
+**Change:** triage now names `likely_area`, picked from the same list staff use; code sets agreement from it (agree when it matches staff's pick), and a mismatch needs a reason or the row is retried (F-008). The prompt defines agreement as Justin did in step 16. Same labels as E-004.
+**Config:** as E-001; commit `d0c598b` (clean). 186 runs, 0 errors, 11.0 min, $2.44.
+**LangSmith:** `d0c598b-e2e-9b1caa49`.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 1.00 ±0.00 | 0.93 ±0.00 | 0.88 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.80 ±0.00 |
+| no_unsafe_release | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.76 ±0.06 | 0.86 ±0.10 | 0.52 ±0.14 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| clarification_correct | 0.97 ±0.00 | 0.78 ±0.06 | 0.83 ±0.12 | 0.70 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.94 ±0.00 | 0.85 ±0.06 | 0.88 ±0.00 | 0.67 ±0.60 | 0.83 ±0.12 | 0.95 ±0.14 |
+| explanation_quality | 0.07 ±0.06 | 0.13 ±0.00 | 0.21 ±0.25 | 0.27 ±0.20 | 0.12 ±0.25 | 0.14 ±0.29 |
+| first_try_valid | 0.94 ±0.11 | 0.98 ±0.06 | 0.96 ±0.12 | 1.00 ±0.00 | 0.96 ±0.12 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.84 ±0.07 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 1.00 ±0.00 | 0.82 ±0.07 | 0.92 ±0.12 | 1.00 ±0.00 | 0.92 ±0.12 | 0.95 ±0.14 |
+| labor_required_present | 0.98 ±0.06 | 0.97 ±0.09 | 0.76 ±0.14 | 0.93 ±0.20 | 0.79 ±0.50 | 1.00 ±0.00 |
+| line_coherence | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 1.00 ±0.00 | 0.94 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_all_compatible | 1.00 ±0.00 | 0.91 ±0.08 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_categories_present | 0.50 ±0.00 | 0.67 ±0.12 | 0.50 ±0.00 | 0.89 ±0.33 | 1.00 ±0.00 | 0.50 ±0.00 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.98 ±0.06 | 0.79 ±0.06 | 0.75 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 0.86 ±0.00 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Compared with E-004:**
+- Target met: overall `agreement_correct` 0.797 to 0.833 (177 scored rows). The contradiction cases are fixed by construction: `n11` (sealant in "tubeless setup"), `s02` and `s08` now 3/3. Up beyond the spread on edge (0.67 to 0.86) and safety (0.88 to 1.00).
+- Down on staff misattribution (0.81 to 0.52), for two specific reasons: exact matching treats adjacent areas as different (`m03`: staff picked rear derailleur, the agent's area is the derailleur hanger; Justin's label says agree), and `m06` now names pedals, following the shop doc's "check the pedals first" order, where staff correctly picked the bottom bracket. `n16` (two-year-old chain) now leads with the cassette.
+- Side effect on severity: `e10-fuelex-swapped-sram-brakes` ("pads are worn out") now escalates 3/3 and `a02` 3/3 (was 2/3). Both fit the wear-line rule added in E-002 and the never-release list; both are labeled needs service. Prompt changes shift triage beyond the field they target.
+
+**Takeaway:** kept. Follow-ups: related-area groups for agreement (derailleur and hanger), and labels for "pads worn out" and open braking questions (see the questions for Justin after E-006).
