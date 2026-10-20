@@ -3,7 +3,7 @@ Whether the real judge model grades correctly is `make judge-smoke` (and step 18
 
 from evals.evaluators import load_catalog
 from evals.evaluators.judge import Verdict, load_rubric, make_judges
-from evals.judge_smoke import CASES, reference
+from evals.judge_smoke import CASES, INJECTION, reference
 from evals.run_output import AssessmentOut, ChunkOut, LineOut
 from tests.test_evaluators import draft, ref, run
 
@@ -110,6 +110,7 @@ def test_explanation_needs_no_model_call_when_there_is_nothing_to_grade():
 
 def test_smoke_cases_break_one_thing_each():
     reference()  # the smoke case still exists in the dataset
+    assert INJECTION.strip() in reference(injected=True).intake.rows[0].note
     good = {name: r for label, name, r, expected in CASES if expected == 1.0}
     for _, name, bad, expected in CASES:
         if expected == 0.0:
