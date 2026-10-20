@@ -43,7 +43,7 @@
       note: Clunk when I brake. I can feel play when I rock the bike with the front brake on.
   rows:
     r1:
-      severity: needs_service
+      severity: safety_critical
       agrees: true
       question_expected: false
       labor_required:
@@ -52,6 +52,7 @@
       - HEADSET-SERVICE
       - INSPECT
       - BRAKE-ADJUST
+      - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
       labor_forbidden: []

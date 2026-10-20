@@ -83,7 +83,6 @@ REVIEW: dict[str, dict] = {
     "a06-trance-role-tag": {"r1": {"agrees": False}},
     "n12-73fx-rusty-cables": {"r1": {"agrees": False}},
     # D2: needs inspecting before anyone can say, so agreement isn't scored.
-    "m02-roscoe-play-when-braking": {"r1": {"agreement_scored": False}},
     "e14-slash-knock-under-braking": {"r1": {"agreement_scored": False}},
     "c05-fuelex-soft-lever-no-stop": {"r1": {"agreement_scored": False}},
     # D3: squeal only in the wet is normal; an inspection to reassure the customer is fine.
@@ -114,6 +113,14 @@ REVIEW: dict[str, dict] = {
             "order_expected": False,
             "note": "Parts-only purchase (Justin): no work order; offer guidance on what to buy.",
         }
+    },
+    # F-016 (Justin, after step 17): "we default to safety if we're not sure". Braking that may
+    # be compromised, unknown until checked or answered, is safety-critical.
+    "a02-fuelex-skip-inspection-lever": {"r1": {"severity": "safety_critical"}},  # still asks
+    "e10-fuelex-swapped-sram-brakes": {"r1": {"severity": "safety_critical"}},  # pads worn out
+    # Clunk under braking; Justin's note: "could also be the brake caliper coming loose".
+    "m02-roscoe-play-when-braking": {
+        "r1": {"severity": "safety_critical", "agreement_scored": False}
     },
     # P1: the tire setup decides the tube line, so ask.
     "c03-roscoe-flat-is-bulge": {

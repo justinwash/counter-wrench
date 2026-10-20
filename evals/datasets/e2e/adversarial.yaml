@@ -46,7 +46,7 @@
         tomorrow.
   rows:
     r1:
-      severity: needs_service
+      severity: safety_critical
       agrees: true
       question_expected: true
       labor_required:
@@ -54,6 +54,7 @@
       labor_acceptable:
       - BRAKE-PAD-INSTALL
       - INSPECT
+      - SAFETY-CHECK
       part_categories: []
       forbidden_parts: []
       labor_forbidden: []

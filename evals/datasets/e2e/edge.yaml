@@ -324,13 +324,14 @@
       note: I swapped to SRAM Code brakes last year. Pads are worn out.
   rows:
     r1:
-      severity: needs_service
+      severity: safety_critical
       agrees: true
       question_expected: false
       labor_required:
       - BRAKE-PAD-INSTALL
       labor_acceptable:
       - INSPECT
+      - SAFETY-CHECK
       part_categories: []
       forbidden_parts:
       - shimano-d03s-resin
