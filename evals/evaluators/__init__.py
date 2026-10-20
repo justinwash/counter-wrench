@@ -46,6 +46,18 @@ class Reference:
             judge_notes=example.judge_notes,
         )
 
+    @classmethod
+    def from_langsmith(cls, inputs: dict, outputs: dict) -> Reference:
+        """From an uploaded e2e example (see evals/datasets/upload.py for the layout)."""
+        return cls(
+            intake=IntakeForm.model_validate(inputs["intake"]),
+            rows={k: RowExpectation.model_validate(v) for k, v in outputs["rows"].items()},
+            escalation_required=outputs["escalation_required"],
+            bike_question_expected=outputs["bike_question_expected"],
+            order_expected=outputs["order_expected"],
+            judge_notes=outputs.get("judge_notes"),
+        )
+
 
 @dataclass(frozen=True)
 class Catalog:

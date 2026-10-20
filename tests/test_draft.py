@@ -39,7 +39,15 @@ DRAFT_ARGS = {
 }
 
 
-def run(db, triage_scripts, agent_turns, bike_id=HIGHTOWER, resume=None, guardrail_note=None):
+def run(
+    db,
+    triage_scripts,
+    agent_turns,
+    bike_id=HIGHTOWER,
+    resume=None,
+    guardrail_note=None,
+    source=None,
+):
     agent = FakeAgent(agent_turns)
     deps = Deps(
         connect=lambda: nullcontext(db),
@@ -55,6 +63,8 @@ def run(db, triage_scripts, agent_turns, bike_id=HIGHTOWER, resume=None, guardra
                                        "suspected_area": "chain"}]}
     )  # fmt: skip
     state = {"intake": intake, "run_id": run_id, "guardrail_note": guardrail_note}
+    if source:
+        state["source"] = source
     result = graph.invoke(state, config=config)
     if resume is not None:
         result = graph.invoke(Command(resume=resume), config=config)
@@ -93,6 +103,19 @@ def test_draft_is_saved_through_tool_calls_and_pauses_for_review(seeded_db):
 def test_saved_order_links_to_its_trace(seeded_db):
     result, _ = run(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
     assert str(order(seeded_db, result["work_order_id"])[4]) == result["run_id"]
+
+
+def test_order_source_defaults_to_counter_and_is_set_by_the_caller(seeded_db):
+    def source(order_id):
+        return seeded_db.execute(
+            "SELECT source FROM work_orders WHERE id = %s", (order_id,)
+        ).fetchone()[0]
+
+    counter, _ = run(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
+    assert source(counter["work_order_id"]) == "counter"
+    ev, _ = run(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]],
+                source="eval")  # fmt: skip
+    assert source(ev["work_order_id"]) == "eval"
 
 
 def test_rejected_draft_is_fixed_and_resubmitted(seeded_db):

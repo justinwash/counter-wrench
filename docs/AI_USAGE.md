@@ -107,3 +107,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 14: LLM-judge evaluators
 **Assistant did:** Wrote the two rubrics, the judge evaluators, seven tests with a scripted judge (including PII and tag-escape checks), and a live smoke test on a real safety case: the judge passed both good outputs and failed both bad ones. Reported that the bad explanation also tripped a second rubric rule, so it isn't a perfectly isolated break.
 **Justin checked / decided:** Chose pass/fail over a 1–5 scale; asked for failing runs to land in a review queue (planned for step 15).
+
+## Step 15a: Eval runner and pilot
+**Assistant did:** Wrote the runner, the state-to-output bridge (tested on real graph runs), the per-case review-queue selection, and migration 007 tagging eval orders. Ran a 6-case pilot and checked every failure against its run before trusting the scores; found that its own diagnosis rubric double-counted agreement with staff (and contradicted a label), and that the explanation judge lacked a shop policy. Fixed both, and flagged a label inconsistency for Justin rather than changing it.
+**Justin checked / decided:** One queue item per case; eval orders kept but tagged; corrected the m04 label (cassette, with a wrong-chain second cause); approved adding the policy fact now and leaving judge strictness to calibration.

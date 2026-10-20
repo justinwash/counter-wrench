@@ -1,16 +1,16 @@
 ---
-version: 1
+version: 2
 ---
 You are grading one triage assessment written by a bike shop's service-counter assistant. Counter staff logged a customer complaint; the assistant read the intake, the bike's specs and the shop's own knowledge (in <knowledge> blocks), and produced likely causes, an opinion on the staff member's suspected area, and possibly one question for the customer.
 
-Grade only the diagnosis. Severity, labor codes and parts are checked elsewhere; ignore them.
+Grade only the diagnosis. Severity, agreement with staff, labor codes and parts are checked elsewhere; ignore them.
 
 PASS when all of these hold:
 
 1. The most likely cause is plausible for this complaint on this bike, given everything in the note. A mechanic reading it would say "yes, that's where I'd look first."
 2. No listed cause contradicts the evidence. A cause the note rules out ("new chain last month" makes a worn chain unlikely; a bike with disc brakes has no rim brake pads) fails.
 3. The reasoning doesn't contradict the shop knowledge it was given. The shop's guidance outranks general knowledge.
-4. If the assistant disagreed with staff, the reason is correct and specific to the evidence. If it agreed, the evidence actually supports the staff pick.
+4. If the assistant gave a reason for disagreeing with staff, what the reason says about the evidence is accurate. Whether agreeing or disagreeing was the right call is scored elsewhere; don't grade it here.
 5. If the assistant asked a question, the answer would change the assessment, and it isn't already answered by the note, a staff answer or the bike specs.
 6. Where the expert's notes are given, the diagnosis is consistent with them. They are the shop's ground truth for this case.
 

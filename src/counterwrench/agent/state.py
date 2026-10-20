@@ -35,6 +35,8 @@ class GraphState(TypedDict, total=False):
     outcome: Outcome
     # Supplied by the caller: the LangSmith run id, so the saved order links to its trace.
     run_id: str | None
+    # Supplied by the caller: counter (default), cli or eval; stored on the order for filtering.
+    source: str
     # Supplied by the caller from apply_guardrails: a note for the reviewing mechanic.
     guardrail_note: str | None
     # Guardrail flag kinds for this intake (instruction_override, role_tag, ...).

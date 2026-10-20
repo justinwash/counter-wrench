@@ -104,6 +104,7 @@ def main() -> int:
     state = {
         "intake": intake,
         "run_id": str(run_id),
+        "source": "cli",
         "guardrail_note": guarded.mechanic_note(),
         "guardrail_flags": sorted({f.kind for f in guarded.flags}),
     }

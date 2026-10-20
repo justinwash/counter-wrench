@@ -55,6 +55,11 @@ DECISIONS: dict[str, dict] = {
     "e15-supercaliber-cheap-chain": {"ask_false": True},
     "m01-checkpoint-seated-creak-bb": {"note": "Correct area: seatpost or saddle."},
     "m02-roscoe-play-when-braking": {"acceptable": ["BRAKE-ADJUST"]},
+    "m04-fuelex-new-chain-skips": {
+        "agrees": False,  # labeled "drivetrain"; on review (step 15 pilot) the area is cassette
+        "note": "Correct area: cassette (most likely worn along with the old chain). A wrong chain "
+        "installed last week (e.g. wrong speed) is a reasonable second cause.",
+    },
     "m07-marlin25-wet-squeal": {"required": ["INSPECT"]},
     "m08-fx2-wobble-headset": {"note": "Correct area: front wheel."},
     "c03-roscoe-flat-is-bulge": {"note": "Correct area: tire."},
@@ -100,7 +105,9 @@ def build() -> dict[str, list[dict]]:
             acceptable = [c for c in acceptable if c not in required]
             rows[rid] = {
                 "severity": lab["severity"],
-                "agrees": {"yes": True, "no": False, "na": None}[lab["agrees"]],
+                "agrees": decision["agrees"]
+                if applies and "agrees" in decision
+                else {"yes": True, "no": False, "na": None}[lab["agrees"]],
                 "question_expected": ask,
                 "labor_required": required,
                 "labor_acceptable": acceptable,

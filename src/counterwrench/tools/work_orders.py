@@ -148,6 +148,7 @@ def draft_work_order(
     args: DraftWorkOrderArgs,
     intake: dict | None = None,
     langsmith_run_id: UUID | None = None,
+    source: str = "counter",
 ) -> DraftResult:
     draft, problems = _validate(conn, args)
     if draft is None:
@@ -162,14 +163,14 @@ def draft_work_order(
             """
             INSERT INTO work_orders (status, bike_id, bike_freetext, severity,
                 customer_explanation, mechanic_notes, citations, estimate_total_cents,
-                intake, langsmith_run_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                intake, langsmith_run_id, source)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
             """,
             (
                 WorkOrderStatus.AWAITING_REVIEW.value, draft.bike_id, draft.bike_freetext,
                 draft.severity.value, draft.customer_explanation, draft.mechanic_notes,
                 draft.citations, draft.estimate_total_cents,
-                Jsonb(intake) if intake is not None else None, langsmith_run_id,
+                Jsonb(intake) if intake is not None else None, langsmith_run_id, source,
             ),
         ).fetchone()[0]  # fmt: skip
         for line in draft.labor_lines:

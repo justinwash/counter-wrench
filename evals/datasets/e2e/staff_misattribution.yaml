@@ -97,7 +97,7 @@
   rows:
     r1:
       severity: needs_service
-      agrees: true
+      agrees: false
       question_expected: false
       labor_required:
       - CASSETTE-INSTALL
@@ -108,7 +108,8 @@
       - sram-pg-1230-11-50
   bike_question_expected: false
   order_expected: true
-  judge_notes: null
+  judge_notes: 'Correct area: cassette (most likely worn along with the old chain). A wrong chain installed
+    last week (e.g. wrong speed) is a reasonable second cause.'
 - id: m05-trance-rub-after-wheel-off
   slice: staff_misattribution
   tags: []

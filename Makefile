@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval
 
 install:
 	uv sync
@@ -53,3 +53,7 @@ upload-datasets:
 
 judge-smoke:
 	uv run python -m evals.judge_smoke
+
+# make eval ARGS="--scratch --limit 6 --repetitions 1" for a pilot
+eval:
+	uv run python -m evals.runner $(ARGS)

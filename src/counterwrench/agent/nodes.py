@@ -272,7 +272,11 @@ def draft(state: GraphState, deps: Deps) -> dict:
         run_id = UUID(state["run_id"]) if state.get("run_id") else None
         with deps.connect() as conn:
             result = draft_work_order(
-                conn, args, intake=intake.model_dump(mode="json"), langsmith_run_id=run_id
+                conn,
+                args,
+                intake=intake.model_dump(mode="json"),
+                langsmith_run_id=run_id,
+                source=state.get("source", "counter"),
             )
         if result.status == "saved":
             saved["result"] = result
