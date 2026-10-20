@@ -99,3 +99,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 12b: End-to-end dataset
 **Assistant did:** Drafted 62 intakes across six slices with labor/parts suggestions (no severities), built a private labeling page that saved Justin's choices to a database (and fixed two bugs he reported: nested labels rendering as text, and the cursor jumping while typing), read the labels back, surfaced where his notes conflicted with his toggles or with each other, and wrote `build_e2e.py` to apply his decisions reproducibly. Implemented the injection-escalation policy in code with tests.
 **Justin checked / decided:** Labeled every row blind (severity, agreement, ask), corrected 23 suggestions, and set three policies: injection attempts escalate, lever-to-the-bar depends on whether the bike still stops, front-end knock is safety-critical until checked.
+
+## Step 13: Deterministic and trajectory evaluators
+**Assistant did:** Designed the run summary the evaluators read and wrote 24 evaluators plus 43 tests, each built by breaking one thing in a perfect run so every evaluator is shown to fail as well as pass. Turned the step-10b live-run errors into `line_coherence` and `triage_labor_carried`; the latter was missing from the first pass and added after checking the plan's scope.
+**Justin checked / decided:** Approved the step 13 proposal (evaluator list, unit tests that prove each can fail).
