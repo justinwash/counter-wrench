@@ -174,3 +174,42 @@ Experiment log. One variable changes per experiment so before/after comparisons 
 - Errors that stopping used to hide: cases that now draft expose drafting mistakes (`forbidden_parts_absent` on edge: `e10` picks Shimano pads for the customer's swapped SRAM brakes; `e03` drafts a 29" tire on an XS frame, D-017), and more drafts are missing install labor (`line_coherence` on safety, `labor_required_present` on note vs picklist), which change #3 targets.
 
 **Takeaway:** kept. The order now exists in every case where it should; the cost is that the safety gate sees under-called drafts it used to miss entirely, which is the honest picture.
+
+## E-004: draft_work_order enforces line coherence
+**Change:** `draft_work_order` rejects a draft where a part lacks the labor that fits it, or where labor works on a part being replaced (ROTOR-TRUE with a new rotor), telling the agent exactly what to add or remove (F-009); the draft prompt states the rule. The evaluator keeps its own copy of the rules, so it still checks independently. Same labels as E-003.
+**Config:** as E-001; commit `15bdd8e` (clean). 186 runs, 0 errors, 11.8 min, $2.38.
+**LangSmith:** `15bdd8e-e2e-819a899d`.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 1.00 ±0.00 | 1.00 ±0.00 | 0.88 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.87 ±0.20 |
+| no_unsafe_release | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.76 ±0.17 | 0.67 ±0.07 | 0.81 ±0.14 | 1.00 ±0.00 | 0.88 ±0.00 | 0.95 ±0.14 |
+| clarification_correct | 1.00 ±0.00 | 0.82 ±0.03 | 0.94 ±0.00 | 0.63 ±0.10 | 1.00 ±0.00 | 0.95 ±0.07 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.76 ±0.06 | 0.80 ±0.12 | 0.75 ±0.25 | 0.87 ±0.20 | 0.88 ±0.00 | 1.00 ±0.00 |
+| explanation_quality | 0.07 ±0.06 | 0.20 ±0.33 | 0.21 ±0.38 | 0.40 ±0.40 | 0.17 ±0.12 | 0.38 ±0.29 |
+| first_try_valid | 1.00 ±0.00 | 0.98 ±0.06 | 1.00 ±0.00 | 1.00 ±0.00 | 0.92 ±0.12 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.87 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 1.00 ±0.00 | 0.73 ±0.13 | 0.83 ±0.12 | 0.93 ±0.20 | 0.79 ±0.12 | 1.00 ±0.00 |
+| labor_required_present | 1.00 ±0.00 | 0.91 ±0.00 | 0.81 ±0.14 | 0.80 ±0.00 | 0.83 ±0.12 | 0.87 ±0.20 |
+| line_coherence | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 1.00 ±0.00 | 0.94 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_all_compatible | 1.00 ±0.00 | 0.89 ±0.10 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.83 ±0.33 |
+| parts_categories_present | 0.50 ±0.00 | 0.58 ±0.25 | 0.50 ±0.00 | 0.67 ±0.00 | 1.00 ±0.00 | 0.67 ±0.50 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.96 ±0.06 | 0.90 ±0.06 | 0.75 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 0.90 ±0.14 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Compared with E-003:**
+- Target met: `line_coherence` is 1.00 on every slice (was 0.79 to 0.93 on four of them); `labor_required_present` on the safety slice rose 0.67 to 0.83, beyond the spread.
+- Side effect: `labor_no_extras` on edge fell 0.91 to 0.73. The cases: `e16` (a take-home spare chain now gets CHAIN-INSTALL; per Justin's X1 call it shouldn't be a work order at all, which `order_created_when_expected` already flags), `e05` (adds FLAT-REPAIR on top of TIRE-INSTALL, which already covers the tube), `e10` (BRAKE-ADJUST and ROTOR-TRUE on a case that newly drafts since E-003). None is the rule adding wrong labor.
+- Safety unchanged: same three cases as E-003.
+
+**Takeaway:** kept. A guarantee in code beats a prompt request: the error class is gone rather than reduced.

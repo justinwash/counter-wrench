@@ -203,3 +203,8 @@ Policies set while labeling: (1) an intake that tries to override the assistant'
 **Context:** Step 16 (F-005): any question stopped the run before a draft existed, and most of the agent's questions were reasonable follow-ups the shop wants answered anyway.
 **Decision:** `route` returns `needs_answers` only when the bike itself is unresolved (no part can be checked without it). Row questions travel with the draft: code adds them to the mechanic notes, so the counter asks before work starts. Labels changed to match. E-003: orders now exist wherever expected; it also exposed an under-called safety case the old stop had been hiding (c02), now a policy question for Justin.
 **Alternatives:** Keep stopping and tighten the question rule (loses useful questions and still blocks orders). A separate "pending answers" order status (more states for the UI and review flow; worth it only if the policy question above says so).
+
+## D-038: Line coherence is enforced in the draft tool, checked independently by the evals
+**Context:** Parts drafted without their install labor, and truing a rotor being replaced, appeared in step 10b and again in the baseline (F-009).
+**Decision:** `draft_work_order` rejects incoherent drafts with a precise fix ("add CASSETTE-INSTALL", "remove ROTOR-TRUE"), like any other validation problem, so nothing incoherent can be saved; the agent retries. The rule table lives in `tools/work_orders.py`; `evals/evaluators/draft.py` keeps its own copy so a bug in one shows up in the other. E-004: `line_coherence` 1.00 on every slice.
+**Alternatives:** Silently adding missing labor in code (the agent wouldn't learn, and choosing between BB-INSTALL-THREADED and -PRESSFIT needs the bike). Prompt only (reduces, doesn't remove).
