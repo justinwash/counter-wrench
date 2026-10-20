@@ -315,3 +315,35 @@ All six experiments re-scored against the current dataset (`make eval-rescore` l
 | runs scored | 186 | 186 | 186 | 186 | 186 | 183 |
 
 What moved, and why: the safety list fixed two of the three missed escalations (c03, n06) and removed the unsafe releases they caused; letting questions travel with the draft made orders exist almost everywhere they should (0.88 to 0.98) and exposed one under-call the old stop was hiding (c02); code-enforced coherence took `line_coherence` to 1.00; computed agreement removed the self-contradicting cases but is too strict for adjacent areas, so the overall figure barely moved; the generic tube and the "draft it unverified" rule took parts coverage from 0.62 to 0.89. Over-escalation rose from 3 to 9 runs: three cases (m02, a02, e10) where the agent escalates while the shop's labels say ask or service. That, not the missed escalations, is now the main safety-adjacent problem, and it needs a policy decision (see FAILURES F-016).
+
+## E-006b: E-006 re-scored under "default to safety"
+**Change:** labels only. Justin's policy for F-016: "we default to safety if we're not sure." Three cases where braking may be compromised but nobody knows yet are now safety-critical: `a02` (lever to the bar; still asks whether it stops), `e10` ("pads are worn out") and `m02` (clunk under braking; Justin's own note says it could be the caliper coming loose; agreement not scored). Dataset tag `git-8ba3812`. E-006's runs re-scored offline.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| no_unsafe_release | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.75 ±0.06 | 0.83 ±0.07 | 0.52 ±0.14 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| clarification_correct | 0.94 ±0.01 | 0.83 ±0.06 | 0.85 ±0.19 | 0.67 ±0.10 | 1.00 ±0.00 | 0.93 ±0.00 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.80 ±0.09 | 0.78 ±0.17 | 0.79 ±0.12 | 0.80 ±0.40 | 0.92 ±0.25 | 0.86 ±0.29 |
+| explanation_quality | 0.08 ±0.11 | 0.27 ±0.13 | 0.08 ±0.12 | 0.53 ±0.40 | 0.25 ±0.25 | 0.38 ±0.14 |
+| first_try_valid | 0.98 ±0.07 | 0.94 ±0.12 | 0.96 ±0.12 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.84 ±0.07 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 1.00 ±0.00 | 0.80 ±0.13 | 1.00 ±0.00 | 0.93 ±0.20 | 0.92 ±0.12 | 1.00 ±0.00 |
+| labor_required_present | 0.92 ±0.06 | 0.91 ±0.00 | 0.76 ±0.14 | 1.00 ±0.00 | 0.79 ±0.12 | 1.00 ±0.00 |
+| line_coherence | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 1.00 ±0.00 | 0.94 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_all_compatible | 1.00 ±0.00 | 0.87 ±0.11 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_categories_present | 0.90 ±0.25 | 0.88 ±0.00 | 0.50 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.96 ±0.06 | 0.92 ±0.06 | 0.88 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Safety:** zero over-escalations; one miss left, `c02-stumpjumper-squeak-is-brakes` 3/3: the agent asks whether the front brake has felt weaker and holds at needs service, where the policy says safety-critical until answered. E-007 puts the policy in the triage prompt.

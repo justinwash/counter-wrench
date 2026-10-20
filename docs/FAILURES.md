@@ -109,4 +109,4 @@ The entries below come from step 16: the assistant proposed a root cause for eac
 **Found in:** E-002 to E-006 / `a02-fuelex-skip-inspection-lever` (3/3), `e10-fuelex-swapped-sram-brakes` (3/3), `m02-roscoe-play-when-braking` (3/3); the mirror case `c02-stumpjumper-squeak-is-brakes` (missed 3/3).
 **What happened:** With the never-release list always in view, the agent escalates a lever to the bar while asking whether the bike still stops (a02), and "pads are worn out" as worn to the wear line (e10). The labels say needs service plus a question for a02, needs service for e10, needs service for m02 (D-031), but safety-critical for c02, where whether braking is affected is equally unknown.
 **Root cause:** label question: the labels don't follow one rule for "braking may be compromised, unknown until answered".
-**Fix:** needs Justin's policy (one rule for these four), then labels or prompt follow it.
+**Fix:** Justin's policy: "we default to safety if we're not sure." a02, e10 and m02 relabeled safety-critical (E-006b: no over-escalations left); the agent still holds c02 at needs service while asking, addressed in E-007.
