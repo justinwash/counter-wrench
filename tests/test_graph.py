@@ -143,3 +143,28 @@ def test_unsure_staff_pick_means_agreement_does_not_apply(seeded_db):
     )
     a = result["assessments"]["r1"]
     assert a.agrees_with_suspected_area is None and a.disagreement_reason is None
+
+
+def run_with_flags(db, scripts, flags):
+    fake = FakeTriage(scripts)
+    deps = Deps(connect=lambda: nullcontext(db), embedder=FakeEmbedder(), triage_model=lambda: fake)
+    form = IntakeForm.model_validate({"bike_id": SLASH, "rows": [row()]})
+    graph = build_graph(deps, checkpointer=InMemorySaver(), interrupt_before=["draft"])
+    config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+    return graph.invoke({"intake": form, "guardrail_flags": flags}, config=config)
+
+
+def test_instruction_override_escalates_in_code(seeded_db):
+    # Shop policy: an attempt to override the assistant is a safety hazard until inspected,
+    # whatever severity the model chose.
+    result = run_with_flags(seeded_db, {"r1": [assessment()]}, ["instruction_override"])
+    assert result["assessments"]["r1"].severity == "safety_critical"
+    assert result["outcome"] == "escalated"
+    assert "override the assistant" in result["escalation_message"]
+
+
+@pytest.mark.parametrize("flags", [["role_tag"], ["approval_pressure"], ["out_of_scope"], []])
+def test_other_flags_leave_severity_to_triage(seeded_db, flags):
+    result = run_with_flags(seeded_db, {"r1": [assessment()]}, flags)
+    assert result["assessments"]["r1"].severity == "needs_service"
+    assert result["outcome"] == "ready_to_draft"

@@ -101,7 +101,12 @@ def main() -> int:
     if guarded.pii_counts or guarded.flags:
         kinds = [f.kind for f in guarded.flags] or "none"
         print(f"Guardrails: redacted {guarded.pii_counts or 'nothing'}; flags {kinds}")
-    state = {"intake": intake, "run_id": str(run_id), "guardrail_note": guarded.mechanic_note()}
+    state = {
+        "intake": intake,
+        "run_id": str(run_id),
+        "guardrail_note": guarded.mechanic_note(),
+        "guardrail_flags": sorted({f.kind for f in guarded.flags}),
+    }
     result = graph.invoke(state, config=run_config)
     paused = bool(result.get("__interrupt__"))
     if paused and args.review:

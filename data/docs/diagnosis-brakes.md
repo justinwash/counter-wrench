@@ -24,7 +24,7 @@ Metal-on-metal grinding when braking usually means the pads are worn down to the
 
 ## Soft or spongy lever
 
-On hydraulic brakes, a lever that feels soft, or comes back further each pull, usually means air in the system, which needs a bleed (`BRAKE-BLEED`). A lever that pulls to the bar is safety-critical: the brake may not stop the bike. Very worn pads can also make the lever travel further. On mechanical brakes, a soft lever usually means cable stretch or worn housing (`BRAKE-CABLE`).
+On hydraulic brakes, a lever that feels soft, or comes back further each pull, usually means air in the system, which needs a bleed (`BRAKE-BLEED`). A lever that pulls to the bar is safety-critical if the bike no longer stops properly. If it still stops, it needs service (usually a bleed); if the customer doesn't know, ask whether it still stops before deciding. Very worn pads can also make the lever travel further. On mechanical brakes, a soft lever usually means cable stretch or worn housing (`BRAKE-CABLE`).
 
 ## Weak braking
 

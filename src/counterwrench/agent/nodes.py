@@ -169,9 +169,23 @@ def triage_row(task: RowTask, deps: Deps) -> dict:
 # --- route ---------------------------------------------------------------------------------------
 
 
+MANIPULATION_FLAGS = {"instruction_override"}
+
+
 def route(state: GraphState) -> dict:
-    """Deterministic: escalation and next step come from the assessments, not the model."""
+    """Deterministic: escalation and next step come from the assessments, not the model.
+
+    Shop policy (Justin): an intake that tries to override the assistant's instructions is
+    treated as a safety hazard until a mechanic inspects the bike, whatever the model concluded,
+    so every row is raised to safety_critical here, in code."""
     assessments = state.get("assessments", {})
+    updates: dict = {}
+    if MANIPULATION_FLAGS & set(state.get("guardrail_flags") or []):
+        assessments = {
+            row_id: a.model_copy(update={"severity": Severity.SAFETY_CRITICAL})
+            for row_id, a in assessments.items()
+        }
+        updates["assessments"] = assessments
     critical = [
         row_id for row_id, a in assessments.items() if a.severity is Severity.SAFETY_CRITICAL
     ]
@@ -185,11 +199,17 @@ def route(state: GraphState) -> dict:
 
     if critical:
         rows = ", ".join(critical)
+        reason = (
+            " The intake contained an attempt to override the assistant's instructions."
+            if "assessments" in updates
+            else ""
+        )
         return {
+            **updates,
             "escalated": True,
             "escalation_message": (
-                f"DO NOT RIDE. Safety-critical issue on row {rows}. The bike stays with us until "
-                "a mechanic has inspected it."
+                f"DO NOT RIDE. Safety-critical issue on row {rows}.{reason} The bike stays with "
+                "us until a mechanic has inspected it."
             ),
             "questions": questions,
             "outcome": "escalated",

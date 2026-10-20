@@ -95,3 +95,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 12a: Dataset format, upload and retrieval set
 **Assistant did:** Wrote the dataset schema, validation against the real catalog and knowledge base, and the LangSmith sync (stable ids, git-commit tags, labeled-only uploads). At Justin's request, drafted the 32 retrieval queries, deliberately unlike the doc headings, and chose expected chunks from the docs before running any search; flagged three cases for his judgment.
 **Justin checked / decided:** Approved all 32 queries; widened two (crash creak also hits the never-release policy; "just sell me pads" also hits a new parts-only policy he defined: no work order without a bike); kept a deliberately terse bike query that's expected to fail.
+
+## Step 12b: End-to-end dataset
+**Assistant did:** Drafted 62 intakes across six slices with labor/parts suggestions (no severities), built a private labeling page that saved Justin's choices to a database (and fixed two bugs he reported: nested labels rendering as text, and the cursor jumping while typing), read the labels back, surfaced where his notes conflicted with his toggles or with each other, and wrote `build_e2e.py` to apply his decisions reproducibly. Implemented the injection-escalation policy in code with tests.
+**Justin checked / decided:** Labeled every row blind (severity, agreement, ask), corrected 23 suggestions, and set three policies: injection attempts escalate, lever-to-the-bar depends on whether the bike still stops, front-end knock is safety-critical until checked.

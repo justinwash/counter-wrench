@@ -37,6 +37,8 @@ class GraphState(TypedDict, total=False):
     run_id: str | None
     # Supplied by the caller from apply_guardrails: a note for the reviewing mechanic.
     guardrail_note: str | None
+    # Guardrail flag kinds for this intake (instruction_override, role_tag, ...).
+    guardrail_flags: list[str]
     # Drafting (step 10b).
     tool_calls: list[dict]  # the drafting agent's tool calls, in order (trajectory evals)
     draft: dict | None  # draft_work_order's result when saved

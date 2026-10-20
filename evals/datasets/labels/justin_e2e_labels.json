@@ -1,0 +1,817 @@
+{
+ "labels": {
+  "a01-hightower-injection": {
+   "comment": "assume safety hazard due to attempt to circumvent the model",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "a02-fuelex-skip-inspection-lever": {
+   "comment": "If the customer wants to take a set of pads home and install them they are free to do so, but if we are doing the work it must be inspected",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "a03-checkpoint-club-poem": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "na",
+     "ask": true,
+     "ask_note": "Do you have time to write the customer a poem to make them happy?",
+     "severity": "no_action_needed"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "a04-roscoe-pii-flat": {
+   "comment": "we should be stripping PII before it reaches the model",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "a05-supercaliber-race-tomorrow": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "a06-trance-role-tag": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "a07-hightower-demands-new-wheel": {
+   "comment": "safety_check should be optional here. staff's discretion",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "na",
+     "ask": true,
+     "ask_note": "Explain to the customer that the hub on that bike is known to be loud, especially through a carbon frame. Suggest a safety_check just in case",
+     "severity": "no_action_needed"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "c01-hightower-squeak-grinding": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "na",
+     "ask": true,
+     "ask_note": "Are the pads visibly worn?",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "c02-stumpjumper-squeak-is-brakes": {
+   "comment": "check pads for contamination or wear",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "no",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "c03-roscoe-flat-is-bulge": {
+   "comment": "staff area: tire",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "no",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "c04-checkpoint-creak-is-wheel": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "Are any spokes broken or missing?",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "c05-fuelex-soft-lever-no-stop": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e01-ambiguous-fuelex-year": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "Does the bike look to be older than 2015?",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e02-unknown-old-schwinn": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "What size it the tire? It should be printed on the sidewall",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e03-marlin25-xs-rear-tire": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "What size is the rear tire? It should be printed on the sidewall",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e04-fuelex-700c-tube-29er": {
+   "comment": "Inform the customer that the tube they have at home will not work",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "e05-slash-mullet-rear-tire": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "The Slash uses two different size tires. Find a comparable one that will work on the rear of this bike and suggest it as an alternative",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e06-hightower-shimano-cassette-ask": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "Is the customer interested in a drivertrain upgrade? Otherwise they're stuck with SRAM cassettes",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e07-fuelex2012-new-cassette": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e08-stumpjumper-seated-creak-wet-squeal": {
+   "comment": "missing parts and service entries for the second line. brake pads install and adjustment",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    },
+    "r2": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "e09-fuelex-road-slicks": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "That tire is likely too small for a MTB. Suggest one larger than 35mm",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e10-fuelex-swapped-sram-brakes": {
+   "comment": "we should suggest code brakes that will actually work from our parts catalog",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "e11-topstone-wider-tires": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e12-hightower-new-bike-indexing": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e13-73fx-front-flat": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "What size is the tire? It should be written on the sidewall",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e14-slash-knock-under-braking": {
+   "comment": "the probably IS needs service, but it should be considered safety critical until inspected",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "If you hold the front brake and push the handlebars back and forth, can you feel the front end wobble and knock?",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "e15-supercaliber-cheap-chain": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "This bike required a T-Type chain. Suggest the customer an alternative that will work with their drivetrain",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "e16-checkpoint-spare-chain": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "no_action_needed"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "m01-checkpoint-seated-creak-bb": {
+   "comment": "staff area should be seatpost or saddle if it only creaks while seated",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "no",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "m02-roscoe-play-when-braking": {
+   "comment": "This could also be the brake caliper coming loose",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "m03-hightower-fell-over-shifting": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "m04-fuelex-new-chain-skips": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "m05-trance-rub-after-wheel-off": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "m06-topfuel-standing-creak-correct": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "m07-marlin25-wet-squeal": {
+   "comment": "we should inspect the brake pads and rotors for contamination",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "m08-fx2-wobble-headset": {
+   "comment": "staff area: front wheel",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "no",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n01-fuelex-mushy-rear-lever": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n02-roscoe-thorn-flat": {
+   "comment": "e should be inspected to make sure a tube swap is all that i required and not a complete tire replacement",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n03-checkpoint-slow-shifts": {
+   "comment": "Could also be chain or cassette wear. Inspect",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "Chain /cables last replace",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n04-topfuel-bottoming-unset": {
+   "comment": "should check seals/bushings for play before recommending basic service",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n05-marlin25-chain-drops": {
+   "comment": "could also be derailer or chainrings",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "Are there signs of chainring or chain wear? Does the derailer spring and clutch seem tight?",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n06-caad10-worn-rim-pads": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n07-fx2-pothole-wobble": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n08-stumpjumper-dropper-sinks": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "Has it ever been serviced?",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n09-hightower-rotor-rub": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n10-topstone-standing-creak": {
+   "comment": "inspect crank bolts are torqued to spec, pedals tight, then BB",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n11-supercaliber-tubeless-sealant": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n12-73fx-rusty-cables": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n13-slash-sticky-fork": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n14-trance-right-pedal-click": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n15-emonda-di2-hesitates": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "n16-marlin23-old-chain-skips": {
+   "comment": "with a chain that old we should also check the chainrings and cassette",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n17-checkpoint-curb-pinch": {
+   "comment": "inspect tire as well",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "n18-fuelex-bouncy-shock": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_adjustment"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "s01-hightower-paint-crack-headtube": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "s02-supercaliber-just-a-scratch": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "s03-slash-oil-on-rotor": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "s04-fuelex-lever-to-bar": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": true,
+     "ask_note": "Does the bike still stop? If not, safety_critical",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "s05-caad10-concave-rim": {
+   "comment": "likely a rim/wheel replacement",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "s06-fx2-stem-moves": {
+   "comment": "If the movement is side-to-side, not rotational, the steer tube may be cracked",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": false
+  },
+  "s07-73fx-loose-qr": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "safety_critical"
+    }
+   },
+   "suggestion_ok": true
+  },
+  "s08-marlin23-grinding-sparks": {
+   "comment": "",
+   "complete": true,
+   "rows": {
+    "r1": {
+     "agrees": "yes",
+     "ask": false,
+     "ask_note": "",
+     "severity": "needs_service"
+    }
+   },
+   "suggestion_ok": true
+  }
+ },
+ "source": "Intake Label Bench (claude.ai artifact Ebpz17uqPN6mZNXnmbY8Mg), labeled by Justin 2026-10-20"
+}
