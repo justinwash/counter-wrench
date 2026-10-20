@@ -1,0 +1,220 @@
+# Retrieval eval cases: queries in counter-staff and customer language, with the knowledge
+# chunks that should answer them (any-of counts as a hit).
+#
+# Queries drafted by the assistant (author: assistant), deliberately phrased unlike the doc
+# headings; expected chunks chosen from the docs alone, before running any search. Each case
+# is uploaded only once Justin approves it (labeled_by: justin). All 32 approved by Justin;
+# #5 and #26 expanded on his review, adding a parts-without-the-bike policy section.
+
+# --- Noises ------------------------------------------------------------------------------------
+
+- id: r-creak-sitting-down
+  query: theres a creak every time i sit back down on the saddle
+  expected_chunks: [diagnosis-noises#creak-only-when-seated, diagnosis-dropper#creaks-from-the-dropper]
+  author: assistant
+  labeled_by: justin
+
+- id: r-cracking-mashing-uphill
+  query: loud cracking noise when i mash the pedals uphill
+  expected_chunks: [diagnosis-noises#creak-when-pedaling-hard-or-standing]
+  author: assistant
+  labeled_by: justin
+
+- id: r-tick-every-crank-turn
+  query: tick tick tick once every time the cranks go around
+  expected_chunks: [diagnosis-noises#clicking-every-pedal-stroke]
+  author: assistant
+  labeled_by: justin
+
+- id: r-squeak-like-a-mouse
+  query: something squeaks when I pedal, kinda like a mouse
+  expected_chunks: [diagnosis-noises#squeaks]
+  author: assistant
+  labeled_by: justin
+
+- id: r-new-creak-after-crash
+  query: crashed last week and now theres a new creak i cant find
+  expected_chunks: [diagnosis-noises#a-creak-that-could-be-a-cracked-frame, policy-safety#carbon-after-a-crash, policy-safety#what-we-never-release]
+  author: assistant
+  labeled_by: justin
+
+# --- Brakes ------------------------------------------------------------------------------------
+
+- id: r-brake-screams
+  query: back brake screams on every stop
+  expected_chunks: [diagnosis-brakes#squealing-or-howling-brakes]
+  author: assistant
+  labeled_by: justin
+
+- id: r-lever-to-the-grip
+  query: front lever comes almost all the way to the grip now
+  expected_chunks: [diagnosis-brakes#soft-or-spongy-lever]
+  author: assistant
+  labeled_by: justin
+
+- id: r-metal-scraping-braking
+  query: sounds like metal scraping when I brake
+  expected_chunks: [diagnosis-brakes#grinding-when-braking]
+  author: assistant
+  labeled_by: justin
+
+- id: r-disc-shhh
+  query: my disc brake rubs, makes a shhh shhh sound every wheel turn
+  expected_chunks: [diagnosis-brakes#disc-brake-rub]
+  author: assistant
+  labeled_by: justin
+
+- id: r-lube-on-rotor
+  query: got chain lube on the rotor by accident and now it barely stops
+  expected_chunks: [diagnosis-brakes#weak-braking, diagnosis-brakes#squealing-or-howling-brakes]
+  author: assistant
+  labeled_by: justin
+
+# --- Shifting and drivetrain ------------------------------------------------------------------
+
+- id: r-chain-jumps-standing
+  query: chain keeps jumping when I stand up and push hard
+  expected_chunks: [diagnosis-drivetrain#skipping-under-load, standards-chains#new-chain-skips-on-an-old-cassette]
+  author: assistant
+  labeled_by: justin
+
+- id: r-gears-change-themselves
+  query: gears change by themselves on bumpy trails
+  expected_chunks: [diagnosis-drivetrain#ghost-shifting]
+  author: assistant
+  labeled_by: justin
+
+- id: r-dropped-bike-easiest-gear
+  query: dropped my bike and now it wont go into the easiest gear
+  expected_chunks: [diagnosis-drivetrain#poor-shifting-after-a-crash-or-tip-over, standards-shifting#derailleur-hangers]
+  author: assistant
+  labeled_by: justin
+
+- id: r-chain-falls-off-front
+  query: chain falls off the front ring on rough descents
+  expected_chunks: [diagnosis-drivetrain#chain-drops]
+  author: assistant
+  labeled_by: justin
+
+# --- Wheels and tires -------------------------------------------------------------------------
+
+- id: r-29-tube-in-700c
+  query: will a 29 inch tube fit my 700c gravel bike
+  expected_chunks: [standards-wheel-sizes#700c-and-29-are-the-same-size, standards-wheel-sizes#tubes-valves-and-valve-length]
+  author: assistant
+  labeled_by: justin
+
+- id: r-tubeless-flat-every-morning
+  query: my tubeless tire is flat every morning
+  expected_chunks: [diagnosis-wheels-tires#slow-leaks-on-tubeless-tires]
+  author: assistant
+  labeled_by: justin
+
+- id: r-wheel-wobbles-spinning
+  query: back wheel wobbles side to side when it spins
+  expected_chunks: [diagnosis-wheels-tires#wheel-wobble]
+  author: assistant
+  labeled_by: justin
+
+- id: r-two-flats-same-wheel
+  query: got two flats this week on the same wheel
+  expected_chunks: [diagnosis-wheels-tires#flat-tires]
+  author: assistant
+  labeled_by: justin
+
+# --- Suspension and dropper -------------------------------------------------------------------
+
+- id: r-fork-pogo-stick
+  query: fork feels like a pogo stick
+  expected_chunks: [diagnosis-suspension#bouncing-pogo]
+  author: assistant
+  labeled_by: justin
+
+- id: r-shock-harsher-rocks
+  query: rear shock gets harsher and harsher on rocky sections
+  expected_chunks: [diagnosis-suspension#packing-up]
+  author: assistant
+  labeled_by: justin
+
+- id: r-oil-on-fork-legs
+  query: theres oil on my fork legs
+  expected_chunks: [diagnosis-suspension#leaking-oil-or-losing-air]
+  author: assistant
+  labeled_by: justin
+
+- id: r-seat-wont-come-up
+  query: seat post wont come back up when I push the button
+  expected_chunks: [diagnosis-dropper#won-t-drop-or-won-t-return, diagnosis-dropper#slow-to-return]
+  author: assistant
+  labeled_by: justin
+
+# --- Standards and fit ------------------------------------------------------------------------
+
+- id: r-xd-cassette-my-wheel
+  query: can i put an XD cassette on my wheel
+  expected_chunks: [standards-freehubs#xd-and-xdr, standards-freehubs#changing-freehub-standards]
+  author: assistant
+  labeled_by: justin
+
+- id: r-203-vs-200
+  query: is a 203 rotor the same as a 200
+  expected_chunks: [standards-rotors#shimano-203-mm-vs-sram-200-mm]
+  author: assistant
+  labeled_by: justin
+
+- id: r-bb-for-dub
+  query: what bottom bracket do i need for a DUB crank
+  expected_chunks: [standards-bottom-brackets#crank-spindles]
+  author: assistant
+  labeled_by: justin
+
+# --- Policy and prices ------------------------------------------------------------------------
+
+- id: r-just-sell-pads
+  query: can you just sell me brake pads, I'll put them on myself
+  expected_chunks: [policy-parts#selling-parts-without-the-bike, policy-safety#pressure-to-skip-the-inspection]
+  author: assistant
+  labeled_by: justin
+
+- id: r-price-bleed-both
+  query: how much to bleed both brakes
+  expected_chunks: [labor#BRAKE-BLEED]
+  author: assistant
+  labeled_by: justin
+
+- id: r-charge-to-look
+  query: do you charge just to look at it
+  expected_chunks: [policy-intake#inspection-fee]
+  author: assistant
+  labeled_by: justin
+
+# --- Is this normal? --------------------------------------------------------------------------
+
+- id: r-loud-hub-coasting
+  query: rear hub is super loud when coasting, is that bad
+  expected_chunks: [normal-working-as-intended#loud-freehub-buzz-when-coasting]
+  author: assistant
+  labeled_by: justin
+
+- id: r-white-spots-new-tires
+  query: my new tires have white spots coming through the sides
+  expected_chunks: [normal-working-as-intended#tubeless-sealant-on-a-new-tire-s-sidewall]
+  author: assistant
+  labeled_by: justin
+
+# --- Bike-specific ----------------------------------------------------------------------------
+
+- id: r-biggest-tire-fuel-ex
+  query: biggest tire that fits it
+  bike_id: trek-fuel-ex-8-gen-6-2023
+  expected_chunks: [bike#trek-fuel-ex-8-gen-6-2023, standards-wheel-sizes#tire-width-and-frame-clearance]
+  author: assistant
+  labeled_by: justin
+  notes: Terse on purpose; step 7 showed terse bike-fact queries rank the spec sheet low.
+
+- id: r-slash-rear-tire-size
+  query: what size tire goes on the back of a slash
+  bike_id: trek-slash-9-8-xt-gen-6-2024
+  expected_chunks: [bike#trek-slash-9-8-xt-gen-6-2024, standards-wheel-sizes#mixed-wheels-mullet-bikes]
+  author: assistant
+  labeled_by: justin

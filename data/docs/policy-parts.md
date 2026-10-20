@@ -24,3 +24,7 @@ We fit SRAM chains of the right speed by default; they work across nearly every 
 ## Pricing
 
 Labor is flat-rate from the service menu, not hourly. Jobs priced per wheel, per brake or per cable are charged once per unit. Parts are charged at the catalog price.
+
+## Selling parts without the bike
+
+A customer buying parts over the counter without bringing a bike in doesn't need a work order or an intake; the counter sells it from the catalog. Without the bike we can't confirm the fit, so check the make, model and year with the customer, and say so if we can't confirm it. For brake and other safety parts, we're happy to install them or check the bike.

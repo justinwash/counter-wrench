@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets
 
 install:
 	uv sync
@@ -47,3 +47,6 @@ ingest:
 
 studio:
 	uv run langgraph dev
+
+upload-datasets:
+	uv run python -m evals.datasets.upload

@@ -91,3 +91,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 11: Guardrails
 **Assistant did:** Wrote pattern-based PII redaction and injection/scope flags, applied at the boundary before the graph; added the flag to mechanic notes by code; 43 tests including bike names, part numbers and serials that must not be redacted; verified live by reading back all 27 runs of a trace and the saved order and finding no raw PII. Broke a test file again through string escapes in a shell heredoc and switched to direct file edits.
 **Justin checked / decided:** Approved flag-don't-block and regex-only redaction for v0.
+
+## Step 12a: Dataset format, upload and retrieval set
+**Assistant did:** Wrote the dataset schema, validation against the real catalog and knowledge base, and the LangSmith sync (stable ids, git-commit tags, labeled-only uploads). At Justin's request, drafted the 32 retrieval queries, deliberately unlike the doc headings, and chose expected chunks from the docs before running any search; flagged three cases for his judgment.
+**Justin checked / decided:** Approved all 32 queries; widened two (crash creak also hits the never-release policy; "just sell me pads" also hits a new parts-only policy he defined: no work order without a bike); kept a deliberately terse bike query that's expected to fail.
