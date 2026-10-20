@@ -220,13 +220,15 @@ def route(state: GraphState) -> dict:
             "questions": questions,
             "outcome": "escalated",
         }
-    if questions:
+    # Only an unresolved bike stops the run: without it no part can be checked. Questions about
+    # a row go on the draft for the counter to ask (Justin, step 16), instead of blocking it.
+    if "bike" in questions:
         return {"escalated": False, "escalation_message": None, "questions": questions,
                 "outcome": "needs_answers"}  # fmt: skip
     if state.get("failed_rows"):
-        return {"escalated": False, "escalation_message": None, "questions": {},
+        return {"escalated": False, "escalation_message": None, "questions": questions,
                 "outcome": "needs_mechanic"}  # fmt: skip
-    return {"escalated": False, "escalation_message": None, "questions": {},
+    return {"escalated": False, "escalation_message": None, "questions": questions,
             "outcome": "ready_to_draft"}  # fmt: skip
 
 
@@ -262,6 +264,13 @@ def draft(state: GraphState, deps: Deps) -> dict:
         if state.get("failed_rows")
         else None
     )
+    open_questions = {k: v for k, v in (state.get("questions") or {}).items() if k != "bike"}
+    questions_note = (
+        "Ask the customer before work starts: "
+        + " ".join(f"{row_id}: {q}" for row_id, q in sorted(open_questions.items()))
+        if open_questions
+        else None
+    )
     saved: dict = {}
 
     def save_draft(**kwargs) -> str:
@@ -269,7 +278,7 @@ def draft(state: GraphState, deps: Deps) -> dict:
         overrides = {"bike_id": bike.id if bike else None, "bike_freetext": intake.bike_freetext}
         if severity is not None:
             overrides["severity"] = severity
-        code_notes = [failed_note, state.get("guardrail_note")]
+        code_notes = [failed_note, questions_note, state.get("guardrail_note")]
         if any(code_notes):
             overrides["mechanic_notes"] = "\n".join(
                 filter(None, [args.mechanic_notes, *code_notes])

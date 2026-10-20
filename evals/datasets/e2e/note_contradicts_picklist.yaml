@@ -119,7 +119,7 @@
       forbidden_parts: []
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'Expected question for r1 (Justin): Are any spokes broken or missing?'
 - id: c05-fuelex-soft-lever-no-stop
   slice: note_contradicts_picklist

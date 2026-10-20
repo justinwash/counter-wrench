@@ -1,7 +1,8 @@
 """The CounterWrench graph, v0.
 
 resolve_bike -> retrieve -> triage_row (one parallel branch per row) -> route
-  -> needs_answers: stop (staff answer the questions and re-run)
+  -> needs_answers (the bike itself is unresolved): stop until staff say which bike
+  -> row questions don't stop it: they go on the draft for the counter to ask
   -> otherwise: draft (tool-calling agent) -> human_review (pause for a mechanic) -> end
 """
 

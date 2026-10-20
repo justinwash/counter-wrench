@@ -50,10 +50,10 @@ def test_real_run_scores_clean_on_the_checks_it_should_pass(seeded_db):
         assert evaluator(out, ref(), ctx).score == 1.0, evaluator.__name__
 
 
-def test_run_that_stops_for_answers_has_no_draft(seeded_db):
+def test_run_with_an_open_question_keeps_it_alongside_the_draft(seeded_db):
     question = triage_ok(question_for_customer="Which gears skip?")
-    state, _ = run(seeded_db, {"r1": [question]}, [])
+    state, _ = run(seeded_db, {"r1": [question]}, [[("draft_work_order", DRAFT_ARGS)]])
     out = build_run_output(state, seeded_db)
-    assert out.outcome == "needs_answers" and out.draft is None
+    assert out.outcome == "ready_to_draft" and out.draft is not None
     assert out.questions == {"r1": "Which gears skip?"}
     assert out.assessments["r1"].question == "Which gears skip?"

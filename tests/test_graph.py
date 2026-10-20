@@ -109,9 +109,9 @@ def test_still_invalid_after_retry_goes_to_mechanic(seeded_db):
     assert result["outcome"] == "needs_mechanic" and "r1" not in result.get("assessments", {})
 
 
-def test_questions_stop_the_run_for_answers(seeded_db):
+def test_row_questions_go_on_to_the_draft(seeded_db):
     result, _ = run(seeded_db, {"r1": [assessment(question_for_customer="Which gear?")]})
-    assert result["outcome"] == "needs_answers"
+    assert result["outcome"] == "ready_to_draft"
     assert result["questions"] == {"r1": "Which gear?"}
 
 

@@ -164,14 +164,17 @@ def test_bad_tool_arguments_come_back_as_text(seeded_db):
     assert result["work_order_id"] is not None
 
 
-def test_needs_answers_never_drafts(seeded_db):
+def test_open_questions_are_drafted_with_the_question_for_the_counter(seeded_db):
     result, agent = run(
         seeded_db,
         {"r1": [triage_ok(question_for_customer="Which gears skip?")]},
         [[("draft_work_order", DRAFT_ARGS)]],
     )
-    assert agent.calls == 0 and result["outcome"] == "needs_answers"
-    assert seeded_db.execute("SELECT count(*) FROM work_orders").fetchone() == (0,)
+    assert agent.calls == 1 and result["work_order_id"] is not None
+    notes = seeded_db.execute(
+        "SELECT mechanic_notes FROM work_orders WHERE id = %s", (result["work_order_id"],)
+    ).fetchone()[0]
+    assert "Ask the customer before work starts: r1: Which gears skip?" in notes
 
 
 # --- Human review ---------------------------------------------------------------------------------

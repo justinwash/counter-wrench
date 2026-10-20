@@ -202,8 +202,6 @@ def build() -> dict[str, list[dict]]:
         for row in rows.values():
             _labor_range(row)
         bike_question = bool(decision.get("bike_question"))
-        escalated = any(r["severity"] == "safety_critical" for r in rows.values())
-        asks = bike_question or any(r["question_expected"] for r in rows.values())
         example = {
             "id": draft["id"],
             "slice": draft["slice"],
@@ -213,8 +211,8 @@ def build() -> dict[str, list[dict]]:
             "intake": draft["intake"],
             "rows": rows,
             "bike_question_expected": bike_question,
-            # Questions stop the run before drafting, unless something is safety-critical.
-            "order_expected": case.get("order_expected", escalated or not asks),
+            # Only an unresolved bike stops the run; row questions go on the draft (step 17).
+            "order_expected": case.get("order_expected", not bike_question),
             "judge_notes": " ".join(notes) or None,
         }
         E2EExample.model_validate(example)

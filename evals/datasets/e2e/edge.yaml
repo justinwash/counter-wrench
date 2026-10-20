@@ -58,7 +58,7 @@
       forbidden_parts: []
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'Not in the catalog, so no parts can be checked; labor only. Expected question for r1 (Justin):
     What size it the tire? It should be printed on the sidewall'
 - id: e03-marlin25-xs-rear-tire
@@ -93,7 +93,7 @@
       - maxxis-rekon-29x2-6
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'XS/S Marlin 7 Gen 3 frames use 27.5" wheels; the catalog only models the 29" (D-017),
     so a 29" tire is wrong here. Expected question for r1 (Justin): What size is the rear tire? It should
     be printed on the sidewall'
@@ -194,7 +194,7 @@
       - shimano-cs-m8100-10-51
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'HG freehub and SRAM Eagle shifting; a Micro Spline Shimano cassette doesn''t fit. Changing
     systems is a mechanic''s upgrade, not a counter quote. Expected question for r1 (Justin): Is the customer
     interested in a drivertrain upgrade? Otherwise they''re stuck with SRAM cassettes'
@@ -430,7 +430,7 @@
       forbidden_parts: []
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'The installed tire width isn''t known, so the right tube can''t be confirmed without it.
     Expected question for r1 (Justin): What size is the tire? It should be written on the sidewall'
 - id: e14-slash-knock-under-braking

@@ -58,7 +58,7 @@
       forbidden_parts: []
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'Expected question for r1 (Justin): Does the bike still stop? Justin: If the customer wants
     to take a set of pads home and install them they are free to do so, but if we are doing the work it
     must be inspected'

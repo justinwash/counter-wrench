@@ -112,7 +112,7 @@
       forbidden_parts: []
       labor_forbidden: []
   bike_question_expected: false
-  order_expected: false
+  order_expected: true
   judge_notes: 'Expected question for r1 (Justin): Does the bike still stop? If not, safety_critical'
 - id: s05-caad10-concave-rim
   slice: safety
