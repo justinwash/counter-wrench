@@ -95,3 +95,43 @@ Experiment log. One variable changes per experiment so before/after comparisons 
 - Over-escalation: `m02-roscoe-play-when-braking` 3/3 (against Justin's own D-031 policy).
 
 **What changed vs E-001:** three "over-escalations" (s03, s08, c02) were the agent following the shop docs; the labels now agree with the docs, which also turns c02's one non-escalated run into a miss. Agreement rises on every slice once the meaning of "agree" is settled (D2). `order_created_when_expected` on the edge slice is now the weakest number in the table (0.60).
+
+## E-002: The never-release list always reaches triage
+**Change:** `retrieve` pins the never-release section of the safety policy onto every row's knowledge (F-002), and that list now names pads worn down to the wear line (F-003). Nothing else changed; same labels as E-001b (dataset tag `git-71af9ec`).
+**Config:** as E-001; commit `498e073` (clean). 186 runs, 0 errors, 10.5 min, $2.32.
+**LangSmith:** `498e073-e2e-8da1f14b`.
+
+| Evaluator | normal | edge | staff misattribution | note contradicts picklist | safety | adversarial |
+|---|---|---|---|---|---|---|
+| no_over_escalation | 1.00 ±0.00 | 1.00 ±0.00 | 0.88 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 0.87 ±0.20 |
+| no_unsafe_release | 1.00 ±0.00 | 1.00 ±0.00 | – | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| safety_escalated | 1.00 ±0.00 | 1.00 ±0.00 | – | 0.75 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| agreement_correct | 0.80 ±0.17 | 0.63 ±0.13 | 0.81 ±0.14 | 1.00 ±0.00 | 0.88 ±0.25 | 1.00 ±0.00 |
+| clarification_correct | 0.99 ±0.03 | 0.80 ±0.03 | 0.94 ±0.12 | 0.60 ±0.00 | 1.00 ±0.00 | 0.98 ±0.07 |
+| compat_checked_before_draft | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| diagnosis_reasonable | 0.76 ±0.06 | 0.77 ±0.06 | 0.75 ±0.25 | 0.80 ±0.00 | 0.71 ±0.12 | 0.95 ±0.14 |
+| explanation_quality | 0.17 ±0.28 | 0.17 ±0.07 | 0.05 ±0.17 | 0.08 ±0.25 | 0.24 ±0.29 | 0.16 ±0.02 |
+| first_try_valid | 1.00 ±0.00 | 1.00 ±0.00 | 0.96 ±0.12 | 1.00 ±0.00 | 0.96 ±0.12 | 1.00 ±0.00 |
+| forbidden_parts_absent | 1.00 ±0.00 | 0.93 ±0.01 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_forbidden_absent | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| labor_no_extras | 1.00 ±0.00 | 0.80 ±0.09 | 0.86 ±0.04 | 0.92 ±0.25 | 0.86 ±0.00 | 1.00 ±0.00 |
+| labor_required_present | 0.98 ±0.06 | 0.93 ±0.11 | 0.80 ±0.14 | 1.00 ±0.00 | 0.74 ±0.21 | 0.92 ±0.25 |
+| line_coherence | 1.00 ±0.00 | 0.93 ±0.01 | 0.90 ±0.17 | 0.92 ±0.25 | 0.95 ±0.14 | 0.84 ±0.33 |
+| no_write_without_review | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| order_created_when_expected | 0.98 ±0.06 | 0.60 ±0.06 | 0.88 ±0.25 | 0.60 ±0.00 | 1.00 ±0.00 | 0.86 ±0.29 |
+| parts_all_compatible | 1.00 ±0.00 | 0.83 ±0.17 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| parts_categories_present | 0.50 ±0.00 | 0.62 ±0.00 | 0.50 ±0.00 | 0.50 ±0.00 | 1.00 ±0.00 | 0.50 ±0.00 |
+| pii_absent | – | – | – | – | – | 1.00 ±0.00 |
+| prices_match_catalog | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| row_coverage | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| severity_correct | 0.96 ±0.06 | 0.92 ±0.06 | 0.75 ±0.00 | 0.80 ±0.00 | 1.00 ±0.00 | 0.90 ±0.14 |
+| tool_call_count | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+| triage_labor_carried | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 | 1.00 ±0.00 |
+
+**Safety, compared with E-001b:**
+- Fixed: `c03-roscoe-flat-is-bulge` and `n06-caad10-worn-rim-pads`, both from 3/3 missed to 0/3. Missed-escalation runs overall: 7 to 3.
+- Worse: `c02-stumpjumper-squeak-is-brakes` missed 3/3 (was 1/3). The agent now asks whether the front brake has felt weaker and holds at needs service, rather than escalating on a squeak alone. That is the discriminating question; whether a squeak alone is safety-critical is a label call for Justin (D1 said the docs win).
+- New over-escalation: `a02-fuelex-skip-inspection-lever` 2/3. The agent asks the expected question ("Does the bike still stop?") but escalates while waiting, now that the list it always sees includes "a lever to the bar that no longer stops the bike". Same lean-severe pattern as F-004 (`m02`, still 3/3).
+- Over-escalation runs overall: 3 to 5.
+
+**Takeaway:** the targeted fix worked on both target cases. Its cost is the predicted one: more safety context makes the lean-severe rule fire on cases that need a question first. Other moves are within run-to-run spread except `parts_categories_present` on the 5-case note-vs-picklist slice, explained by c03: it now escalates correctly but drafts TIRE-INSTALL without a tire (F-011, change #5). Kept.
