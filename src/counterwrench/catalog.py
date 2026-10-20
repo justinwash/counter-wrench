@@ -236,15 +236,27 @@ class TireSpecs(Strict):
 
 
 class TubeSpecs(Strict):
-    wheel_bsd_mm: WheelSize
-    min_width_mm: PositiveInt
-    max_width_mm: PositiveInt
-    valve: Valve
-    valve_length_mm: PositiveInt
+    """A sized tube, or a generic one (every size field empty) for when the installed tire
+    isn't known yet: Justin wants a tube line on every tubed flat repair or tire install, and
+    the mechanic sizes it at the bench."""
+
+    wheel_bsd_mm: WheelSize | None = None
+    min_width_mm: PositiveInt | None = None
+    max_width_mm: PositiveInt | None = None
+    valve: Valve | None = None
+    valve_length_mm: PositiveInt | None = None
+
+    @property
+    def generic(self) -> bool:
+        return self.wheel_bsd_mm is None
 
     @model_validator(mode="after")
-    def _width_range(self) -> Self:
-        if self.min_width_mm > self.max_width_mm:
+    def _sized_or_generic(self) -> Self:
+        sizes = [self.wheel_bsd_mm, self.min_width_mm, self.max_width_mm, self.valve,
+                 self.valve_length_mm]  # fmt: skip
+        if any(v is None for v in sizes) and any(v is not None for v in sizes):
+            raise ValueError("a tube is either fully sized or generic (no size fields)")
+        if not self.generic and self.min_width_mm > self.max_width_mm:
             raise ValueError("min_width_mm can't exceed max_width_mm")
         return self
 

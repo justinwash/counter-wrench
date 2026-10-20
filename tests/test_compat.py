@@ -102,6 +102,22 @@ def test_tube_needs_tire_width():
     assert status(CAAD10, "tube-700x28-35-presta", FRONT, tire_width_mm=23) is NO
 
 
+def test_generic_tube_is_never_a_confirmed_fit():
+    for bike in (CAAD10, FUEL_2023, SLASH):
+        for position in (FRONT, REAR):
+            assert status(bike, "tube-generic", position, tire_width_mm=40) is UNKNOWN
+
+
+def test_a_tube_is_fully_sized_or_generic():
+    from pydantic import ValidationError
+
+    from counterwrench.catalog import TubeSpecs
+
+    assert TubeSpecs().generic
+    with pytest.raises(ValidationError):
+        TubeSpecs(wheel_bsd_mm=622)  # half-sized
+
+
 def test_700c_and_29_inch_are_one_size():
     # A "700c" tube in a 29er: same 622 mm bead seat.
     assert status(FUEL_2023, "tube-700x35-45-presta", FRONT, tire_width_mm=40) is OK

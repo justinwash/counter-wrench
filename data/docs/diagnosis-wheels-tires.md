@@ -20,7 +20,7 @@ If the bike feels wobbly or vague when riding but the wheels spin true, check th
 
 ## Flat tires
 
-For a flat, find the cause before fitting a new tube, or it'll flat again. Common causes: a thorn or glass still in the tire, a pinch flat from low pressure (two small slits side by side), a rim tape that's shifted and exposed a spoke hole, or a worn-out tire. A fix with a new tube is `FLAT-REPAIR`. Repeated flats from the same spot point to the rim tape or something stuck in the tire. A cut sidewall needs a new tire (`TIRE-INSTALL`).
+For a flat, find the cause before fitting a new tube, or it'll flat again. Common causes: a thorn or glass still in the tire, a pinch flat from low pressure (two small slits side by side), a rim tape that's shifted and exposed a spoke hole, or a worn-out tire. A fix with a new tube is `FLAT-REPAIR`, and it needs a tube on the order: a sized tube when the tire size is known, otherwise the generic tube, which the mechanic sizes at the bench. Repeated flats from the same spot point to the rim tape or something stuck in the tire. A cut sidewall needs a new tire (`TIRE-INSTALL`). A new tire on a tubed wheel needs a tube too; a tubeless wheel needs `TUBELESS-SETUP` instead. High-end bikes usually run tubeless and entry-level bikes run tubes, but ask the customer when it matters for the order.
 
 ## Slow leaks on tubeless tires
 

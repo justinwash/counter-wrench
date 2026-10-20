@@ -239,6 +239,8 @@ def _tire(bike, specs, rules, position, tire_width_mm) -> list[Finding]:
 
 
 def _tube(bike, specs, rules, position, tire_width_mm) -> list[Finding]:
+    if specs.generic:
+        return [Finding(UNKNOWN, "Generic tube: the mechanic sizes it to the installed tire.")]
     findings = [_wheel_size(bike, specs.wheel_bsd_mm, position)]
     if tire_width_mm is None:
         findings.append(Finding(UNKNOWN, "Need the installed tire width to size the tube."))

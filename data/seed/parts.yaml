@@ -557,6 +557,13 @@
 
 # --- Tubes -------------------------------------------------------------------------------------
 
+- id: tube-generic
+  category: tube
+  brand: Shop stock
+  name: Inner tube, sized at the bench
+  price_cents: 1000
+  specs: {}
+
 - id: tube-29x2-1-2-6-presta
   category: tube
   brand: Bontrager
