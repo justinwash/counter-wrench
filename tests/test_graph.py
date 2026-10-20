@@ -20,6 +20,7 @@ def assessment(row_id="r1", **overrides):
         "row_id": row_id,
         "severity": "needs_service",
         "likely_causes": ["Worn cassette"],
+        "likely_area": None,
         "agrees_with_suspected_area": True,
         **overrides,
     }
@@ -73,6 +74,25 @@ def test_every_row_sees_the_never_release_list(seeded_db):
         ids = [h.chunk_id for h in result["row_chunks"][row_id]]
         assert ids.count("policy-safety#what-we-never-release") == 1
         assert 'chunk_id="policy-safety#what-we-never-release"' in fake.calls[row_id][0][1].content
+
+
+def test_agreement_follows_the_models_own_area(seeded_db):
+    # Says "disagree" but puts the cause in staff's area (chain): code makes it agree (F-008).
+    contradicts = assessment(likely_area="chain", agrees_with_suspected_area=False,
+                             disagreement_reason="It's the chain.")  # fmt: skip
+    result, _ = run(seeded_db, {"r1": [contradicts]})
+    a = result["assessments"]["r1"]
+    assert a.agrees_with_suspected_area is True and a.disagreement_reason is None
+
+
+def test_a_different_area_needs_a_reason_or_is_retried(seeded_db):
+    no_reason = assessment(likely_area="cassette")  # claims agreement, but blames the cassette
+    with_reason = assessment(likely_area="cassette", agrees_with_suspected_area=False,
+                             disagreement_reason="New chain; the cassette is worn.")  # fmt: skip
+    result, fake = run(seeded_db, {"r1": [no_reason, with_reason]})
+    a = result["assessments"]["r1"]
+    assert a.agrees_with_suspected_area is False and result["triage_retries"] == 1
+    assert "give disagreement_reason" in fake.calls["r1"][1][-1].content
 
 
 def test_invalid_output_is_retried_with_the_error_fed_back(seeded_db):

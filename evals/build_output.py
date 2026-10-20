@@ -43,6 +43,7 @@ def build_run_output(state: dict, conn: psycopg.Connection) -> RunOutput:
     assessments = {
         row_id: AssessmentOut(
             row_id=row_id, severity=a.severity.value, agrees=a.agrees_with_suspected_area,
+            likely_area=a.likely_area.value if a.likely_area else None,
             likely_causes=a.likely_causes, disagreement_reason=a.disagreement_reason,
             question=a.question_for_customer, suggested_labor=list(a.suggested_labor),
             citations=a.citations,

@@ -130,6 +130,30 @@ def check_assessment(
     return problems
 
 
+def settle_agreement(
+    a: RowAssessment, staff_area: SuspectedArea
+) -> tuple[RowAssessment, list[str]]:
+    """Agreement follows from the model's own pick, so the two can't contradict (F-008): agree
+    when the most likely problem is in the area staff picked (Justin, step 16). With "unsure"
+    there's nothing to agree with. Without a likely_area, the model's answer stands."""
+    if staff_area == SuspectedArea.UNSURE:
+        return a.model_copy(
+            update={"agrees_with_suspected_area": None, "disagreement_reason": None}
+        ), []
+    if a.likely_area is None:
+        return a, []
+    if a.likely_area == staff_area:
+        return a.model_copy(
+            update={"agrees_with_suspected_area": True, "disagreement_reason": None}
+        ), []
+    if not a.disagreement_reason:
+        return a, [
+            f"likely_area {a.likely_area.value} isn't the area staff picked ({staff_area.value}): "
+            f"give disagreement_reason, or use {staff_area.value} if the problem is there."
+        ]
+    return a.model_copy(update={"agrees_with_suspected_area": False}), []
+
+
 def triage_row(task: RowTask, deps: Deps) -> dict:
     row_id = task["row_id"]
     row = next(r for r in task["intake"].rows if r.row_id == row_id)
@@ -153,12 +177,8 @@ def triage_row(task: RowTask, deps: Deps) -> dict:
         if assessment is not None and not problems:
             problems = check_assessment(assessment, row_id, menu_codes, chunk_ids)
         if not problems:
-            if row.suspected_area == SuspectedArea.UNSURE:
-                # Staff didn't commit to an area, so agreement doesn't apply. Enforced in code,
-                # whatever the model said.
-                assessment = assessment.model_copy(
-                    update={"agrees_with_suspected_area": None, "disagreement_reason": None}
-                )
+            assessment, problems = settle_agreement(assessment, row.suspected_area)
+        if not problems:
             return {"assessments": {row_id: assessment}, "triage_retries": retries}
         last_error = "; ".join(problems)
         if attempt + 1 < MAX_TRIAGE_ATTEMPTS:

@@ -121,6 +121,7 @@ ASSESSMENT = {
     "row_id": "r1",
     "severity": "needs_service",
     "likely_causes": ["Dry seatpost"],
+    "likely_area": "seatpost",
     "agrees_with_suspected_area": False,
     "disagreement_reason": "Creaks only when seated, which points to the seatpost.",
     "suggested_labor": ["SEATPOST-SERVICE"],

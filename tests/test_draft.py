@@ -23,6 +23,7 @@ def triage_ok(row_id="r1", **overrides):
         "row_id": row_id,
         "severity": "needs_service",
         "likely_causes": ["Worn cassette"],
+        "likely_area": None,
         "agrees_with_suspected_area": True,
         "suggested_labor": ["CASSETTE-INSTALL"],
         "suggested_part_categories": ["cassette"],

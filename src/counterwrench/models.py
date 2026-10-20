@@ -166,6 +166,12 @@ class RowAssessment(Strict):
         max_length=5,
         description="Most likely causes, most likely first. Short phrases.",
     )
+    likely_area: SuspectedArea | None = Field(
+        description=(
+            "The area your most likely cause is in, from the same list staff pick from. Code "
+            "compares it with staff's pick to decide agreement."
+        )
+    )
     agrees_with_suspected_area: bool | None = Field(
         description=(
             "Whether the evidence supports the suspected area the staff member picked. Null when "

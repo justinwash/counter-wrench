@@ -16,6 +16,7 @@ class AssessmentOut(BaseModel):
     row_id: str
     severity: str
     agrees: bool | None
+    likely_area: str | None = None
     likely_causes: list[str] = Field(default_factory=list)
     disagreement_reason: str | None = None
     question: str | None = None
