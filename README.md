@@ -4,18 +4,18 @@ A front-of-house service intake tool for bike shops. Counter staff pick the cust
 
 **Live demo: <https://counterwrench.shop>.** It sits behind a login. Ask the candidate (Justin), or Katy (who will be given one), for the password. The data is synthetic and the traces it produces are public.
 
-This is an interview take-home, and the point of it is the **methodology**: how the agent's quality is defined, measured, improved one change at a time, and watched in production. The agent is a means; the eval work is the deliverable. Scores are reported with their noise, and failures are reported where they were found.
-
 **Contents:** [Try it](#try-it) · [How it works](#how-it-works) · [Evals](#evals) · [Before and after](#before-and-after) · [Failures and limits](#failures-and-limitations) · [Production evaluation](#production-evaluation) · [Public links](#public-links) · [AI usage](#ai-usage) · [Development](#development)
 
 ## Try it
 
-You need Docker (Compose v2) and an [OpenRouter](https://openrouter.ai) key. Nothing else (no Node, no Python).
+You need Docker (Compose v2) and **one** model API key: Anthropic, OpenAI, Google or [OpenRouter](https://openrouter.ai), whichever you have. Nothing else (no Node, no Python). With several keys set, Anthropic is picked first, then OpenAI, Google, OpenRouter; the judge for the evals comes from a different model family than the agent when your keys allow it (the config says which models it chose, and warns when the judge shares the agent's family).
 
 ```sh
-cp .env.example .env     # set OPENROUTER_API_KEY; LANGSMITH_API_KEY is optional (tracing, evals)
+cp .env.example .env     # set one of ANTHROPIC_/OPENAI_/GOOGLE_/OPENROUTER_API_KEY; LANGSMITH_API_KEY is optional (tracing, evals)
 make start               # builds the image, migrates, seeds, ingests, serves on http://localhost:8000
 ```
+
+The numbers in this README come from one pinned configuration (Haiku 5.5 as agent, GPT-6.1 Sol as judge, both through OpenRouter with the serving backend fixed), so your scores on other models will differ; the LangSmith experiments are the reference. The model-selection rules are covered by tests (`tests/test_config.py`); the full app and the evals have been run end to end only on the OpenRouter configuration above, so if another provider's key misbehaves, `make doctor` (needs [uv](https://docs.astral.sh/uv/)) makes one real tool-calling and structured-output call per model and says what is wrong.
 
 Things worth trying on the counter screen:
 
@@ -69,20 +69,20 @@ The full explanation is in [docs/EVALS.md](docs/EVALS.md). In short:
 
 Seven experiments (E-001 to E-007), re-scored on one set of labels so the columns compare ([docs/EVAL_RESULTS.md](docs/EVAL_RESULTS.md) has every table, config, cost and per-slice spread). Models: `claude-haiku-5.5` for agent and triage, `gpt-6.1-sol` as judge, via OpenRouter. Each full run is 62 cases x 3 repetitions, about 11 minutes and $2.20.
 
-| Evaluator (mean over all slices) | Baseline | After E-006 | What the log says |
-|---|---|---|---|
-| safety_escalated | 0.84 | 0.93 | Targeted fix: `c03` and `n06` went from missed to escalated 3/3 (E-002) |
-| no_unsafe_release | 0.84 | 0.93 | 1.00 after E-002; E-003 let some questions through a draft (a trade-off, kept) |
-| no_over_escalation | 0.98 | 0.93 | **Got worse**: 3 to 9 runs, mostly three braking cases; led to the default-to-safety policy (F-016) |
-| order_created_when_expected | 0.88 | 0.98 | Beyond the spread on edge, note-vs-picklist and safety (E-003) |
-| line_coherence | 0.91 | 1.00 | Beyond the spread on every slice; enforced in code (E-004) |
-| parts_categories_present | 0.69 | 0.89 | Generic tube, and unverified parts drafted rather than dropped (E-006) |
-| agreement_correct | 0.83 | 0.82 | No net change: fixed self-contradictions by construction, but too strict about adjacent areas (E-005) |
-| severity_correct | 0.87 | 0.89 | Within noise |
-| diagnosis_reasonable (judge, rubric v2) | 0.80 | 0.82 | Within noise; the judge was recalibrated later, so these aren't comparable with v3 |
-| explanation_quality (judge, rubric v2) | 0.17 | 0.22 | Not meaningful: the judge failed calibration |
+| Evaluator (mean over all slices)        | Baseline | After E-006 | What the log says                                                                                     |
+| --------------------------------------- | -------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| safety_escalated                        | 0.84     | 0.93        | Targeted fix: `c03` and `n06` went from missed to escalated 3/3 (E-002)                               |
+| no_unsafe_release                       | 0.84     | 0.93        | 1.00 after E-002; E-003 let some questions through a draft (a trade-off, kept)                        |
+| no_over_escalation                      | 0.98     | 0.93        | **Got worse**: 3 to 9 runs, mostly three braking cases; led to the default-to-safety policy (F-016)   |
+| order_created_when_expected             | 0.88     | 0.98        | Beyond the spread on edge, note-vs-picklist and safety (E-003)                                        |
+| line_coherence                          | 0.91     | 1.00        | Beyond the spread on every slice; enforced in code (E-004)                                            |
+| parts_categories_present                | 0.69     | 0.89        | Generic tube, and unverified parts drafted rather than dropped (E-006)                                |
+| agreement_correct                       | 0.83     | 0.82        | No net change: fixed self-contradictions by construction, but too strict about adjacent areas (E-005) |
+| severity_correct                        | 0.87     | 0.89        | Within noise                                                                                          |
+| diagnosis_reasonable (judge, rubric v2) | 0.80     | 0.82        | Within noise; the judge was recalibrated later, so these aren't comparable with v3                    |
+| explanation_quality (judge, rubric v2)  | 0.17     | 0.22        | Not meaningful: the judge failed calibration                                                          |
 
-Rules used to read this table: a gap smaller than the spread of the three repetitions is noise; small slices (5 to 8 cases) have large spreads; and within-experiment spread understates between-experiment variation for the judge columns. **E-007** (a prompt line stating the default-to-safety policy) is logged as *inconclusive*: one fewer missed run and two more over-escalated, inside the noise. It was kept because it states the policy, and the log says so. Baseline column: E-001b (E-001 re-scored on corrected labels, because the first report was built on corrupted scores, F-001). Run counts: 186 per experiment; E-006 has 183 scored (three runs lost to dropped connections, F-015).
+Rules used to read this table: a gap smaller than the spread of the three repetitions is noise; small slices (5 to 8 cases) have large spreads; and within-experiment spread understates between-experiment variation for the judge columns. **E-007** (a prompt line stating the default-to-safety policy) is logged as _inconclusive_: one fewer missed run and two more over-escalated, inside the noise. It was kept because it states the policy, and the log says so. Baseline column: E-001b (E-001 re-scored on corrected labels, because the first report was built on corrupted scores, F-001). Run counts: 186 per experiment; E-006 has 183 scored (three runs lost to dropped connections, F-015).
 
 ## Failures and limitations
 
@@ -99,9 +99,9 @@ The full list is [docs/FAILURES.md](docs/FAILURES.md) (F-001 to F-016); the ones
 
 ## Production evaluation
 
-The live app scores itself. After each triage and each drafted order, a background thread runs the *same evaluator code* as the offline suite and posts the scores as feedback on that run's LangSmith trace: structure, safety consistency, parts, prices, coherence, tool-call trajectory, PII, and the two judges (on a configurable share of runs, `CW_JUDGE_SAMPLE`). Only checks that need no labeled answer run live (D-053). Mechanics' approve/edit/reject decisions land on the same trace.
+The live app scores itself. After each triage and each drafted order, a background thread runs the _same evaluator code_ as the offline suite and posts the scores as feedback on that run's LangSmith trace: structure, safety consistency, parts, prices, coherence, tool-call trajectory, PII, and the two judges (on a configurable share of runs, `CW_JUDGE_SAMPLE`). Only checks that need no labeled answer run live (D-053). Mechanics' approve/edit/reject decisions land on the same trace.
 
-- **Thumbs up/down** on any order (D-054). A thumbs-down needs a reason and puts the run in an annotation queue; a thumbs-up makes the order a *candidate*, never a golden. Candidates and rejected or edited orders become eval cases only when Justin labels them.
+- **Thumbs up/down** on any order (D-054). A thumbs-down needs a reason and puts the run in an annotation queue; a thumbs-up makes the order a _candidate_, never a golden. Candidates and rejected or edited orders become eval cases only when Justin labels them.
 - `make prod-report` summarizes the live app (approved as drafted, edited, rejected, escalations, question-limit and unconfirmed-bike rates, thumbs, mean live scores, latency and cost, problem orders with safety first). `make prod-harvest` writes the orders worth labeling to a file. On the server, run them inside the app container: `docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app python -m counterwrench.online.report`.
 - **Alerting is described, not built.** Nothing here pages anyone. In a real shop a LangSmith alert on `safety_consistent` dropping, or on thumbs-down spiking, would notify Slack or email.
 - Production traces go to their own project (`counterwrench-prod`) with a capped OpenRouter key and per-IP rate limiting.
