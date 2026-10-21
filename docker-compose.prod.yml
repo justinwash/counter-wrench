@@ -1,0 +1,34 @@
+# Production override for counterwrench.shop: Caddy in front (HTTPS + a site login), a rate
+# limit on the requests that spend model money, and a separate LangSmith project.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build db app caddy
+services:
+  app:
+    restart: unless-stopped
+    environment:
+      CW_RATE_LIMIT_PER_HOUR: "60"
+      LANGSMITH_PROJECT: counterwrench-prod
+
+  db:
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:-counterwrench.shop}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Written by deploy/setup-env.sh: one "user bcrypt-hash" line per login.
+      - ./deploy/site-users:/etc/caddy/site-users:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

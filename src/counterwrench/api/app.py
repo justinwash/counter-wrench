@@ -24,8 +24,10 @@ class AppState:
     config: Any = None  # ModelConfig, for run metadata; None in tests
 
 
-def create_app(deps: Deps | None = None, checkpointer=None, config=None) -> FastAPI:
-    from counterwrench.api import catalog, intakes, orders
+def create_app(
+    deps: Deps | None = None, checkpointer=None, config=None, rate_limit_per_hour: int | None = None
+) -> FastAPI:
+    from counterwrench.api import catalog, intakes, limits, orders
 
     if deps is None:
         from counterwrench.config import load_config
@@ -38,6 +40,7 @@ def create_app(deps: Deps | None = None, checkpointer=None, config=None) -> Fast
         deps, checkpointer=checkpointer or InMemorySaver(), confirm_before_draft=True
     )
     app.state.cw = AppState(deps=deps, graph=graph, config=config)
+    limits.install(app, rate_limit_per_hour)
     app.include_router(catalog.router, prefix="/api")
     app.include_router(intakes.router, prefix="/api")
     app.include_router(orders.router, prefix="/api")

@@ -253,3 +253,17 @@ def test_serves_the_built_ui_with_deep_links(seeded_db, tmp_path, monkeypatch):
     assert api.get("/assets/app.js").text == "console.log(1)"
     assert api.get("/api/no-such-route").status_code == 404  # API misses aren't the UI
     assert api.get("/api/taxonomy").status_code == 200
+
+
+def test_rate_limit_applies_only_to_requests_that_spend_money(seeded_db):
+    triage, agent = FakeTriage({"r1": [triage_ok(), triage_ok()]}), FakeAgent([])
+    deps = Deps(connect=lambda: nullcontext(seeded_db), embedder=FakeEmbedder(),
+                triage_model=lambda: triage, agent_model=lambda: agent)  # fmt: skip
+    api = TestClient(create_app(deps=deps, rate_limit_per_hour=2))
+    assert api.post("/api/intakes", json=intake()).status_code == 200
+    assert api.post("/api/intakes", json=intake()).status_code == 200
+    blocked = api.post("/api/intakes", json=intake())
+    assert blocked.status_code == 429 and int(blocked.headers["retry-after"]) > 0
+    assert api.get("/api/taxonomy").status_code == 200  # reads aren't limited
+    other = api.post("/api/intakes", json=intake(), headers={"x-forwarded-for": "10.0.0.9"})
+    assert other.status_code == 200  # per client, not global

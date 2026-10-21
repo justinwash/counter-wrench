@@ -1,0 +1,11 @@
+# HTTPS for the site (Caddy gets and renews the certificate), a login on everything, and the
+# app behind it. flush_interval -1 passes the triage stream through as it arrives.
+{$SITE_DOMAIN} {
+	encode zstd gzip
+	basic_auth {
+		import /etc/caddy/site-users
+	}
+	reverse_proxy app:8000 {
+		flush_interval -1
+	}
+}

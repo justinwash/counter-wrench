@@ -24,3 +24,6 @@ Thumbs.db
 frontend/node_modules/
 frontend/dist/
 frontend/*.tsbuildinfo
+
+# Production secrets, written on the server by deploy/setup-env.sh
+deploy/site-users
