@@ -9,3 +9,8 @@
 		flush_interval -1
 	}
 }
+
+# www is a CNAME to the bare domain: give it a certificate and send visitors to the main address.
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
