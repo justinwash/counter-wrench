@@ -64,6 +64,61 @@ def orders(
     return [OrderSummary(**r) for r in rows]
 
 
+class OrderRecord(BaseModel):
+    id: int
+    created_at: datetime
+    status: str
+    bike_id: str | None
+    bike_freetext: str | None
+    bike_name: str | None  # "2024 Trek Slash 9.8 XT Gen 6", or the customer's own description
+    severity: str
+    priority: bool
+    customer_explanation: str
+    mechanic_notes: str | None
+    citations: list[str]
+    estimate_total_cents: int
+    intake: dict | None
+    reviewed_by: str | None
+    reviewed_at: datetime | None
+    review_notes: str | None
+    source: str
+    edited_by: str | None
+    edited_at: datetime | None
+    waiver_signed: bool
+
+
+class OrderLine(BaseModel):
+    labor_code: str | None
+    part_id: str | None
+    name: str | None
+    qty: int
+    unit_price_cents: int
+    position: str | None
+    unverified: bool
+    unverified_reason: str | None
+    compat_reasons: list[str] = []
+
+
+class OrderSource(BaseModel):
+    id: str
+    title: str
+    heading: str
+
+
+class OrderTriage(BaseModel):
+    assessments: dict[str, dict]
+    questions: dict[str, str]
+    escalation_message: str | None
+
+
+class OrderDetail(BaseModel):
+    order: OrderRecord
+    lines: list[OrderLine]
+    sources: list[OrderSource]
+    triage: OrderTriage | None
+    trace_url: str | None
+
+
 def _thread(order: dict) -> dict | None:
     return (
         {"configurable": {"thread_id": str(order["langsmith_run_id"])}}
@@ -72,7 +127,7 @@ def _thread(order: dict) -> dict | None:
     )
 
 
-def _detail(cw, order_id: int) -> dict:
+def _detail(cw, order_id: int) -> OrderDetail:
     with cw.deps.connect() as conn:
         cur = conn.cursor(row_factory=dict_row)
         order = cur.execute("SELECT * FROM work_orders WHERE id = %s", (order_id,)).fetchone()
@@ -90,6 +145,9 @@ def _detail(cw, order_id: int) -> dict:
             (order_id,),
         ).fetchall()
         bike = load_bike(conn, order["bike_id"]) if order["bike_id"] else None
+        order["bike_name"] = (
+            f"{bike.year} {bike.make} {bike.model}" if bike else order["bike_freetext"]
+        )
         rules = load_rules(conn) if bike else None
         for line in lines:  # why each part fits (or why it's unverified), for the mechanic
             if line["part_id"] and bike:
@@ -107,14 +165,17 @@ def _detail(cw, order_id: int) -> dict:
     if thread:
         values = cw.graph.get_state(thread).values
         if values:
-            triage = {
-                "assessments": {k: a.model_dump(mode="json")
-                                for k, a in values.get("assessments", {}).items()},
-                "questions": values.get("questions") or {},
-                "escalation_message": values.get("escalation_message"),
-            }  # fmt: skip
-    return {"order": order, "lines": lines, "sources": sources, "triage": triage,
-            "trace_url": _trace_url(cw, order)}  # fmt: skip
+            triage = OrderTriage(
+                assessments={k: a.model_dump(mode="json")
+                             for k, a in values.get("assessments", {}).items()},
+                questions=values.get("questions") or {},
+                escalation_message=values.get("escalation_message"),
+            )  # fmt: skip
+    return OrderDetail(
+        order=OrderRecord(**order), lines=[OrderLine(**line) for line in lines],
+        sources=[OrderSource(**s) for s in sources], triage=triage,
+        trace_url=_trace_url(cw, order),
+    )  # fmt: skip
 
 
 def _trace_url(cw, order: dict) -> str | None:
@@ -132,7 +193,7 @@ def _trace_url(cw, order: dict) -> str | None:
 
 
 @router.get("/orders/{order_id}")
-def order(order_id: int, request: Request) -> dict:
+def order(order_id: int, request: Request) -> OrderDetail:
     return _detail(request.app.state.cw, order_id)
 
 
@@ -154,7 +215,7 @@ def part_options(order_id: int, category: str, request: Request) -> CompatiblePa
 
 
 @router.put("/orders/{order_id}/lines")
-def edit(order_id: int, body: EditLinesArgs, request: Request) -> dict:
+def edit(order_id: int, body: EditLinesArgs, request: Request) -> OrderDetail:
     """Replace the lines of a draft awaiting review, checked like the agent's own drafts."""
     cw = request.app.state.cw
     with cw.deps.connect() as conn:
@@ -164,8 +225,14 @@ def edit(order_id: int, body: EditLinesArgs, request: Request) -> dict:
     return _detail(cw, order_id)
 
 
+class ReviewResult(BaseModel):
+    id: int
+    status: str
+    resumed_graph: bool
+
+
 @router.post("/orders/{order_id}/review")
-def review(order_id: int, decision: ReviewDecision, request: Request) -> dict:
+def review(order_id: int, decision: ReviewDecision, request: Request) -> ReviewResult:
     cw = request.app.state.cw
     with cw.deps.connect() as conn:
         order = (
@@ -195,7 +262,7 @@ def review(order_id: int, decision: ReviewDecision, request: Request) -> dict:
     except ReviewError as exc:
         raise HTTPException(409, str(exc)) from exc
     _send_feedback(order, decision)
-    return {"id": order_id, "status": status, "resumed_graph": bool(paused)}
+    return ReviewResult(id=order_id, status=status, resumed_graph=bool(paused))
 
 
 def _send_feedback(order: dict, decision: ReviewDecision) -> None:

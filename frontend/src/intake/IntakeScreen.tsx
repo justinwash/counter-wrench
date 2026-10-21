@@ -1,25 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useReducer, useState } from "react";
+import { Link } from "react-router-dom";
 import { api, type ComplaintOption, type IntakeForm } from "../api/client";
-import { postStream, type RowResult, type Severity, type StreamEvent } from "../api/stream";
+import { postStream, type RowResult, type StreamEvent } from "../api/stream";
 import BikePicker, { type BikeChoice } from "./BikePicker";
+import { field, nice, primary, secondary, SEVERITY } from "../ui";
 import { applyEvent, emptyRun, type RunState } from "./run";
 
 interface Row { row_id: string; complaint: string; suspected_area: string; note: string; answer: string }
 
-const SEVERITY: Record<Severity, { label: string; cls: string }> = {
-  safety_critical: { label: "Safety-critical", cls: "bg-sev-safety" },
-  needs_service: { label: "Needs service", cls: "bg-sev-service" },
-  needs_adjustment: { label: "Needs adjustment", cls: "bg-sev-adjust" },
-  cosmetic: { label: "Cosmetic", cls: "bg-sev-cosmetic" },
-  no_action_needed: { label: "No action needed", cls: "bg-sev-none" },
-};
-
-const nice = (v: string) => v.replace(/_/g, " ");
 const newRow = (n: number): Row => ({ row_id: `r${n}`, complaint: "", suspected_area: "", note: "", answer: "" });
-const field = "border border-line rounded-sm px-2 py-1";
-const primary = "bg-accent text-header font-semibold px-4 py-1.5 rounded-sm disabled:opacity-40";
-const secondary = "border border-line font-semibold px-4 py-1.5 rounded-sm hover:border-muted disabled:opacity-40";
 
 type Action =
   | { type: "start" } | { type: "busy" } | { type: "event"; event: StreamEvent }
@@ -273,7 +263,7 @@ export default function IntakeScreen() {
         <section className="bg-panel border border-line rounded-sm p-3">
           {run.draft.work_order_id ? (
             <p>
-              <span className="font-semibold">Work order #{run.draft.work_order_id}</span> saved for mechanic review.
+              <Link className="font-semibold text-accent underline" to={`/orders/${run.draft.work_order_id}`}>Work order #{run.draft.work_order_id}</Link> saved for mechanic review.
               Estimate <span className="font-mono">{run.draft.estimate_total}</span>
               {run.draft.unverified_parts.length > 0 && (
                 <span className="text-warn"> · fit to confirm: {run.draft.unverified_parts.join(", ")}</span>

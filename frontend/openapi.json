@@ -30,6 +30,31 @@
     }
    }
   },
+  "/api/labor-menu": {
+   "get": {
+    "tags": [
+     "catalog"
+    ],
+    "summary": "Labor Menu",
+    "operationId": "labor_menu_api_labor_menu_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/LaborOption"
+         },
+         "type": "array",
+         "title": "Response Labor Menu Api Labor Menu Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/bikes": {
    "get": {
     "tags": [
@@ -399,9 +424,59 @@
       "content": {
        "application/json": {
         "schema": {
-         "type": "object",
-         "additionalProperties": true,
-         "title": "Response Order Api Orders  Order Id  Get"
+         "$ref": "#/components/schemas/OrderDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/orders/{order_id}/part-options": {
+   "get": {
+    "tags": [
+     "orders"
+    ],
+    "summary": "Part Options",
+    "description": "Parts of a category for the order's bike, split into compatible and unverified, for\nthe mechanic adding a line. Orders without a catalog bike have no parts to offer.",
+    "operationId": "part_options_api_orders__order_id__part_options_get",
+    "parameters": [
+     {
+      "name": "order_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Order Id"
+      }
+     },
+     {
+      "name": "category",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Category"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CompatiblePartsResult"
         }
        }
       }
@@ -454,9 +529,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "type": "object",
-         "additionalProperties": true,
-         "title": "Response Edit Api Orders  Order Id  Lines Put"
+         "$ref": "#/components/schemas/OrderDetail"
         }
        }
       }
@@ -508,9 +581,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "type": "object",
-         "additionalProperties": true,
-         "title": "Response Review Api Orders  Order Id  Review Post"
+         "$ref": "#/components/schemas/ReviewResult"
         }
        }
       }
@@ -572,6 +643,75 @@
      "name"
     ],
     "title": "BikeCandidate"
+   },
+   "CompatiblePartsResult": {
+    "properties": {
+     "bike_id": {
+      "type": "string",
+      "title": "Bike Id"
+     },
+     "category": {
+      "type": "string",
+      "title": "Category"
+     },
+     "compatible": {
+      "items": {
+       "$ref": "#/components/schemas/PartFit"
+      },
+      "type": "array",
+      "title": "Compatible",
+      "default": []
+     },
+     "unverified": {
+      "items": {
+       "$ref": "#/components/schemas/PartFit"
+      },
+      "type": "array",
+      "title": "Unverified",
+      "default": []
+     },
+     "unverified_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unverified Note"
+     },
+     "omitted_incompatible": {
+      "type": "integer",
+      "title": "Omitted Incompatible",
+      "default": 0
+     },
+     "omitted_reasons": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Omitted Reasons",
+      "default": []
+     },
+     "error": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Error"
+     }
+    },
+    "type": "object",
+    "required": [
+     "bike_id",
+     "category"
+    ],
+    "title": "CompatiblePartsResult"
    },
    "Complaint": {
     "type": "string",
@@ -798,6 +938,34 @@
     ],
     "title": "IntakeForm"
    },
+   "LaborOption": {
+    "properties": {
+     "code": {
+      "type": "string",
+      "title": "Code"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "price_cents": {
+      "type": "integer",
+      "title": "Price Cents"
+     },
+     "category": {
+      "type": "string",
+      "title": "Category"
+     }
+    },
+    "type": "object",
+    "required": [
+     "code",
+     "name",
+     "price_cents",
+     "category"
+    ],
+    "title": "LaborOption"
+   },
    "LaborRequest": {
     "properties": {
      "code": {
@@ -837,6 +1005,356 @@
      "label"
     ],
     "title": "Option"
+   },
+   "OrderDetail": {
+    "properties": {
+     "order": {
+      "$ref": "#/components/schemas/OrderRecord"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/OrderLine"
+      },
+      "type": "array",
+      "title": "Lines"
+     },
+     "sources": {
+      "items": {
+       "$ref": "#/components/schemas/OrderSource"
+      },
+      "type": "array",
+      "title": "Sources"
+     },
+     "triage": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/OrderTriage"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "trace_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Trace Url"
+     }
+    },
+    "type": "object",
+    "required": [
+     "order",
+     "lines",
+     "sources",
+     "triage",
+     "trace_url"
+    ],
+    "title": "OrderDetail"
+   },
+   "OrderLine": {
+    "properties": {
+     "labor_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Labor Code"
+     },
+     "part_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Part Id"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "qty": {
+      "type": "integer",
+      "title": "Qty"
+     },
+     "unit_price_cents": {
+      "type": "integer",
+      "title": "Unit Price Cents"
+     },
+     "position": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Position"
+     },
+     "unverified": {
+      "type": "boolean",
+      "title": "Unverified"
+     },
+     "unverified_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unverified Reason"
+     },
+     "compat_reasons": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Compat Reasons",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "labor_code",
+     "part_id",
+     "name",
+     "qty",
+     "unit_price_cents",
+     "position",
+     "unverified",
+     "unverified_reason"
+    ],
+    "title": "OrderLine"
+   },
+   "OrderRecord": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "bike_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bike Id"
+     },
+     "bike_freetext": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bike Freetext"
+     },
+     "bike_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bike Name"
+     },
+     "severity": {
+      "type": "string",
+      "title": "Severity"
+     },
+     "priority": {
+      "type": "boolean",
+      "title": "Priority"
+     },
+     "customer_explanation": {
+      "type": "string",
+      "title": "Customer Explanation"
+     },
+     "mechanic_notes": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Mechanic Notes"
+     },
+     "citations": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Citations"
+     },
+     "estimate_total_cents": {
+      "type": "integer",
+      "title": "Estimate Total Cents"
+     },
+     "intake": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Intake"
+     },
+     "reviewed_by": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reviewed By"
+     },
+     "reviewed_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reviewed At"
+     },
+     "review_notes": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Review Notes"
+     },
+     "source": {
+      "type": "string",
+      "title": "Source"
+     },
+     "edited_by": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Edited By"
+     },
+     "edited_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Edited At"
+     },
+     "waiver_signed": {
+      "type": "boolean",
+      "title": "Waiver Signed"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "created_at",
+     "status",
+     "bike_id",
+     "bike_freetext",
+     "bike_name",
+     "severity",
+     "priority",
+     "customer_explanation",
+     "mechanic_notes",
+     "citations",
+     "estimate_total_cents",
+     "intake",
+     "reviewed_by",
+     "reviewed_at",
+     "review_notes",
+     "source",
+     "edited_by",
+     "edited_at",
+     "waiver_signed"
+    ],
+    "title": "OrderRecord"
+   },
+   "OrderSource": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "heading": {
+      "type": "string",
+      "title": "Heading"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "title",
+     "heading"
+    ],
+    "title": "OrderSource"
    },
    "OrderSummary": {
     "properties": {
@@ -891,6 +1409,93 @@
      "edited"
     ],
     "title": "OrderSummary"
+   },
+   "OrderTriage": {
+    "properties": {
+     "assessments": {
+      "additionalProperties": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "type": "object",
+      "title": "Assessments"
+     },
+     "questions": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "type": "object",
+      "title": "Questions"
+     },
+     "escalation_message": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Escalation Message"
+     }
+    },
+    "type": "object",
+    "required": [
+     "assessments",
+     "questions",
+     "escalation_message"
+    ],
+    "title": "OrderTriage"
+   },
+   "PartFit": {
+    "properties": {
+     "part_id": {
+      "type": "string",
+      "title": "Part Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "price": {
+      "type": "string",
+      "title": "Price"
+     },
+     "position": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Position"
+     },
+     "why": {
+      "type": "string",
+      "title": "Why"
+     },
+     "adapter": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Adapter"
+     }
+    },
+    "type": "object",
+    "required": [
+     "part_id",
+     "name",
+     "price",
+     "why"
+    ],
+    "title": "PartFit"
    },
    "PartRequest": {
     "properties": {
@@ -974,6 +1579,29 @@
      "reviewer"
     ],
     "title": "ReviewDecision"
+   },
+   "ReviewResult": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "resumed_graph": {
+      "type": "boolean",
+      "title": "Resumed Graph"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "status",
+     "resumed_graph"
+    ],
+    "title": "ReviewResult"
    },
    "Revision": {
     "properties": {

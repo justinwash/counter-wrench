@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import IntakeScreen from "./IntakeScreen";
 
 const taxonomy = [{ value: "brake_noise", label: "Brake noise",
@@ -33,7 +34,7 @@ function mockApi(streams: Record<string, string>) {
 
 function renderScreen() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  render(<QueryClientProvider client={client}><IntakeScreen /></QueryClientProvider>);
+  render(<QueryClientProvider client={client}><MemoryRouter><IntakeScreen /></MemoryRouter></QueryClientProvider>);
 }
 
 async function fillOneRow() {

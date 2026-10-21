@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/labor-menu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Labor Menu */
+        get: operations["labor_menu_api_labor_menu_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/bikes": {
         parameters: {
             query?: never;
@@ -178,6 +195,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/orders/{order_id}/part-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Part Options
+         * @description Parts of a category for the order's bike, split into compatible and unverified, for
+         *     the mechanic adding a line. Orders without a catalog bike have no parts to offer.
+         */
+        get: operations["part_options_api_orders__order_id__part_options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/orders/{order_id}/lines": {
         parameters: {
             query?: never;
@@ -239,6 +277,37 @@ export interface components {
             bike_id: string;
             /** Name */
             name: string;
+        };
+        /** CompatiblePartsResult */
+        CompatiblePartsResult: {
+            /** Bike Id */
+            bike_id: string;
+            /** Category */
+            category: string;
+            /**
+             * Compatible
+             * @default []
+             */
+            compatible: components["schemas"]["PartFit"][];
+            /**
+             * Unverified
+             * @default []
+             */
+            unverified: components["schemas"]["PartFit"][];
+            /** Unverified Note */
+            unverified_note?: string | null;
+            /**
+             * Omitted Incompatible
+             * @default 0
+             */
+            omitted_incompatible: number;
+            /**
+             * Omitted Reasons
+             * @default []
+             */
+            omitted_reasons: string[];
+            /** Error */
+            error?: string | null;
         };
         /**
          * Complaint
@@ -308,6 +377,17 @@ export interface components {
              */
             bike_unconfirmed: boolean;
         };
+        /** LaborOption */
+        LaborOption: {
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Price Cents */
+            price_cents: number;
+            /** Category */
+            category: string;
+        };
         /** LaborRequest */
         LaborRequest: {
             /**
@@ -328,6 +408,98 @@ export interface components {
             value: string;
             /** Label */
             label: string;
+        };
+        /** OrderDetail */
+        OrderDetail: {
+            order: components["schemas"]["OrderRecord"];
+            /** Lines */
+            lines: components["schemas"]["OrderLine"][];
+            /** Sources */
+            sources: components["schemas"]["OrderSource"][];
+            triage: components["schemas"]["OrderTriage"] | null;
+            /** Trace Url */
+            trace_url: string | null;
+        };
+        /** OrderLine */
+        OrderLine: {
+            /** Labor Code */
+            labor_code: string | null;
+            /** Part Id */
+            part_id: string | null;
+            /** Name */
+            name: string | null;
+            /** Qty */
+            qty: number;
+            /** Unit Price Cents */
+            unit_price_cents: number;
+            /** Position */
+            position: string | null;
+            /** Unverified */
+            unverified: boolean;
+            /** Unverified Reason */
+            unverified_reason: string | null;
+            /**
+             * Compat Reasons
+             * @default []
+             */
+            compat_reasons: string[];
+        };
+        /** OrderRecord */
+        OrderRecord: {
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Status */
+            status: string;
+            /** Bike Id */
+            bike_id: string | null;
+            /** Bike Freetext */
+            bike_freetext: string | null;
+            /** Bike Name */
+            bike_name: string | null;
+            /** Severity */
+            severity: string;
+            /** Priority */
+            priority: boolean;
+            /** Customer Explanation */
+            customer_explanation: string;
+            /** Mechanic Notes */
+            mechanic_notes: string | null;
+            /** Citations */
+            citations: string[];
+            /** Estimate Total Cents */
+            estimate_total_cents: number;
+            /** Intake */
+            intake: {
+                [key: string]: unknown;
+            } | null;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Review Notes */
+            review_notes: string | null;
+            /** Source */
+            source: string;
+            /** Edited By */
+            edited_by: string | null;
+            /** Edited At */
+            edited_at: string | null;
+            /** Waiver Signed */
+            waiver_signed: boolean;
+        };
+        /** OrderSource */
+        OrderSource: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Heading */
+            heading: string;
         };
         /** OrderSummary */
         OrderSummary: {
@@ -352,6 +524,36 @@ export interface components {
             source: string;
             /** Edited */
             edited: boolean;
+        };
+        /** OrderTriage */
+        OrderTriage: {
+            /** Assessments */
+            assessments: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** Questions */
+            questions: {
+                [key: string]: string;
+            };
+            /** Escalation Message */
+            escalation_message: string | null;
+        };
+        /** PartFit */
+        PartFit: {
+            /** Part Id */
+            part_id: string;
+            /** Name */
+            name: string;
+            /** Price */
+            price: string;
+            /** Position */
+            position?: string | null;
+            /** Why */
+            why: string;
+            /** Adapter */
+            adapter?: string | null;
         };
         /** PartRequest */
         PartRequest: {
@@ -387,6 +589,15 @@ export interface components {
             reviewer: string;
             /** Notes */
             notes?: string | null;
+        };
+        /** ReviewResult */
+        ReviewResult: {
+            /** Id */
+            id: number;
+            /** Status */
+            status: string;
+            /** Resumed Graph */
+            resumed_graph: boolean;
         };
         /** Revision */
         Revision: {
@@ -450,6 +661,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ComplaintOption"][];
+                };
+            };
+        };
+    };
+    labor_menu_api_labor_menu_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LaborOption"][];
                 };
             };
         };
@@ -703,9 +934,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["OrderDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    part_options_api_orders__order_id__part_options_get: {
+        parameters: {
+            query: {
+                category: string;
+            };
+            header?: never;
+            path: {
+                order_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompatiblePartsResult"];
                 };
             };
             /** @description Validation Error */
@@ -740,9 +1002,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["OrderDetail"];
                 };
             };
             /** @description Validation Error */
@@ -777,9 +1037,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["ReviewResult"];
                 };
             };
             /** @description Validation Error */
