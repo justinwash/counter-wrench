@@ -71,6 +71,7 @@ class RunOutput(BaseModel):
     assessments: dict[str, AssessmentOut] = Field(default_factory=dict)
     row_chunks: dict[str, list[ChunkOut]] = Field(default_factory=dict)
     failed_rows: list[str] = Field(default_factory=list)
+    unresolved: dict[str, str] = Field(default_factory=dict)  # questions dropped at the round limit
     escalated: bool = False
     questions: dict[str, str] = Field(default_factory=dict)  # row id or "bike" -> question
     outcome: str

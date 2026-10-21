@@ -14,7 +14,7 @@ FROM python:3.12.12-slim-bookworm
 COPY --from=ghcr.io/astral-sh/uv:0.12.0 /uv /usr/local/bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never \
     FASTEMBED_CACHE_PATH=/opt/fastembed PATH="/app/.venv/bin:$PATH" \
-    CW_STATIC_DIR=/app/static
+    CW_STATIC_DIR=/app/static PYTHONPATH=/app
 WORKDIR /app
 
 # Dependencies first (cached until the lock file changes), then the project itself.
@@ -23,6 +23,8 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY README.md ./
 COPY src/ src/
 COPY data/ data/
+# The evaluators and judge rubrics: online scoring (step 21) runs the same code as the offline evals.
+COPY evals/ evals/
 RUN uv sync --frozen --no-dev
 
 # Bake the embedding model into the image, so containers start without downloading it.

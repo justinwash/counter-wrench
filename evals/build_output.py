@@ -60,6 +60,7 @@ def build_run_output(state: dict, conn: psycopg.Connection) -> RunOutput:
         assessments=assessments,
         row_chunks=row_chunks,
         failed_rows=sorted(state.get("failed_rows", {})),
+        unresolved=state.get("unresolved", {}),
         escalated=bool(state.get("escalated")),
         questions=state.get("questions", {}),
         outcome=state["outcome"],

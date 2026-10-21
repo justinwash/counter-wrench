@@ -35,7 +35,19 @@ def _thread(intake_id: str) -> dict:
     return {"configurable": {"thread_id": intake_id}}
 
 
-def _run(cw, graph_input, intake_id: str, config: dict) -> Iterator[str]:
+def _score(cw, intake_id: str, stage: str | None, state) -> None:
+    """Hand a finished run to online scoring (background; the response doesn't wait)."""
+    values = state.values
+    if cw.online is None or stage is None or not values.get("assessments"):
+        return
+    if stage == "draft" and not values.get("work_order_id"):
+        return  # nothing was drafted, so there is nothing to check
+    run_id = values.get("draft_run_id") if stage == "draft" else intake_id
+    if run_id:
+        cw.online.schedule(stage, str(run_id), values)
+
+
+def _run(cw, graph_input, intake_id: str, config: dict, stage: str | None = None) -> Iterator[str]:
     try:
         for chunk in cw.graph.stream(graph_input, config, stream_mode="updates"):
             for node, update in chunk.items():
@@ -47,6 +59,7 @@ def _run(cw, graph_input, intake_id: str, config: dict) -> Iterator[str]:
         return
     state = cw.graph.get_state(_thread(intake_id))
     values, waiting = state.values, state.next or ()
+    _score(cw, intake_id, stage, state)  # before `done`: a client that hangs up there can't skip it
     yield sse("done", {
         "intake_id": intake_id, "outcome": values.get("outcome"),
         "work_order_id": values.get("work_order_id"),
@@ -71,7 +84,7 @@ def _new_run(cw, intake: IntakeForm, previous: str | None = None) -> Iterator[st
         )  # fmt: skip
     inputs = {"intake": guarded.intake, "run_id": intake_id, "source": "counter",
               "guardrail_note": guarded.mechanic_note(), "guardrail_flags": flags}  # fmt: skip
-    yield from _run(cw, inputs, intake_id, config)
+    yield from _run(cw, inputs, intake_id, config, stage="triage")
 
 
 def _paused_at(cw, intake_id: str, node: str):
@@ -97,7 +110,7 @@ def continue_to_draft(intake_id: str, request: Request) -> StreamingResponse:
     draft_run = uuid.uuid4()
     config = {**_thread(intake_id), "run_id": draft_run, "run_name": "counterwrench-continue"}
     resume = Command(resume={"action": "draft", "draft_run_id": str(draft_run)})
-    return StreamingResponse(_run(cw, resume, intake_id, config), media_type=SSE)
+    return StreamingResponse(_run(cw, resume, intake_id, config, stage="draft"), media_type=SSE)
 
 
 def add_answers(

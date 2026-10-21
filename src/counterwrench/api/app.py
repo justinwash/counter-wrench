@@ -22,10 +22,15 @@ class AppState:
     deps: Deps
     graph: Any
     config: Any = None  # ModelConfig, for run metadata; None in tests
+    online: Any = None  # OnlineScorer, or None when live scoring is off
 
 
 def create_app(
-    deps: Deps | None = None, checkpointer=None, config=None, rate_limit_per_hour: int | None = None
+    deps: Deps | None = None,
+    checkpointer=None,
+    config=None,
+    rate_limit_per_hour: int | None = None,
+    online=None,
 ) -> FastAPI:
     from counterwrench.api import catalog, intakes, limits, orders
 
@@ -35,11 +40,15 @@ def create_app(
         config = config or load_config()
         deps = default_deps(config)
         checkpointer = checkpointer or postgres_checkpointer()
+        if online is None and live_scoring_enabled():
+            from counterwrench.online.scoring import build_scorer
+
+            online = build_scorer(config, deps.connect)
     app = FastAPI(title="CounterWrench", version="0.1.0")
     graph = build_graph(
         deps, checkpointer=checkpointer or InMemorySaver(), confirm_before_draft=True
     )
-    app.state.cw = AppState(deps=deps, graph=graph, config=config)
+    app.state.cw = AppState(deps=deps, graph=graph, config=config, online=online)
     limits.install(app, rate_limit_per_hour)
     app.include_router(catalog.router, prefix="/api")
     app.include_router(intakes.router, prefix="/api")
@@ -70,6 +79,13 @@ def _serve_ui(app: FastAPI) -> None:
             raise HTTPException(404)
         file = static / path
         return FileResponse(file if path and file.is_file() else static / "index.html")
+
+
+def live_scoring_enabled() -> bool:
+    """On when traces are going to LangSmith (that's where the scores go), unless switched off."""
+    import os
+
+    return os.environ.get("LANGSMITH_TRACING") == "true" and os.environ.get("CW_ONLINE_EVAL") != "0"
 
 
 def postgres_checkpointer(url: str | None = None):
