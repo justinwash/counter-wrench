@@ -28,6 +28,7 @@ from counterwrench.config import (
     build_chat_model,
     resolve_models,
     split_model,
+    structured_kwargs,
 )
 from counterwrench.models import Severity
 from counterwrench.tracing import configure_tracing
@@ -166,8 +167,10 @@ def check_tool_calling(model: str, config: ModelConfig) -> CheckResult:
 def check_structured_output(model: str, config: ModelConfig) -> CheckResult:
     start = time.perf_counter()
     try:
+        # The triage setting applies to the models that do triage, not to the judge.
+        extra = structured_kwargs() if model in (config.agent, config.triage) else {}
         llm = build_chat_model(model, config).with_structured_output(
-            SeverityCheck, include_raw=True
+            SeverityCheck, include_raw=True, **extra
         )
         result = llm.invoke(STRUCTURED_PROMPT)
     except Exception as exc:

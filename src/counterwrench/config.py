@@ -154,6 +154,20 @@ def _pick_judge(agent: str, available: tuple[str, ...]) -> str:
     return f"{agent_provider}:{DEFAULTS[agent_provider]['strong']}"
 
 
+def structured_kwargs(env: Mapping[str, str] | None = None) -> dict:
+    """How the triage step asks for structured output. Blank means the library's default (a forced
+    tool call), which is what every experiment before E-009 used. Some models (the Claude 5.5
+    Sonnet, Opus and Fable tiers) refuse a forced tool choice but accept a JSON schema, so
+    TRIAGE_STRUCTURED_METHOD=json_schema lets them run. Opt-in, and recorded on every run."""
+    method = (env if env is not None else os.environ).get("TRIAGE_STRUCTURED_METHOD", "").strip()
+    if method not in ("", "json_schema", "function_calling"):
+        raise ConfigError(
+            f"TRIAGE_STRUCTURED_METHOD={method!r}: use json_schema or function_calling, "
+            "or leave it blank for the default."
+        )
+    return {"method": method} if method else {}
+
+
 def build_chat_model(model: str, config: ModelConfig) -> BaseChatModel:
     """Build (without calling) the chat model. Temperature 0; OpenRouter pinned when configured."""
     provider, name = split_model(model)

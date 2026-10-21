@@ -17,7 +17,7 @@ class FakeTriage:
         self.calls: dict[str, list] = {}
         self._lock = threading.Lock()
 
-    def with_structured_output(self, schema, include_raw):
+    def with_structured_output(self, schema, include_raw, **_):
         return self
 
     def invoke(self, messages):

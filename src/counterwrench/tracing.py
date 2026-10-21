@@ -63,6 +63,8 @@ def run_metadata(config, **extra: Any) -> dict[str, Any]:
         "openrouter_provider_order": list(config.openrouter_provider_order),
         "search_mode": str(DEFAULT_MODE),
         "embedding_model": MODEL_NAME,
+        "triage_structured_method": os.environ.get("TRIAGE_STRUCTURED_METHOD", "").strip()
+        or "default",
         **git_version(),
         **extra,
     }

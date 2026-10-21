@@ -22,6 +22,7 @@ from counterwrench.agent.prompt_builder import build_intake_message, label, retr
 from counterwrench.agent.review import ReviewDecision, apply_review
 from counterwrench.agent.state import GraphState, RowTask
 from counterwrench.compat.lookup import load_bike
+from counterwrench.config import structured_kwargs
 from counterwrench.db.connection import connect
 from counterwrench.models import RowAssessment, Severity, max_severity
 from counterwrench.rag.embed import Embedder
@@ -183,7 +184,9 @@ def triage_row(task: RowTask, deps: Deps) -> dict:
             + f'\n\nAssess row "{row_id}" ({label(row.complaint)}) only.'
         ),
     ]  # fmt: skip
-    model = deps.triage_model().with_structured_output(RowAssessment, include_raw=True)
+    model = deps.triage_model().with_structured_output(
+        RowAssessment, include_raw=True, **structured_kwargs()
+    )
 
     retries, last_error = 0, ""
     for attempt in range(MAX_TRIAGE_ATTEMPTS):

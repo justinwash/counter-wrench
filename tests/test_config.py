@@ -139,3 +139,14 @@ def test_builds_the_right_chat_class(monkeypatch, keys, expected_class):
     model = build_chat_model(config.agent, config)
     assert type(model).__name__ == expected_class
     assert model.temperature == 0
+
+
+def test_structured_method_is_opt_in_and_validated():
+    from counterwrench.config import structured_kwargs
+
+    assert structured_kwargs({}) == {}  # the default every earlier experiment used
+    assert structured_kwargs({"TRIAGE_STRUCTURED_METHOD": " json_schema "}) == {
+        "method": "json_schema"
+    }
+    with pytest.raises(ConfigError, match="json_schema or function_calling"):
+        structured_kwargs({"TRIAGE_STRUCTURED_METHOD": "magic"})
