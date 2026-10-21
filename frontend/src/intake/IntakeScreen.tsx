@@ -44,6 +44,8 @@ export default function IntakeScreen() {
   const [rows, setRows] = useState<Row[]>([newRow(1)]);
   const [generalNotes, setGeneralNotes] = useState("");
   const [triagedNotes, setTriagedNotes] = useState<Record<string, string>>({});
+  // Earlier triage results per row, oldest first, with what changed before each re-triage.
+  const [history, setHistory] = useState<Record<string, Earlier[]>>({});
   const [run, dispatch] = useReducer(reduce, emptyRun);
   const [answerBike, setAnswerBike] = useState<BikeChoice | null>(null);
   const [declining, setDeclining] = useState(false);
@@ -88,6 +90,17 @@ export default function IntakeScreen() {
   }
 
   function retriage() {
+    setHistory((h) => {
+      const next = { ...h };
+      for (const r of rows) {
+        const result = run.rows[r.row_id];
+        if (!result) continue;
+        const noteChanged = r.note.trim() !== (triagedNotes[r.row_id] ?? "");
+        next[r.row_id] = [...(h[r.row_id] ?? []), { result, answer: r.answer.trim() || null,
+          note: noteChanged ? r.note.trim() : null }];
+      }
+      return next;
+    });
     snapshotNotes();
     setRows((rs) => rs.map((r) => ({ ...r, answer: "" })));
     void stream(`/api/intakes/${run.intakeId}/revise`, { answers, notes: changedNotes });
@@ -111,7 +124,7 @@ export default function IntakeScreen() {
 
   function startOver() {
     dispatch({ type: "reset" });
-    setRows([newRow(1)]); setBike(null); setGeneralNotes(""); setTriagedNotes({});
+    setRows([newRow(1)]); setBike(null); setGeneralNotes(""); setTriagedNotes({}); setHistory({});
     setDeclining(false); setStaff(""); setWaiver(false);
   }
 
@@ -173,6 +186,7 @@ export default function IntakeScreen() {
                       placeholder="What the customer said" onChange={(e) => update(i, { note: e.target.value })} />
                   </td>
                   <ResultCells result={result} failed={failed} pending={run.running && !result && !failed}
+                    earlier={history[r.row_id] ?? []}
                     answer={confirming ? { value: r.answer, set: (v) => update(i, { answer: v }), id: `answer-${r.row_id}` } : null} />
                   <td className="px-2 py-2">
                     {rows.length > 1 && !started && (
@@ -280,12 +294,32 @@ export default function IntakeScreen() {
   );
 }
 
-function ResultCells({ result, failed, pending, answer }: {
-  result?: RowResult; failed?: string; pending: boolean;
+interface Earlier { result: RowResult; answer: string | null; note: string | null }
+
+function EarlierTriage({ earlier }: { earlier: Earlier[] }) {
+  if (!earlier.length) return null;
+  return (
+    <ol className="mt-2 border-t border-line pt-1 flex flex-col gap-1 text-xs text-muted" aria-label="Earlier triage">
+      {earlier.map((e, i) => (
+        <li key={i}>
+          <span className="font-semibold">Before re-triage {i + 1}:</span> {SEVERITY[e.result.severity].label}: {e.result.likely_causes[0]}
+          {e.result.question_for_customer && <> · Asked: {e.result.question_for_customer}</>}
+          {e.answer && <> · Answer: <span className="text-ink">{e.answer}</span></>}
+          {e.note && <> · Note changed to: <span className="text-ink">{e.note}</span></>}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function ResultCells({ result, failed, pending, answer, earlier }: {
+  result?: RowResult; failed?: string; pending: boolean; earlier: Earlier[];
   answer: { value: string; set: (v: string) => void; id: string } | null;
 }) {
   if (failed) return <td colSpan={3} className="px-2 py-2 text-warn">Couldn't assess this row; a mechanic will check it.</td>;
-  if (!result) return <td colSpan={3} className="px-2 py-2 text-muted">{pending ? "Triaging…" : ""}</td>;
+  if (!result) return (
+    <td colSpan={3} className="px-2 py-2 text-muted">{pending ? "Triaging…" : ""}<EarlierTriage earlier={earlier} /></td>
+  );
   const sev = SEVERITY[result.severity];
   const agree = result.agrees_with_suspected_area;
   return (
@@ -301,6 +335,7 @@ function ResultCells({ result, failed, pending, answer }: {
           </p>
         )}
         {agree === true && <p className="text-good text-xs mt-1">Agrees with the area staff picked.</p>}
+        <EarlierTriage earlier={earlier} />
         {result.question_for_customer && (
           <div className="text-xs mt-1 bg-ask-bg border border-ask-line px-1.5 py-1 flex flex-col gap-1">
             <span>Ask the customer: {result.question_for_customer}</span>

@@ -105,6 +105,10 @@ describe("IntakeScreen", () => {
     await click("Re-triage with changes");
 
     await waitFor(() => expect(screen.getByText("Needs adjustment")).toBeTruthy());
+    const earlier = screen.getByLabelText("Earlier triage").textContent ?? "";
+    expect(earlier).toContain("Needs service: Pads worn to the backing plate");
+    expect(earlier).toContain("Answer: Yes, but it's weak");
+    expect(earlier).toContain("Note changed to: Grinding, no sparks");
     expect(calls[1]).toEqual({ url: "/api/intakes/i1/revise",
       body: { answers: { r1: "Yes, but it's weak" }, notes: { r1: "Grinding, no sparks" } } });
   });
