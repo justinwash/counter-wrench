@@ -117,13 +117,156 @@
     }
    }
   },
+  "/api/intakes/{intake_id}/continue": {
+   "post": {
+    "tags": [
+     "intakes"
+    ],
+    "summary": "Continue To Draft",
+    "description": "Counter staff are done with the triage: draft the work order for the mechanic.",
+    "operationId": "continue_to_draft_api_intakes__intake_id__continue_post",
+    "parameters": [
+     {
+      "name": "intake_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Intake Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/intakes/{intake_id}/revise": {
+   "post": {
+    "tags": [
+     "intakes"
+    ],
+    "summary": "Revise",
+    "description": "Answer the questions or fix the notes, then triage again. The paused run is finished\nas `revised` first, so its trace ends cleanly instead of hanging at the pause.",
+    "operationId": "revise_api_intakes__intake_id__revise_post",
+    "parameters": [
+     {
+      "name": "intake_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Intake Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Revision"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/intakes/{intake_id}/decline": {
+   "post": {
+    "tags": [
+     "intakes"
+    ],
+    "summary": "Decline",
+    "description": "The customer doesn't want the work: keep a declined record and release the bike. A\nsafety-critical decline needs a signed waiver (the database enforces it too).",
+    "operationId": "decline_api_intakes__intake_id__decline_post",
+    "parameters": [
+     {
+      "name": "intake_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Intake Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Decline"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/intakes/{intake_id}/answers": {
    "post": {
     "tags": [
      "intakes"
     ],
     "summary": "Answer",
-    "description": "Re-run an intake that stopped for answers (the bike couldn't be resolved), with the\nanswers added. Questions about rows don't stop a run (D-037): they're answered at review.",
+    "description": "The bike couldn't be resolved, so the run stopped: re-run with the bike staff picked,\nor with the bike marked unconfirmed (labor only; the mechanic identifies it).",
     "operationId": "answer_api_intakes__intake_id__answers_post",
     "parameters": [
      {
@@ -390,16 +533,6 @@
   "schemas": {
    "Answers": {
     "properties": {
-     "answers": {
-      "additionalProperties": {
-       "type": "string",
-       "maxLength": 500,
-       "minLength": 1
-      },
-      "type": "object",
-      "title": "Answers",
-      "description": "row id -> answer"
-     },
      "bike_id": {
       "anyOf": [
        {
@@ -410,7 +543,13 @@
        }
       ],
       "title": "Bike Id",
-      "description": "The catalog bike, if the bike was the question."
+      "description": "The catalog bike, once identified."
+     },
+     "bike_unconfirmed": {
+      "type": "boolean",
+      "title": "Bike Unconfirmed",
+      "description": "The customer doesn't know either: carry on without a catalog bike.",
+      "default": false
      }
     },
     "type": "object",
@@ -524,6 +663,26 @@
     ],
     "title": "ComplaintRow"
    },
+   "Decline": {
+    "properties": {
+     "staff": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Staff"
+     },
+     "waiver_signed": {
+      "type": "boolean",
+      "title": "Waiver Signed",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "staff"
+    ],
+    "title": "Decline"
+   },
    "EditLinesArgs": {
     "properties": {
      "editor": {
@@ -625,6 +784,11 @@
       },
       "type": "object",
       "title": "Answers"
+     },
+     "bike_unconfirmed": {
+      "type": "boolean",
+      "title": "Bike Unconfirmed",
+      "default": false
      }
     },
     "additionalProperties": false,
@@ -810,6 +974,52 @@
      "reviewer"
     ],
     "title": "ReviewDecision"
+   },
+   "Revision": {
+    "properties": {
+     "answers": {
+      "additionalProperties": {
+       "type": "string",
+       "maxLength": 500,
+       "minLength": 1
+      },
+      "type": "object",
+      "title": "Answers",
+      "description": "row id -> answer"
+     },
+     "notes": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 500,
+         "minLength": 1
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "type": "object",
+      "title": "Notes",
+      "description": "row id -> replacement customer note"
+     },
+     "general_notes": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "General Notes"
+     }
+    },
+    "type": "object",
+    "title": "Revision"
    },
    "SuspectedArea": {
     "type": "string",

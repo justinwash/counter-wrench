@@ -36,58 +36,109 @@ function renderScreen() {
   render(<QueryClientProvider client={client}><IntakeScreen /></QueryClientProvider>);
 }
 
-async function fillOneRow(bikeSearch: string, pick: string) {
-  fireEvent.change(screen.getByPlaceholderText(/Search the catalog/), { target: { value: bikeSearch } });
-  fireEvent.click(await screen.findByText(pick));
+async function fillOneRow() {
+  fireEvent.change(screen.getByPlaceholderText(/Search the catalog/), { target: { value: "slash" } });
+  fireEvent.click(await screen.findByText("2024 Trek Slash 9.8 XT Gen 6"));
   await screen.findByRole("option", { name: "Brake noise" });
   fireEvent.change(screen.getByLabelText("Complaint"), { target: { value: "brake_noise" } });
   fireEvent.change(screen.getByLabelText("Suspected area"), { target: { value: "brake_pads" } });
   fireEvent.change(screen.getByLabelText("Customer's words"), { target: { value: "Grinding and sparks" } });
 }
 
-const row = (severity: string) => ({ row_id: "r1", severity, likely_causes: ["Pads worn to the backing plate"],
-  likely_area: "brake_pads", agrees_with_suspected_area: true, disagreement_reason: null,
-  question_for_customer: "Does it still stop?", suggested_labor: ["BRAKE-PAD-INSTALL"],
-  suggested_part_categories: ["brake_pads"], citations: [] });
+const click = async (text: string) => { await act(async () => { fireEvent.click(screen.getByText(text)); }); };
+
+const row = (severity: string, question: string | null = "Does it still stop?") => ({
+  row_id: "r1", severity, likely_causes: ["Pads worn to the backing plate"], likely_area: "brake_pads",
+  agrees_with_suspected_area: true, disagreement_reason: null, question_for_customer: question,
+  suggested_labor: ["BRAKE-PAD-INSTALL"], suggested_part_categories: ["brake_pads"], citations: [] });
+
+const triage = (id: string, severity: string, extra: [string, object][] = []) => sse([
+  ["accepted", { intake_id: id, run_id: id, previous: null, pii_redacted: { phone: 1 }, guardrail_flags: [] }],
+  ["bike", { bike_id: "trek-slash", name: "2024 Trek Slash 9.8 XT Gen 6", note: "Catalog bike.", question: null }],
+  ["row", row(severity)],
+  ...extra,
+  ["triaged", { stage: "confirm" }],
+  ["done", { intake_id: id, outcome: "ready_to_draft", work_order_id: null, awaiting_confirmation: true, awaiting_review: false }],
+]);
+const escalation: [string, object][] = [["route", { outcome: "escalated", escalated: true,
+  escalation_message: "DO NOT RIDE. Safety-critical issue on row r1.", questions: { r1: "Does it still stop?" } }]];
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe("IntakeScreen", () => {
-  it("fills the row from the stream and turns red on a safety escalation", async () => {
-    const calls = mockApi({ "/api/intakes": sse([
-      ["accepted", { intake_id: "i1", run_id: "i1", previous: null, pii_redacted: { phone: 1 }, guardrail_flags: [] }],
-      ["bike", { bike_id: "trek-slash", name: "2024 Trek Slash 9.8 XT Gen 6", note: "Catalog bike.", question: null }],
-      ["row", row("safety_critical")],
-      ["route", { outcome: "escalated", escalated: true, escalation_message: "DO NOT RIDE. Safety-critical issue on row r1.", questions: {} }],
-      ["draft", { work_order_id: 42, estimate_total: "$55.00", unverified_parts: [], error: null }],
-      ["done", { intake_id: "i1", outcome: "escalated", work_order_id: 42, awaiting_review: true }],
-    ]) });
+  it("triages, turns red on a safety escalation, then creates the work order", async () => {
+    const calls = mockApi({
+      "/api/intakes": triage("i1", "safety_critical", escalation),
+      "/api/intakes/i1/continue": sse([
+        ["draft", { work_order_id: 42, estimate_total: "$55.00", unverified_parts: [], error: null }],
+        ["done", { intake_id: "i1", outcome: "escalated", work_order_id: 42, awaiting_confirmation: false, awaiting_review: true }],
+      ]),
+    });
     renderScreen();
-    await fillOneRow("slash", "2024 Trek Slash 9.8 XT Gen 6");
-    await act(async () => { fireEvent.click(screen.getByText("Submit intake")); });
+    await fillOneRow();
+    await click("Triage");
 
-    expect(await screen.findByRole("alert")).toHaveProperty("textContent", "DO NOT RIDE. Safety-critical issue on row r1.");
+    expect((await screen.findByRole("alert")).textContent).toBe("DO NOT RIDE. Safety-critical issue on row r1.");
     expect(screen.getByText("Safety-critical")).toBeTruthy();
-    expect(screen.getByText(/Ask the customer: Does it still stop\?/)).toBeTruthy();
-    expect(screen.getByText(/Draft work order #42/)).toBeTruthy();
     expect(screen.getByText(/Removed from the notes before triage: 1 phone/)).toBeTruthy();
+    expect(screen.queryByText(/Work order #/)).toBeNull();  // nothing drafted yet
+    await click("Create work order");
+    expect(await screen.findByText(/Work order #42/)).toBeTruthy();
+    expect(screen.getByText("Safety-critical")).toBeTruthy();  // the triage stays on screen
+    expect(calls.map((c) => c.url)).toEqual(["/api/intakes", "/api/intakes/i1/continue"]);
     expect(calls[0].body).toMatchObject({ bike_id: "trek-slash",
       rows: [{ row_id: "r1", complaint: "brake_noise", suspected_area: "brake_pads", note: "Grinding and sparks" }] });
   });
 
-  it("asks which bike when the free text is ambiguous, then re-runs with the answer", async () => {
+  it("re-triages with the customer's answer and a corrected note", async () => {
+    const calls = mockApi({
+      "/api/intakes": triage("i1", "needs_service"),
+      "/api/intakes/i1/revise": triage("i2", "needs_adjustment"),
+    });
+    renderScreen();
+    await fillOneRow();
+    await click("Triage");
+    const reTriage = await screen.findByText("Re-triage with changes");
+    expect((reTriage as HTMLButtonElement).disabled).toBe(true);  // nothing changed yet
+    fireEvent.change(screen.getByLabelText("Customer's answer"), { target: { value: "Yes, but it's weak" } });
+    fireEvent.change(screen.getByLabelText("Customer's words"), { target: { value: "Grinding, no sparks" } });
+    await click("Re-triage with changes");
+
+    await waitFor(() => expect(screen.getByText("Needs adjustment")).toBeTruthy());
+    expect(calls[1]).toEqual({ url: "/api/intakes/i1/revise",
+      body: { answers: { r1: "Yes, but it's weak" }, notes: { r1: "Grinding, no sparks" } } });
+  });
+
+  it("records a declined safety-critical job only with a signed waiver", async () => {
+    const calls = mockApi({
+      "/api/intakes": triage("i1", "safety_critical", escalation),
+      "/api/intakes/i1/decline": sse([["done", { intake_id: "i1", outcome: "declined", work_order_id: 9,
+        awaiting_confirmation: false, awaiting_review: false }]]),
+    });
+    renderScreen();
+    await fillOneRow();
+    await click("Triage");
+    await click("Customer declined…");
+    const record = screen.getByText("Record decline and release the bike") as HTMLButtonElement;
+    fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Sam" } });
+    expect(record.disabled).toBe(true);  // no waiver yet
+    fireEvent.click(screen.getByLabelText(/signed the waiver/));
+    expect(record.disabled).toBe(false);
+    await click("Record decline and release the bike");
+
+    expect(await screen.findByText(/Record #9 kept; the bike is released/)).toBeTruthy();
+    expect(calls[1]).toEqual({ url: "/api/intakes/i1/decline", body: { staff: "Sam", waiver_signed: true } });
+  });
+
+  it("carries on without a confirmed bike when the customer doesn't know the year", async () => {
     const calls = mockApi({
       "/api/intakes": sse([
         ["accepted", { intake_id: "i1", run_id: "i1", previous: null, pii_redacted: {}, guardrail_flags: [] }],
         ["route", { outcome: "needs_answers", escalated: false, escalation_message: null,
-                    questions: { bike: "Which Trek Marlin 7: 2023 or 2025?" } }],
-        ["done", { intake_id: "i1", outcome: "needs_answers", work_order_id: null, awaiting_review: false }],
+                    questions: { bike: "Which bike is it: 2023 or 2025 Trek Marlin 7?" } }],
+        ["done", { intake_id: "i1", outcome: "needs_answers", work_order_id: null, awaiting_confirmation: false, awaiting_review: false }],
       ]),
-      "/api/intakes/i1/answers": sse([
-        ["accepted", { intake_id: "i2", run_id: "i2", previous: "i1", pii_redacted: {}, guardrail_flags: [] }],
-        ["row", row("needs_service")],
-        ["done", { intake_id: "i2", outcome: "ready_to_draft", work_order_id: 7, awaiting_review: true }],
-      ]),
+      "/api/intakes/i1/answers": triage("i2", "needs_service"),
     });
     renderScreen();
     fireEvent.click(screen.getByText("Not in the catalog"));
@@ -95,17 +146,11 @@ describe("IntakeScreen", () => {
     await screen.findByRole("option", { name: "Brake noise" });
     fireEvent.change(screen.getByLabelText("Complaint"), { target: { value: "brake_noise" } });
     fireEvent.change(screen.getByLabelText("Suspected area"), { target: { value: "brake_pads" } });
-    await act(async () => { fireEvent.click(screen.getByText("Submit intake")); });
+    await click("Triage");
 
-    expect(await screen.findByText("Which Trek Marlin 7: 2023 or 2025?")).toBeTruthy();
-    const search = screen.getAllByPlaceholderText(/Search the catalog/).at(-1)!;
-    fireEvent.change(search, { target: { value: "marlin" } });
-    fireEvent.click(await screen.findByText("2023 Trek Marlin 7 Gen 3"));
-    await act(async () => { fireEvent.click(screen.getByText("Re-run with this bike")); });
-
+    expect(await screen.findByText("Which bike is it: 2023 or 2025 Trek Marlin 7?")).toBeTruthy();
+    await click("Customer doesn't know: draft without a confirmed bike");
     await waitFor(() => expect(screen.getByText("Needs service")).toBeTruthy());
-    expect(calls.map((c) => c.url)).toEqual(["/api/intakes", "/api/intakes/i1/answers"]);
-    expect(calls[1].body).toEqual({ bike_id: "trek-marlin-2023" });
-    expect(screen.queryByRole("alert")).toBeNull();
+    expect(calls[1]).toEqual({ url: "/api/intakes/i1/answers", body: { bike_unconfirmed: true } });
   });
 });

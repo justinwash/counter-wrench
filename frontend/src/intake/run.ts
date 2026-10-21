@@ -12,13 +12,16 @@ export interface RunState {
   escalationMessage: string | null;
   questions: Record<string, string>;
   outcome: string | null;
+  awaitingConfirmation: boolean;
+  workOrderId: number | null;
   draft: { work_order_id: number | null; estimate_total: string | null; unverified_parts: string[]; error: string | null } | null;
   error: string | null;
 }
 
 export const emptyRun: RunState = {
   running: false, intakeId: null, redacted: {}, flags: [], bike: null, rows: {}, failedRows: {},
-  escalationMessage: null, questions: {}, outcome: null, draft: null, error: null,
+  escalationMessage: null, questions: {}, outcome: null, awaitingConfirmation: false,
+  workOrderId: null, draft: null, error: null,
 };
 
 export function applyEvent(state: RunState, e: StreamEvent): RunState {
@@ -36,7 +39,8 @@ export function applyEvent(state: RunState, e: StreamEvent): RunState {
     case "draft":
       return { ...state, draft: e.data };
     case "done":
-      return { ...state, running: false, outcome: e.data.outcome, intakeId: e.data.intake_id };
+      return { ...state, running: false, outcome: e.data.outcome, intakeId: e.data.intake_id,
+               awaitingConfirmation: e.data.awaiting_confirmation, workOrderId: e.data.work_order_id };
     case "error":
       return { ...state, running: false, error: e.data.message };
     default:

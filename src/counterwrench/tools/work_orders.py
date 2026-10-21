@@ -236,6 +236,35 @@ def edit_lines(conn: psycopg.Connection, order_id: int, edit: EditLinesArgs) -> 
     return []
 
 
+def record_decline(
+    conn: psycopg.Connection,
+    *,
+    intake: dict,
+    bike_id: str | None,
+    bike_freetext: str | None,
+    severity: str,
+    staff: str,
+    waiver_signed: bool,
+    langsmith_run_id: UUID | None,
+    source: str,
+) -> int:
+    """Keep the customer's decline as a record (no lines, nothing to approve). The database
+    refuses a safety-critical decline without a signed waiver."""
+    waiver = " Signed a waiver of liability." if waiver_signed else ""
+    advised = " We advised against riding it." if severity == "safety_critical" else ""
+    note = f"Customer declined the recommended service.{advised}{waiver} Bike released."
+    return conn.execute(
+        """
+        INSERT INTO work_orders (status, bike_id, bike_freetext, severity, customer_explanation,
+            estimate_total_cents, intake, langsmith_run_id, source, reviewed_by, reviewed_at,
+            review_notes, waiver_signed)
+        VALUES ('declined', %s, %s, %s, %s, 0, %s, %s, %s, %s, now(), %s, %s) RETURNING id
+        """,
+        (bike_id, bike_freetext, severity, note, Jsonb(intake), langsmith_run_id, source, staff,
+         note, waiver_signed),
+    ).fetchone()[0]  # fmt: skip
+
+
 def draft_work_order(
     conn: psycopg.Connection,
     args: DraftWorkOrderArgs,

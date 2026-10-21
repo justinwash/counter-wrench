@@ -34,7 +34,9 @@ def create_app(deps: Deps | None = None, checkpointer=None, config=None) -> Fast
         deps = default_deps(config)
         checkpointer = checkpointer or postgres_checkpointer()
     app = FastAPI(title="CounterWrench", version="0.1.0")
-    graph = build_graph(deps, checkpointer=checkpointer or InMemorySaver())
+    graph = build_graph(
+        deps, checkpointer=checkpointer or InMemorySaver(), confirm_before_draft=True
+    )
     app.state.cw = AppState(deps=deps, graph=graph, config=config)
     app.include_router(catalog.router, prefix="/api")
     app.include_router(intakes.router, prefix="/api")

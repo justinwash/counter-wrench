@@ -58,6 +58,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/intakes/{intake_id}/continue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Continue To Draft
+         * @description Counter staff are done with the triage: draft the work order for the mechanic.
+         */
+        post: operations["continue_to_draft_api_intakes__intake_id__continue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/intakes/{intake_id}/revise": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revise
+         * @description Answer the questions or fix the notes, then triage again. The paused run is finished
+         *     as `revised` first, so its trace ends cleanly instead of hanging at the pause.
+         */
+        post: operations["revise_api_intakes__intake_id__revise_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/intakes/{intake_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decline
+         * @description The customer doesn't want the work: keep a declined record and release the bike. A
+         *     safety-critical decline needs a signed waiver (the database enforces it too).
+         */
+        post: operations["decline_api_intakes__intake_id__decline_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/intakes/{intake_id}/answers": {
         parameters: {
             query?: never;
@@ -69,8 +131,8 @@ export interface paths {
         put?: never;
         /**
          * Answer
-         * @description Re-run an intake that stopped for answers (the bike couldn't be resolved), with the
-         *     answers added. Questions about rows don't stop a run (D-037): they're answered at review.
+         * @description The bike couldn't be resolved, so the run stopped: re-run with the bike staff picked,
+         *     or with the bike marked unconfirmed (labor only; the mechanic identifies it).
          */
         post: operations["answer_api_intakes__intake_id__answers_post"];
         delete?: never;
@@ -160,17 +222,16 @@ export interface components {
         /** Answers */
         Answers: {
             /**
-             * Answers
-             * @description row id -> answer
-             */
-            answers?: {
-                [key: string]: string;
-            };
-            /**
              * Bike Id
-             * @description The catalog bike, if the bike was the question.
+             * @description The catalog bike, once identified.
              */
             bike_id?: string | null;
+            /**
+             * Bike Unconfirmed
+             * @description The customer doesn't know either: carry on without a catalog bike.
+             * @default false
+             */
+            bike_unconfirmed: boolean;
         };
         /** BikeCandidate */
         BikeCandidate: {
@@ -202,6 +263,16 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /** Decline */
+        Decline: {
+            /** Staff */
+            staff: string;
+            /**
+             * Waiver Signed
+             * @default false
+             */
+            waiver_signed: boolean;
+        };
         /**
          * EditLinesArgs
          * @description A mechanic's replacement lines for a draft awaiting review.
@@ -231,6 +302,11 @@ export interface components {
             general_notes?: string | null;
             /** Answers */
             answers?: Record<string, never>;
+            /**
+             * Bike Unconfirmed
+             * @default false
+             */
+            bike_unconfirmed: boolean;
         };
         /** LaborRequest */
         LaborRequest: {
@@ -311,6 +387,25 @@ export interface components {
             reviewer: string;
             /** Notes */
             notes?: string | null;
+        };
+        /** Revision */
+        Revision: {
+            /**
+             * Answers
+             * @description row id -> answer
+             */
+            answers?: {
+                [key: string]: string;
+            };
+            /**
+             * Notes
+             * @description row id -> replacement customer note
+             */
+            notes?: {
+                [key: string]: string | null;
+            };
+            /** General Notes */
+            general_notes?: string | null;
         };
         /**
          * SuspectedArea
@@ -400,6 +495,107 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["IntakeForm"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    continue_to_draft_api_intakes__intake_id__continue_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                intake_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revise_api_intakes__intake_id__revise_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                intake_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Revision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decline_api_intakes__intake_id__decline_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                intake_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Decline"];
             };
         };
         responses: {

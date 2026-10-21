@@ -124,6 +124,9 @@ class IntakeForm(Strict):
     general_notes: LongText | None = None
     # Staff answers to the agent's per-row questions, keyed by row_id.
     answers: dict[RowId, ShortText] = Field(default_factory=dict)
+    # Staff confirmed the customer doesn't know which bike it is: draft without a catalog bike
+    # (labor only) and leave identifying it to the mechanic, instead of asking again.
+    bike_unconfirmed: bool = False
 
     @model_validator(mode="after")
     def _consistent(self) -> Self:
@@ -134,6 +137,8 @@ class IntakeForm(Strict):
         row_ids = [row.row_id for row in self.rows]
         if len(row_ids) != len(set(row_ids)):
             raise ValueError("row_id values must be unique")
+        if self.bike_unconfirmed and self.bike_id is not None:
+            raise ValueError("bike_unconfirmed only applies to a free-text bike")
         unknown = set(self.answers) - set(row_ids)
         if unknown:
             raise ValueError(f"answers refer to rows that don't exist: {sorted(unknown)}")
@@ -301,6 +306,7 @@ class WorkOrderStatus(StrEnum):
     APPROVED = "approved"
     REJECTED = "rejected"
     COMPLETED = "completed"
+    DECLINED = "declined"  # the customer declined the work at the counter
 
 
 class WorkOrderDraft(Strict):

@@ -30,7 +30,7 @@ from counterwrench.taxonomy import SuspectedArea
 from counterwrench.tools import make_tools
 from counterwrench.tools.bikes import lookup_bike
 from counterwrench.tools.context import ToolContext
-from counterwrench.tools.work_orders import DraftWorkOrderArgs, draft_work_order
+from counterwrench.tools.work_orders import DraftWorkOrderArgs, draft_work_order, record_decline
 
 PROMPTS = Path(__file__).parent / "prompts"
 CHUNKS_PER_ROW = 5
@@ -73,6 +73,11 @@ def resolve_bike(state: GraphState, deps: Deps) -> dict:
     question = None
     if result.status == "ambiguous":
         options = " or ".join(c.name for c in result.candidates)
+        if intake.bike_unconfirmed:  # the customer doesn't know either: carry on without it
+            note = (f"Bike unconfirmed: the customer doesn't know which it is ({options}). "
+                    "Identify the bike and confirm part fitment, then call the customer with "
+                    "the parts quote.")  # fmt: skip
+            return {"bike": None, "bike_question": None, "bike_note": note}
         question = f"Which bike is it: {options}?"
     return {"bike": bike, "bike_question": question, "bike_note": result.message}
 
@@ -298,7 +303,8 @@ def draft(state: GraphState, deps: Deps) -> dict:
         overrides = {"bike_id": bike.id if bike else None, "bike_freetext": intake.bike_freetext}
         if severity is not None:
             overrides["severity"] = severity
-        code_notes = [failed_note, questions_note, state.get("guardrail_note")]
+        unconfirmed = state["bike_note"] if intake.bike_unconfirmed else None
+        code_notes = [failed_note, questions_note, unconfirmed, state.get("guardrail_note")]
         if any(code_notes):
             overrides["mechanic_notes"] = "\n".join(
                 filter(None, [args.mechanic_notes, *code_notes])
@@ -361,6 +367,41 @@ def draft(state: GraphState, deps: Deps) -> dict:
         "draft": None, "work_order_id": None, "tool_calls": trajectory, "outcome": "needs_mechanic",
         "draft_error": "The drafting agent ended without a saved draft; a mechanic must write it.",
     }  # fmt: skip
+
+
+# --- confirm (counter UI only) -------------------------------------------------------------------
+
+
+def confirm(state: GraphState) -> dict:
+    """Pause after triage so counter staff can answer questions and fix notes before a work
+    order exists. Resume with {"action": "draft"} to continue, or {"action": "revise"} to end
+    this run as `revised` (the API then starts a new run with the changes), so no trace is left
+    hanging at an interrupt."""
+    answer = interrupt({"stage": "confirm", "questions": state.get("questions") or {},
+                        "action": "Create the work order, or revise and re-triage."})  # fmt: skip
+    action = (answer or {}).get("action")
+    if action == "revise":
+        return {"outcome": "revised"}
+    if action == "decline":
+        return {"outcome": "declined", "decline": answer}
+    return {}
+
+
+def record_decline_node(state: GraphState, deps: Deps) -> dict:
+    """The customer declined the work: keep the record, draft nothing."""
+    intake, bike = state["intake"], state.get("bike")
+    assessments = state.get("assessments", {})
+    severity = max_severity(a.severity for a in assessments.values()) if assessments else None
+    decline = state["decline"]
+    with deps.connect() as conn:
+        order_id = record_decline(
+            conn, intake=intake.model_dump(mode="json"), bike_id=bike.id if bike else None,
+            bike_freetext=intake.bike_freetext, severity=(severity or "needs_service"),
+            staff=decline["staff"], waiver_signed=bool(decline.get("waiver_signed")),
+            langsmith_run_id=UUID(state["run_id"]) if state.get("run_id") else None,
+            source=state.get("source", "counter"),
+        )  # fmt: skip
+    return {"work_order_id": order_id}
 
 
 # --- human_review --------------------------------------------------------------------------------

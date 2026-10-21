@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
-/* POS look: plain, dense, high contrast. Severity colors are the only color with meaning. */
+/* POS look, dark by default (Justin: reviewers are developers): plain, dense, high contrast.
+   Severity colors are the only color with meaning. */
 @theme {
   --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
   --font-mono: Consolas, "Cascadia Mono", "Courier New", monospace;
-  --color-ink: #1d232b;
-  --color-muted: #5d6875;
-  --color-line: #cfd6de;
-  --color-panel: #ffffff;
-  --color-ground: #eceff3;
-  --color-accent: #1f5fbf;
-  --color-sev-safety: #c4302b;
-  --color-sev-service: #a86200;
-  --color-sev-adjust: #1f5fbf;
-  --color-sev-cosmetic: #6b5aa6;
-  --color-sev-none: #2f7d4f;
+  --color-ink: #e3e8ee;
+  --color-muted: #96a1ad;
+  --color-line: #2e3640;
+  --color-panel: #171c22;
+  --color-ground: #0f1317;
+  --color-field: #11161b;
+  --color-header: #0a0d10;
+  --color-accent: #5b9bf0;
+  --color-sev-safety: #c93c37;
+  --color-sev-service: #a36b00;
+  --color-sev-adjust: #2f6fcb;
+  --color-sev-cosmetic: #7b5cc4;
+  --color-sev-none: #3c8a4a;
+  --color-warn: #e0a83a;
+  --color-good: #6cc27a;
+  --color-alert-row: #2a1716;
+  --color-ask-bg: #2a2212;
+  --color-ask-line: #5c4615;
+}
+
+:root {
+  color-scheme: dark;
 }
 
 body {
   background: var(--color-ground);
   color: var(--color-ink);
   font-size: 14px;
+}
+
+input,
+select,
+textarea {
+  background: var(--color-field);
+  color: inherit;
 }
 
 :focus-visible {

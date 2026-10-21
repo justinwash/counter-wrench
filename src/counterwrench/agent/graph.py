@@ -15,8 +15,10 @@ from langgraph.types import Send
 
 from counterwrench.agent.nodes import (
     Deps,
+    confirm,
     draft,
     human_review,
+    record_decline_node,
     resolve_bike,
     retrieve,
     route,
@@ -45,13 +47,22 @@ def after_route(state: GraphState) -> str:
     return END if state["outcome"] == "needs_answers" else "draft"
 
 
+def after_confirm(state: GraphState) -> str:
+    outcome = state.get("outcome")
+    return END if outcome == "revised" else "record_decline" if outcome == "declined" else "draft"
+
+
 def after_draft(state: GraphState) -> str:
     return "human_review" if state.get("work_order_id") else END
 
 
-def build_graph(deps: Deps | None = None, checkpointer=None, interrupt_before=None):
+def build_graph(
+    deps: Deps | None = None, checkpointer=None, interrupt_before=None, confirm_before_draft=False
+):
     """`checkpointer` is required to pause for review; LangGraph Studio supplies its own.
-    `interrupt_before=["draft"]` stops after triage, e.g. to test or inspect triage alone."""
+    `interrupt_before=["draft"]` stops after triage, e.g. to test or inspect triage alone.
+    `confirm_before_draft` adds the counter's pause after triage (the API); the CLI and evals
+    run straight through."""
     deps = deps or default_deps()
     graph = StateGraph(GraphState)
     graph.add_node("resolve_bike", partial(resolve_bike, deps=deps))
@@ -59,12 +70,21 @@ def build_graph(deps: Deps | None = None, checkpointer=None, interrupt_before=No
     graph.add_node("triage_row", partial(triage_row, deps=deps))
     graph.add_node("route", route)
     graph.add_node("draft", partial(draft, deps=deps))
+    if confirm_before_draft:
+        graph.add_node("confirm", confirm)
+        graph.add_node("record_decline", partial(record_decline_node, deps=deps))
+        graph.add_edge("record_decline", END)
     graph.add_node("human_review", partial(human_review, deps=deps))
     graph.add_edge(START, "resolve_bike")
     graph.add_edge("resolve_bike", "retrieve")
     graph.add_conditional_edges("retrieve", fan_out_rows, ["triage_row"])
     graph.add_edge("triage_row", "route")
-    graph.add_conditional_edges("route", after_route, ["draft", END])
+    if confirm_before_draft:
+        graph.add_conditional_edges("route", lambda s: END if s["outcome"] == "needs_answers"
+                                    else "confirm", ["confirm", END])  # fmt: skip
+        graph.add_conditional_edges("confirm", after_confirm, ["draft", "record_decline", END])
+    else:
+        graph.add_conditional_edges("route", after_route, ["draft", END])
     graph.add_conditional_edges("draft", after_draft, ["human_review", END])
     graph.add_edge("human_review", END)
     return graph.compile(checkpointer=checkpointer, interrupt_before=interrupt_before)

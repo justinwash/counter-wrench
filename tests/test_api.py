@@ -45,52 +45,111 @@ def test_picklists(seeded_db):
     assert len(api.get("/api/bikes").json()) > 10
 
 
-def test_intake_streams_each_step_and_saves_a_counter_order(seeded_db):
+def triaged(api, body=None) -> dict:
+    return dict(events(api.post("/api/intakes", json=body or intake())))
+
+
+def continued(api, intake_id: str) -> list[tuple[str, dict]]:
+    return events(api.post(f"/api/intakes/{intake_id}/continue"))
+
+
+def test_intake_pauses_after_triage_then_drafts_on_continue(seeded_db):
     api, _ = client(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
-    stream = events(api.post("/api/intakes", json=intake()))
-    names = [e for e, _ in stream]
-    assert names == ["accepted", "bike", "row", "route", "draft", "review", "done"]
-    done = stream[-1][1]
-    assert done["outcome"] == "ready_to_draft" and done["awaiting_review"] is True
+    first = events(api.post("/api/intakes", json=intake()))
+    assert [e for e, _ in first] == ["accepted", "bike", "row", "route", "triaged", "done"]
+    done = first[-1][1]
+    assert done["awaiting_confirmation"] is True and done["work_order_id"] is None
+    assert seeded_db.execute("SELECT count(*) FROM work_orders").fetchone()[0] == 0
+    second = continued(api, done["intake_id"])
+    assert [e for e, _ in second] == ["draft", "review", "done"]
+    finished = second[-1][1]
+    assert finished["awaiting_review"] is True and finished["work_order_id"]
     source = seeded_db.execute("SELECT source FROM work_orders WHERE id = %s",
-                               (done["work_order_id"],)).fetchone()[0]  # fmt: skip
+                               (finished["work_order_id"],)).fetchone()[0]  # fmt: skip
     assert source == "counter"
-    assert dict(stream)["row"]["severity"] == "needs_service"
+    assert api.post(f"/api/intakes/{done['intake_id']}/continue").status_code == 409
 
 
 def test_guardrails_run_before_the_graph(seeded_db):
-    api, triage = client(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
-    stream = dict(events(api.post("/api/intakes", json=intake(note="Call me at (555) 222-3434."))))
+    api, triage = client(seeded_db, {"r1": [triage_ok()]})
+    stream = triaged(api, intake(note="Call me at (555) 222-3434."))
     assert stream["accepted"]["pii_redacted"] == {"phone": 1}
-    prompt = triage.calls["r1"][0][1].content
-    assert "222-3434" not in prompt
+    assert "222-3434" not in triage.calls["r1"][0][1].content
 
 
 def test_safety_escalation_is_announced(seeded_db):
-    critical = {**DRAFT_ARGS, "severity": "safety_critical"}
-    api, _ = client(seeded_db, {"r1": [triage_ok(severity="safety_critical")]},
-                    [[("draft_work_order", critical)]])  # fmt: skip
-    route = dict(events(api.post("/api/intakes", json=intake())))["route"]
+    api, _ = client(seeded_db, {"r1": [triage_ok(severity="safety_critical")]})
+    route = triaged(api)["route"]
     assert route["escalated"] is True and route["escalation_message"].startswith("DO NOT RIDE")
 
 
+def test_revise_finishes_the_old_run_and_triages_again_with_answers(seeded_db):
+    asks = triage_ok(question_for_customer="Which gears skip?")
+    api, triage = client(seeded_db, {"r1": [asks, triage_ok()]})
+    first = triaged(api)
+    assert first["route"]["questions"] == {"r1": "Which gears skip?"}
+    old_id = first["done"]["intake_id"]
+    body = {"answers": {"r1": "Only the two biggest cogs"}, "notes": {"r1": "Skips under power"}}
+    second = dict(events(api.post(f"/api/intakes/{old_id}/revise", json=body)))
+    assert second["accepted"]["previous"] == old_id and second["done"]["awaiting_confirmation"]
+    retriage_prompt = triage.calls["r1"][1][1].content
+    assert "Only the two biggest cogs" in retriage_prompt and "Skips under power" in retriage_prompt
+    old = api.app.state.cw.graph.get_state({"configurable": {"thread_id": old_id}})
+    assert old.values["outcome"] == "revised" and not old.next  # finished, not left hanging
+
+
 def test_answering_the_bike_question_reruns_with_the_bike(seeded_db):
-    api, _ = client(seeded_db, {"r1": [triage_ok(), triage_ok()]},
-                    [[("draft_work_order", DRAFT_ARGS)]])  # fmt: skip
-    ambiguous = intake(bike_id=None, bike_freetext="Trek Marlin 7, not sure what year")
-    first = dict(events(api.post("/api/intakes", json=ambiguous)))
+    api, _ = client(seeded_db, {"r1": [triage_ok(), triage_ok()]})
+    first = triaged(api, intake(bike_id=None, bike_freetext="Trek Marlin 7, not sure what year"))
     assert first["done"]["outcome"] == "needs_answers" and "bike" in first["route"]["questions"]
     rerun = dict(events(api.post(f"/api/intakes/{first['done']['intake_id']}/answers",
                                  json={"bike_id": HIGHTOWER})))  # fmt: skip
     assert rerun["accepted"]["previous"] == first["done"]["intake_id"]
-    assert rerun["bike"]["bike_id"] == HIGHTOWER and rerun["done"]["awaiting_review"] is True
+    assert rerun["bike"]["bike_id"] == HIGHTOWER and rerun["done"]["awaiting_confirmation"]
+
+
+def test_unknown_bike_year_drafts_labor_only_with_a_note(seeded_db):
+    labor_only = {**DRAFT_ARGS, "part_lines": []}
+    api, _ = client(seeded_db, {"r1": [triage_ok(), triage_ok()]},
+                    [[("draft_work_order", labor_only)]])  # fmt: skip
+    first = triaged(api, intake(bike_id=None, bike_freetext="Trek Marlin 7, not sure what year"))
+    rerun = dict(events(api.post(f"/api/intakes/{first['done']['intake_id']}/answers",
+                                 json={"bike_unconfirmed": True})))  # fmt: skip
+    assert rerun["bike"]["bike_id"] is None and rerun["bike"]["question"] is None
+    assert rerun["done"]["awaiting_confirmation"] is True
+    order_id = dict(continued(api, rerun["done"]["intake_id"]))["done"]["work_order_id"]
+    notes = seeded_db.execute("SELECT mechanic_notes FROM work_orders WHERE id = %s",
+                              (order_id,)).fetchone()[0]  # fmt: skip
+    assert "Bike unconfirmed" in notes and "call the customer" in notes
+
+
+def test_a_safety_critical_decline_needs_a_signed_waiver(seeded_db):
+    api, _ = client(seeded_db, {"r1": [triage_ok(severity="safety_critical")]})
+    intake_id = triaged(api)["done"]["intake_id"]
+    unsigned = api.post(f"/api/intakes/{intake_id}/decline", json={"staff": "sam"})
+    assert unsigned.status_code == 422
+    done = dict(events(api.post(f"/api/intakes/{intake_id}/decline",
+                                json={"staff": "sam", "waiver_signed": True})))["done"]  # fmt: skip
+    assert done["outcome"] == "declined"
+    row = seeded_db.execute(
+        "SELECT status, severity, waiver_signed, reviewed_by, review_notes "
+        "FROM work_orders WHERE id = %s", (done["work_order_id"],),
+    ).fetchone()  # fmt: skip
+    assert row[:4] == ("declined", "safety_critical", True, "sam") and "Bike released" in row[4]
+    state = api.app.state.cw.graph.get_state({"configurable": {"thread_id": intake_id}})
+    assert not state.next  # the run finished
 
 
 def test_answers_only_for_intakes_waiting_on_them(seeded_db):
-    api, _ = client(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
-    done = dict(events(api.post("/api/intakes", json=intake())))["done"]
-    assert api.post(f"/api/intakes/{done['intake_id']}/answers", json={}).status_code == 409
-    assert api.post("/api/intakes/nope/answers", json={}).status_code == 404
+    api, _ = client(seeded_db, {"r1": [triage_ok()]})
+    done = triaged(api)["done"]
+    assert (
+        api.post(
+            f"/api/intakes/{done['intake_id']}/answers", json={"bike_unconfirmed": True}
+        ).status_code
+        == 409
+    )
+    assert api.post("/api/intakes/nope/answers", json={"bike_unconfirmed": True}).status_code == 404
 
 
 # --- Orders: queue, detail, edits, review (19b) --------------------------------------------------
@@ -102,7 +161,8 @@ def no_tracing(monkeypatch):
 
 
 def drafted(api) -> int:
-    return dict(events(api.post("/api/intakes", json=intake())))["done"]["work_order_id"]
+    intake_id = triaged(api)["done"]["intake_id"]
+    return dict(continued(api, intake_id))["done"]["work_order_id"]
 
 
 def test_review_queue_puts_safety_first_and_hides_eval_orders(seeded_db):

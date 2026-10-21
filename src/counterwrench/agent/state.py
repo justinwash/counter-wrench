@@ -14,7 +14,9 @@ def merge(left: dict, right: dict) -> dict:
     return {**left, **right}
 
 
-Outcome = Literal["escalated", "needs_answers", "needs_mechanic", "ready_to_draft"]
+Outcome = Literal[
+    "escalated", "needs_answers", "needs_mechanic", "ready_to_draft", "revised", "declined"
+]
 
 
 class GraphState(TypedDict, total=False):
@@ -47,6 +49,7 @@ class GraphState(TypedDict, total=False):
     work_order_id: int | None
     draft_error: str | None
     review: dict | None  # the mechanic's decision, after the graph resumes
+    decline: dict | None  # counter staff's record of a customer declining the work
 
 
 class RowTask(TypedDict):

@@ -32,9 +32,10 @@ export type StreamEvent =
       escalation_message: string | null; questions: Record<string, string> } }
   | { event: "draft"; data: { work_order_id: number | null; estimate_total: string | null;
       unverified_parts: string[]; error: string | null } }
+  | { event: "triaged"; data: Record<string, unknown> }
   | { event: "review"; data: Record<string, unknown> }
   | { event: "done"; data: { intake_id: string; outcome: string; work_order_id: number | null;
-      awaiting_review: boolean } }
+      awaiting_confirmation: boolean; awaiting_review: boolean } }
   | { event: "error"; data: { message: string } };
 
 /** Split buffered text into complete events; returns them and the unfinished remainder. */

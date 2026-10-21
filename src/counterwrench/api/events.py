@@ -18,7 +18,9 @@ def sse(event: str, data: dict) -> str:
 def events_for(node: str, update: Any) -> Iterator[tuple[str, dict]]:
     if node == "__interrupt__":
         for interrupt in update:
-            yield "review", dict(interrupt.value)
+            value = dict(interrupt.value)
+            # Two pauses: after triage for counter staff (confirm), after drafting for the mechanic.
+            yield ("triaged" if value.get("stage") == "confirm" else "review"), value
         return
     if not isinstance(update, dict):
         return
