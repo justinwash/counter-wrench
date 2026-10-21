@@ -38,6 +38,8 @@ def events_for(node: str, update: Any) -> Iterator[tuple[str, dict]]:
     elif node == "triage_row":
         for row_id, assessment in (update.get("assessments") or {}).items():
             yield "row", {"row_id": row_id, **assessment.model_dump(mode="json")}
+        for row_id, question in (update.get("unresolved") or {}).items():
+            yield "row_unresolved", {"row_id": row_id, "question": question}
         for row_id, error in (update.get("failed_rows") or {}).items():
             yield "row_failed", {"row_id": row_id, "error": error}
     elif node == "route":

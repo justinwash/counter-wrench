@@ -34,6 +34,16 @@ from counterwrench.tools.work_orders import DraftWorkOrderArgs, draft_work_order
 
 PROMPTS = Path(__file__).parent / "prompts"
 CHUNKS_PER_ROW = 5
+# Rounds of questions per row before triage stops asking: past this, the same uncertainty goes
+# to the mechanic instead of looping with the counter (Justin: "my brakes squeal" asked for the
+# fifth time, reworded).
+MAX_QUESTION_ROUNDS = 2
+ALREADY_ASKED = (
+    "Staff have already asked the customer about this row; each 'Asked' with its 'Answered' is "
+    "in staff_answer. Never ask something that was answered, or the same question reworded. If "
+    "the answers settle it, assess with them; if something is still unknown, assess with what "
+    "you have and say what's uncertain in likely_causes."
+)
 # Knowledge every row sees, whatever retrieval ranks: the never-release list decides escalation,
 # but reads like no single complaint, so similarity search found it for 4 of 63 rows (F-002).
 ALWAYS_INCLUDED = ["policy-safety#what-we-never-release"]
@@ -169,6 +179,7 @@ def triage_row(task: RowTask, deps: Deps) -> dict:
         HumanMessage(
             build_intake_message(task["intake"], task["bike"])
             + "\n\n" + _knowledge_block(task["chunks"])
+            + (f"\n\n{ALREADY_ASKED}" if task["intake"].answers.get(row_id) else "")
             + f'\n\nAssess row "{row_id}" ({label(row.complaint)}) only.'
         ),
     ]  # fmt: skip
@@ -184,7 +195,13 @@ def triage_row(task: RowTask, deps: Deps) -> dict:
         if not problems:
             assessment, problems = settle_agreement(assessment, row.suspected_area)
         if not problems:
-            return {"assessments": {row_id: assessment}, "triage_retries": retries}
+            update: dict = {"assessments": {row_id: assessment}, "triage_retries": retries}
+            asked = assessment.question_for_customer
+            if asked and task["intake"].question_rounds.get(row_id, 0) >= MAX_QUESTION_ROUNDS:
+                # Enough rounds: the same uncertainty goes to the mechanic, not back to the counter.
+                capped = assessment.model_copy(update={"question_for_customer": None})
+                update |= {"assessments": {row_id: capped}, "unresolved": {row_id: asked}}
+            return update
         last_error = "; ".join(problems)
         if attempt + 1 < MAX_TRIAGE_ATTEMPTS:
             retries += 1
@@ -296,6 +313,12 @@ def draft(state: GraphState, deps: Deps) -> dict:
         if open_questions
         else None
     )
+    unresolved_note = (
+        f"Still unclear after {MAX_QUESTION_ROUNDS} rounds of questions; check in person: "
+        + " ".join(f"{row_id}: {q}" for row_id, q in sorted(state["unresolved"].items()))
+        if state.get("unresolved")
+        else None
+    )
     saved: dict = {}
 
     def save_draft(**kwargs) -> str:
@@ -304,7 +327,8 @@ def draft(state: GraphState, deps: Deps) -> dict:
         if severity is not None:
             overrides["severity"] = severity
         unconfirmed = state["bike_note"] if intake.bike_unconfirmed else None
-        code_notes = [failed_note, questions_note, unconfirmed, state.get("guardrail_note")]
+        code_notes = [failed_note, questions_note, unresolved_note, unconfirmed,
+                      state.get("guardrail_note")]  # fmt: skip
         if any(code_notes):
             overrides["mechanic_notes"] = "\n".join(
                 filter(None, [args.mechanic_notes, *code_notes])

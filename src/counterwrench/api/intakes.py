@@ -99,6 +99,21 @@ def continue_to_draft(intake_id: str, request: Request) -> StreamingResponse:
     )
 
 
+def add_answers(
+    prior: IntakeForm, questions: dict[str, str], new: dict[str, str]
+) -> tuple[dict[str, str], dict[str, int]]:
+    """Append this round's answers to each row's record, each with the question it answers.
+    A bare "yes" means nothing on the next round, and replacing the earlier answer made the
+    agent forget what it had been told, so it asked again (the loop Justin hit)."""
+    answers, rounds = dict(prior.answers), dict(prior.question_rounds)
+    for row_id, answer in new.items():
+        question = questions.get(row_id) or "(staff added this)"
+        entry = f"Asked: {question}\nAnswered: {answer}"
+        answers[row_id] = f"{answers[row_id]}\n\n{entry}" if answers.get(row_id) else entry
+        rounds[row_id] = rounds.get(row_id, 0) + 1
+    return answers, rounds
+
+
 class Revision(BaseModel):
     answers: dict[str, ShortText] = Field(default_factory=dict, description="row id -> answer")
     notes: dict[str, ShortText | None] = Field(
@@ -119,8 +134,9 @@ def revise(intake_id: str, body: Revision, request: Request) -> StreamingRespons
         pass
     rows = [r.model_copy(update={"note": body.notes[r.row_id]}) if r.row_id in body.notes else r
             for r in prior.rows]  # fmt: skip
+    answers, rounds = add_answers(prior, state.values.get("questions") or {}, body.answers)
     data = {**prior.model_dump(), "rows": [r.model_dump() for r in rows],
-            "answers": {**prior.answers, **body.answers}}  # fmt: skip
+            "answers": answers, "question_rounds": rounds}  # fmt: skip
     if "general_notes" in body.model_fields_set:
         data["general_notes"] = body.general_notes
     return StreamingResponse(

@@ -136,6 +136,15 @@ describe("IntakeScreen", () => {
     expect(calls[1]).toEqual({ url: "/api/intakes/i1/decline", body: { staff: "Sam", waiver_signed: true } });
   });
 
+  it("says so when triage stops asking after two rounds, instead of looping", async () => {
+    mockApi({ "/api/intakes": triage("i1", "needs_service", [["row_unresolved", { row_id: "r1", question: "Does it squeal on dry days too?" }]]) });
+    renderScreen();
+    await fillOneRow();
+    await click("Triage");
+    expect(await screen.findByText(/Still unclear after two rounds of questions, so no more/)).toBeTruthy();
+    expect(screen.getByText(/Does it squeal on dry days too\?/)).toBeTruthy();
+  });
+
   it("carries on without a confirmed bike when the customer doesn't know the year", async () => {
     const calls = mockApi({
       "/api/intakes": sse([

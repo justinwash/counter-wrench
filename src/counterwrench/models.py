@@ -27,6 +27,7 @@ Slug = Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")]
 LaborCode = Annotated[str, StringConstraints(pattern=r"^[A-Z0-9]+(-[A-Z0-9]+)*$")]
 RowId = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_-]{1,20}$")]
 ShortText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+Transcript = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)]
 LongText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
 
 
@@ -122,8 +123,11 @@ class IntakeForm(Strict):
     bike_freetext: ShortText | None = None
     rows: list[ComplaintRow] = Field(min_length=1, max_length=10)
     general_notes: LongText | None = None
-    # Staff answers to the agent's per-row questions, keyed by row_id.
-    answers: dict[RowId, ShortText] = Field(default_factory=dict)
+    # What counter staff learned from the customer by row: every "Asked: ... Answered: ..." pair
+    # so far, oldest first (an answer without its question means nothing on the next round).
+    answers: dict[RowId, Transcript] = Field(default_factory=dict)
+    # How many rounds of questions have been answered per row. Triage stops asking at the limit.
+    question_rounds: dict[RowId, int] = Field(default_factory=dict)
     # Staff confirmed the customer doesn't know which bike it is: draft without a catalog bike
     # (labor only) and leave identifying it to the mechanic, instead of asking again.
     bike_unconfirmed: bool = False

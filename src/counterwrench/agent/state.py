@@ -28,6 +28,8 @@ class GraphState(TypedDict, total=False):
     bike_question: str | None
     row_chunks: dict[str, list[SearchHit]]
     assessments: Annotated[dict[str, RowAssessment], merge]
+    # Questions triage wanted to ask again after the limit on rounds; the mechanic gets them.
+    unresolved: Annotated[dict[str, str], merge]
     # Rows whose assessment stayed invalid after a retry, with the last error.
     failed_rows: Annotated[dict[str, str], merge]
     triage_retries: Annotated[int, operator.add]

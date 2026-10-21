@@ -283,3 +283,60 @@ def test_labor_menu_and_part_options_for_the_edit_screen(seeded_db):
         api.get("/api/orders/999999/part-options", params={"category": "cassette"}).status_code
         == 404
     )
+
+
+# --- Question rounds: no loops ------------------------------------------------------------------
+
+
+def asks(question):
+    return triage_ok(question_for_customer=question)
+
+
+def revised(api, intake_id, answer):
+    stream = events(api.post(f"/api/intakes/{intake_id}/revise", json={"answers": {"r1": answer}}))
+    return dict(stream)
+
+
+def test_each_answer_is_kept_with_its_question_across_rounds(seeded_db):
+    from counterwrench.agent.nodes import ALREADY_ASKED
+
+    first_q, second_q = "Do they squeal when wet?", "Does it happen on dry days too?"
+    api, triage = client(seeded_db, {"r1": [asks(first_q), asks(second_q), triage_ok()]})
+    first = triaged(api)
+    second = revised(api, first["done"]["intake_id"], "Only when it's wet")
+    third = revised(api, second["done"]["intake_id"], "No, dry days are fine")
+    assert third["done"]["awaiting_confirmation"] is True
+
+    prompts = [call[1].content for call in triage.calls["r1"]]
+    assert ALREADY_ASKED not in prompts[0]  # a first look is unchanged
+    assert f"Asked: {first_q}\nAnswered: Only when it's wet" in prompts[1]
+    # Round two still carries round one: the earlier answer isn't replaced.
+    assert f"Asked: {first_q}\nAnswered: Only when it's wet" in prompts[2]
+    assert f"Asked: {second_q}\nAnswered: No, dry days are fine" in prompts[2]
+    assert ALREADY_ASKED in prompts[1] and ALREADY_ASKED in prompts[2]
+
+
+def test_triage_stops_asking_after_two_rounds_and_tells_the_mechanic(seeded_db):
+    api, _ = client(seeded_db, {"r1": [asks("Q1?"), asks("Q2?"), asks("Q3, reworded?")]},
+                    [[("draft_work_order", DRAFT_ARGS)]])  # fmt: skip
+    first = triaged(api)
+    second = revised(api, first["done"]["intake_id"], "A1")
+    third = revised(api, second["done"]["intake_id"], "A2")
+
+    assert third["row_unresolved"] == {"row_id": "r1", "question": "Q3, reworded?"}
+    assert third["row"]["question_for_customer"] is None  # no third question for the counter
+    assert third["route"]["questions"] == {} and third["done"]["outcome"] == "ready_to_draft"
+    order_id = dict(continued(api, third["done"]["intake_id"]))["done"]["work_order_id"]
+    notes = seeded_db.execute("SELECT mechanic_notes FROM work_orders WHERE id = %s",
+                              (order_id,)).fetchone()[0]  # fmt: skip
+    assert "Still unclear after 2 rounds of questions; check in person: r1: Q3, reworded?" in notes
+
+
+def test_an_answer_with_no_recorded_question_is_still_kept(seeded_db):
+    from counterwrench.api.intakes import add_answers
+    from counterwrench.models import IntakeForm
+
+    prior = IntakeForm.model_validate(intake())
+    answers, rounds = add_answers(prior, {}, {"r1": "It only started last week"})
+    assert answers["r1"] == "Asked: (staff added this)\nAnswered: It only started last week"
+    assert rounds == {"r1": 1}

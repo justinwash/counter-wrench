@@ -176,7 +176,7 @@ export default function IntakeScreen() {
                       placeholder="What the customer said" onChange={(e) => update(i, { note: e.target.value })} />
                   </td>
                   <ResultCells result={result} failed={failed} pending={run.running && !result && !failed}
-                    earlier={history[r.row_id] ?? []}
+                    earlier={history[r.row_id] ?? []} unresolved={run.unresolved[r.row_id]}
                     answer={confirming ? { value: r.answer, set: (v) => update(i, { answer: v }), id: `answer-${r.row_id}` } : null} />
                   <td className="px-2 py-2">
                     {rows.length > 1 && !started && (
@@ -302,8 +302,8 @@ function EarlierTriage({ earlier }: { earlier: Earlier[] }) {
   );
 }
 
-function ResultCells({ result, failed, pending, answer, earlier }: {
-  result?: RowResult; failed?: string; pending: boolean; earlier: Earlier[];
+function ResultCells({ result, failed, pending, answer, earlier, unresolved }: {
+  result?: RowResult; failed?: string; pending: boolean; earlier: Earlier[]; unresolved?: string;
   answer: { value: string; set: (v: string) => void; id: string } | null;
 }) {
   if (failed) return <td colSpan={3} className="px-2 py-2 text-warn">Couldn't assess this row; a mechanic will check it.</td>;
@@ -326,6 +326,11 @@ function ResultCells({ result, failed, pending, answer, earlier }: {
         )}
         {agree === true && <p className="text-good text-xs mt-1">Agrees with the area staff picked.</p>}
         <EarlierTriage earlier={earlier} />
+        {unresolved && (
+          <p className="text-xs mt-1 text-warn">
+            Still unclear after two rounds of questions, so no more: the mechanic will check ("{unresolved}").
+          </p>
+        )}
         {result.question_for_customer && (
           <div className="text-xs mt-1 bg-ask-bg border border-ask-line px-1.5 py-1 flex flex-col gap-1">
             <span>Ask the customer: {result.question_for_customer}</span>

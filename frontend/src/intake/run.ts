@@ -9,6 +9,7 @@ export interface RunState {
   bike: { name: string | null; note: string | null; question: string | null } | null;
   rows: Record<string, RowResult>;
   failedRows: Record<string, string>;
+  unresolved: Record<string, string>;  // questions triage wanted to ask again after two rounds
   escalationMessage: string | null;
   questions: Record<string, string>;
   outcome: string | null;
@@ -19,7 +20,7 @@ export interface RunState {
 }
 
 export const emptyRun: RunState = {
-  running: false, intakeId: null, redacted: {}, flags: [], bike: null, rows: {}, failedRows: {},
+  running: false, intakeId: null, redacted: {}, flags: [], bike: null, rows: {}, failedRows: {}, unresolved: {},
   escalationMessage: null, questions: {}, outcome: null, awaitingConfirmation: false,
   workOrderId: null, draft: null, error: null,
 };
@@ -34,6 +35,8 @@ export function applyEvent(state: RunState, e: StreamEvent): RunState {
       return { ...state, rows: { ...state.rows, [e.data.row_id]: e.data } };
     case "row_failed":
       return { ...state, failedRows: { ...state.failedRows, [e.data.row_id]: e.data.error } };
+    case "row_unresolved":
+      return { ...state, unresolved: { ...state.unresolved, [e.data.row_id]: e.data.question } };
     case "route":
       return { ...state, escalationMessage: e.data.escalation_message, questions: e.data.questions, outcome: e.data.outcome };
     case "draft":

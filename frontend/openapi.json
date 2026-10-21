@@ -918,12 +918,21 @@
       "patternProperties": {
        "^[A-Za-z0-9_-]{1,20}$": {
         "type": "string",
-        "maxLength": 500,
+        "maxLength": 4000,
         "minLength": 1
        }
       },
       "type": "object",
       "title": "Answers"
+     },
+     "question_rounds": {
+      "patternProperties": {
+       "^[A-Za-z0-9_-]{1,20}$": {
+        "type": "integer"
+       }
+      },
+      "type": "object",
+      "title": "Question Rounds"
      },
      "bike_unconfirmed": {
       "type": "boolean",

@@ -28,6 +28,7 @@ export type StreamEvent =
       question: string | null } }
   | { event: "row"; data: RowResult }
   | { event: "row_failed"; data: { row_id: string; error: string } }
+  | { event: "row_unresolved"; data: { row_id: string; question: string } }
   | { event: "route"; data: { outcome: string; escalated: boolean;
       escalation_message: string | null; questions: Record<string, string> } }
   | { event: "draft"; data: { work_order_id: number | null; estimate_total: string | null;

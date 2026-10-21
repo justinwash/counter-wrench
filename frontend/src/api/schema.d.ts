@@ -371,6 +371,8 @@ export interface components {
             general_notes?: string | null;
             /** Answers */
             answers?: Record<string, never>;
+            /** Question Rounds */
+            question_rounds?: Record<string, never>;
             /**
              * Bike Unconfirmed
              * @default false
