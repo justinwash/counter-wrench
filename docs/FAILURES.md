@@ -97,7 +97,7 @@ The entries below come from step 16: the assistant proposed a root cause for eac
 **Found in:** step 16 review.
 **What happened:** Justin sided with the explanation judge on invented findings, unexplained jargon and mentioning checks that aren't on the order, but not on hedged likely causes ("this usually means...") or on promising a tube for a flat repair. It also failed true shop facts it wasn't given (the inspection fee is waived when work is booked).
 **Root cause:** judge rubric (too strict on hedges; missing shop facts and the tube rule).
-**Fix:** unfixed; step 18 calibration. Changing the rubric now would break comparability with E-001b.
+**Fix:** rubric v3 (D-042, C-001): hedges, shop facts and jargon no longer fail; diagnosis judge held-out kappa 0.60. The explanation judge still misses Justin's rare fails (held-out kappa -0.20).
 
 ## F-015: A dropped connection lost three runs, and the reports choked on it
 **Found in:** E-006 (`8d43b45-e2e-454b7b83`).

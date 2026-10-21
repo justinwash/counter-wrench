@@ -386,3 +386,30 @@ What moved, and why: the safety list fixed two of the three missed escalations (
 - `clarification_correct` fell on most slices: the rule says to ask as well, and the agent asks more.
 
 **Takeaway:** inconclusive. The net safety change (one fewer missed run, two more over-escalated) is within the run-to-run variation seen between experiments (E-006). Kept for now because it states Justin's policy; decision for Justin: keep, revert, or re-run once to separate the effect from noise (about $2.40).
+
+## C-001: Judge calibration against Justin's blind grades
+**Set:** 40 judged outputs from E-006 (`evals/calibration/set.json`): per judge, 10 the judge passed and 10 it failed, at most one per case, split 6 dev / 4 held-out per group. Justin graded all 40 pass/fail by the same rubric on a page that never showed the judge's verdict (`evals/calibration/justin_labels.json`, verbatim). He passed 33 and failed 7.
+**Metrics:** TPR = the judge passes what Justin passes; TNR = the judge fails what Justin fails; Cohen's kappa = agreement beyond chance. With 7 fails in 40, TNR and kappa rest on very few items: a judge that passed everything would score 0.82 accuracy and kappa 0.
+
+**Rubric v2 (as used in E-001 to E-007):**
+
+| Judge | Split | n | Accuracy | TPR | TNR | Kappa |
+|---|---|---|---|---|---|---|
+| diagnosis_reasonable | dev | 12 | 0.50 | 0.50 | 0.50 | 0.00 |
+| diagnosis_reasonable | heldout | 8 | 0.62 | 0.57 | 1.00 | 0.25 |
+| explanation_quality | dev | 12 | 0.50 | 0.50 | 0.50 | 0.00 |
+| explanation_quality | heldout | 8 | 0.50 | 0.50 | 0.50 | 0.00 |
+
+**Rubric v3 (tuned on the dev disagreements only; `make judge-smoke` still 6/6):**
+
+| Judge | Split | n | Accuracy | TPR | TNR | Kappa |
+|---|---|---|---|---|---|---|
+| diagnosis_reasonable | dev | 12 | 0.83 | 1.00 | 0.00 | 0.00 |
+| diagnosis_reasonable | heldout | 8 | 0.88 | 0.86 | 1.00 | 0.60 |
+| explanation_quality | dev | 12 | 0.67 | 0.80 | 0.00 | -0.20 |
+| explanation_quality | heldout | 8 | 0.62 | 0.83 | 0.00 | -0.20 |
+
+**What v2 got wrong, from the dev disagreements:** it failed a sound diagnosis over one weak secondary cause (`n14`, `s07`), over a slightly redundant follow-up question (`c03`, `e03`), and over a defensible disagreement with staff (`a06`); it failed explanations for shop jargon (bleed, sag, re-index), which Justin passed blind even though he had sided with the judge on jargon in step 16 (he settled it: "we're workers in a bike shop, we're gonna use jargon"); and it treated hedged likely causes and true shop facts as unsupported claims. In the other direction, Justin failed `c02` on both judges: he read the symptom as unusual enough to suggest a loose caliper or structural damage, which neither judge raised.
+
+**Result:** the diagnosis judge now agrees with Justin on unseen items (held-out accuracy 0.62 to 0.88, kappa 0.25 to 0.60). The explanation judge is no longer too strict, but it catches none of the explanations Justin failed (c02's unusual symptom, `e05` not saying why the tire is a comparable replacement, `a02` not saying a pads-only purchase needs no work order): held-out kappa -0.20. Stopping at v3: chasing the remaining dev cases (mostly c02, where Justin's reading of the note is one of two) would fit the rubric to single items. Treat `explanation_quality` as a coarse check, not a quality score; the deterministic and diagnosis checks carry the weight.
+**Consequence:** rubric v3 is now what `make eval` uses, so judge columns from experiments before this point (v2) aren't comparable with later ones.

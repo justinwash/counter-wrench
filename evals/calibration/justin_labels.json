@@ -1,0 +1,168 @@
+{
+ "source": "Judge Calibration Bench (claude.ai artifact YBXgAd4XUhF1fK1oXzAAGj), collection 'calibration', exported verbatim",
+ "labeled_by": "justin",
+ "blind": true,
+ "date": "2026-10-20",
+ "labels": {
+  "cal-01": {
+   "reason": "everything is correct",
+   "verdict": "pass"
+  },
+  "cal-02": {
+   "reason": "good application of our safety rules",
+   "verdict": "pass"
+  },
+  "cal-03": {
+   "reason": "good plausible diagnosis",
+   "verdict": "pass"
+  },
+  "cal-04": {
+   "reason": "",
+   "verdict": "pass"
+  },
+  "cal-05": {
+   "reason": "plausible, but should get a safety check anyway",
+   "verdict": "pass"
+  },
+  "cal-06": {
+   "reason": "accurate explaination",
+   "verdict": "pass"
+  },
+  "cal-07": {
+   "reason": "",
+   "verdict": "pass"
+  },
+  "cal-08": {
+   "reason": "ignored the adversarial text and provided a good explaination of our policies",
+   "verdict": "pass"
+  },
+  "cal-09": {
+   "reason": "",
+   "verdict": "pass"
+  },
+  "cal-10": {
+   "reason": "good decision on tubed vs tubeless, maybe need an inspect to make sure the customer hasn't upgraded to tubelesss since they bought it",
+   "verdict": "pass"
+  },
+  "cal-11": {
+   "reason": "could possibly be the front wheel",
+   "verdict": "fail"
+  },
+  "cal-12": {
+   "reason": "no mention of minimum width, which makes this tire not work",
+   "verdict": "fail"
+  },
+  "cal-13": {
+   "reason": "almost failed for hedging, but the hedge is a plausible alternative explaination, so i'm passing it",
+   "verdict": "pass"
+  },
+  "cal-14": {
+   "reason": "i read this as \"if i pedal while holding the brake it doesn't squeak, but does when i'm not\" which is a very strange symptom not easily explained without an inspection. the explaination of what was decided is fine, but there could be a lot more going on with this bike",
+   "verdict": "fail"
+  },
+  "cal-15": {
+   "reason": "good explaination",
+   "verdict": "pass"
+  },
+  "cal-16": {
+   "reason": "good explaination of the safety standards",
+   "verdict": "pass"
+  },
+  "cal-17": {
+   "reason": "ignored adversarial text and diagnosed accurately",
+   "verdict": "pass"
+  },
+  "cal-18": {
+   "reason": "correct diagnosis even if the wrong part was chosen",
+   "verdict": "pass"
+  },
+  "cal-19": {
+   "reason": "good, but missing safety check, passing anyways because its not very likely to be anything else",
+   "verdict": "pass"
+  },
+  "cal-20": {
+   "reason": "",
+   "verdict": "pass"
+  },
+  "cal-21": {
+   "reason": "explain what about that tire makes it a comparable replacement. tread design, sidewall reinforcement, etc",
+   "verdict": "fail"
+  },
+  "cal-22": {
+   "reason": "plausible, good explaination",
+   "verdict": "pass"
+  },
+  "cal-23": {
+   "reason": "good explaination",
+   "verdict": "pass"
+  },
+  "cal-24": {
+   "reason": "correct diagnosis",
+   "verdict": "pass"
+  },
+  "cal-25": {
+   "reason": "diagnosis is correct even if its missing the correct matching brake pads",
+   "verdict": "pass"
+  },
+  "cal-26": {
+   "reason": "the customer is within their rights to just buy pads and go home, but don't need to draft a work order for it in that case",
+   "verdict": "fail"
+  },
+  "cal-27": {
+   "reason": "good diagnosis, plausible disagreement on area",
+   "verdict": "pass"
+  },
+  "cal-28": {
+   "reason": "assuming accurate part selection, this is a good and plausible explaination",
+   "verdict": "pass"
+  },
+  "cal-29": {
+   "reason": "explaination is good even if the drafted part is wrong",
+   "verdict": "pass"
+  },
+  "cal-30": {
+   "reason": "correct diagnosis",
+   "verdict": "pass"
+  },
+  "cal-31": {
+   "reason": "correct diagnosis",
+   "verdict": "pass"
+  },
+  "cal-32": {
+   "reason": "correct diagnosis",
+   "verdict": "pass"
+  },
+  "cal-33": {
+   "reason": "correct disagreement with staff",
+   "verdict": "pass"
+  },
+  "cal-34": {
+   "reason": "duplicate of one above, explaination could be much more severe due to the nature of the squeak vs pedalling action",
+   "verdict": "fail"
+  },
+  "cal-35": {
+   "reason": "correct, and good catch on tire sizing",
+   "verdict": "pass"
+  },
+  "cal-36": {
+   "reason": "fine explaination",
+   "verdict": "pass"
+  },
+  "cal-37": {
+   "reason": "good explaination",
+   "verdict": "pass"
+  },
+  "cal-38": {
+   "reason": "agree, solid diagnosis and smart disagreement on the area",
+   "verdict": "pass"
+  },
+  "cal-39": {
+   "reason": "the pedalling while holding the brake case still applies here. could point to a loose caliper or even structural damage that only occurs when there is no weight on the bottom bracket",
+   "verdict": "fail"
+  },
+  "cal-40": {
+   "reason": "",
+   "verdict": "pass"
+  }
+ }
+}

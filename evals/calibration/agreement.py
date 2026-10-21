@@ -1,6 +1,6 @@
 """How well the LLM judges agree with Justin (step 18).
 
-    uv run python -m evals.calibration.agreement [labels.json]
+    uv run python -m evals.calibration.agreement [--verdicts verdicts_v3.json]
 
 Reads the calibration set (set.json, with the judges' verdicts) and Justin's blind labels
 (justin_labels.json: {"labels": {item id: {"verdict": "pass"|"fail", "reason": ...}}}). Per
@@ -50,8 +50,15 @@ def _fmt(v) -> str:
 
 
 def main() -> int:
-    labels_path = Path(sys.argv[1]) if len(sys.argv) > 1 else LABELS_FILE
+    args = sys.argv[1:]
     items = json.loads(SET_FILE.read_text("utf-8"))["items"]
+    if "--verdicts" in args:  # re-judged with newer rubrics (rejudge.py) instead of the originals
+        path = Path(args[args.index("--verdicts") + 1])
+        rejudged = json.loads((path if path.exists() else HERE / path).read_text("utf-8"))
+        print(f"Judge verdicts: {path.name}, rubrics {rejudged['rubric_versions']}")
+        for item in items:
+            item["judge_verdict"] = rejudged["verdicts"][item["id"]]["verdict"]
+    labels_path = Path(args[0]) if args and not args[0].startswith("--") else LABELS_FILE
     labels = json.loads(labels_path.read_text("utf-8"))["labels"]
     missing = [i["id"] for i in items if i["id"] not in labels]
     if missing:

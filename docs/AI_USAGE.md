@@ -127,3 +127,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 17 follow-up and step 18 prep
 **Assistant did:** Applied Justin's default-to-safety policy to the labels (missed s04 at first and corrected it while analyzing E-007), ran E-007 with the policy in the triage prompt and reported it as inconclusive rather than a win. For step 18: added the live injection case to `make judge-smoke` (the judge resisted it), built a balanced 40-item calibration set with a dev/held-out split, a blind labeling page that never shows the judge's verdict, and the agreement metrics with tests on hand-computed values.
 **Justin checked / decided:** The default-to-safety policy. Pending: m02's relabel, keep or revert E-007's prompt rule, and his blind calibration labels.
+
+## Step 18: Judge calibration
+**Assistant did:** Computed agreement between the judges and Justin's blind grades, read the judge's reasoning on every dev disagreement, proposed rubric changes from dev only, re-judged all 40 items with the original inputs, and reported held-out numbers including the bad one (explanation judge kappa -0.20) and the base-rate caveat (7 fails in 40). Stopped iterating rather than fit the rubric to single cases.
+**Justin checked / decided:** Graded all 40 outputs blind; settled the jargon question ("we're gonna use jargon").
