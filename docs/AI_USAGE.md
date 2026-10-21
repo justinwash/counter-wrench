@@ -22,7 +22,7 @@ How the coding assistant helped, and what Justin checked himself.
 
 ## Step 2: Docker Compose + Postgres/pgvector
 **Assistant did:** Diagnosed Docker Desktop failing to start (the WSL data distro's disk was missing), fixed it (unregistered the broken distro, upgraded Docker Desktop 4.17 → 4.95 and WSL), wrote the Compose file, init script and Makefile targets, and verified pgvector, persistence across restarts, and localhost-only binding. Ran a live demo showing init scripts don't re-run on an existing volume.
-**Justin checked / decided:** Approved the proposal and the Docker repair; worked through container vs volume, why schema belongs in migrations rather than init scripts, and why the volume is a local build artifact rebuilt by `make seed` rather than something shipped to reviewers.
+**Justin checked / decided:** Approved the proposal and the Docker repair; worked through container vs volume, why schema belongs in migrations rather than init scripts, and why the volume is a local build artifact rebuilt by `make seed` rather than something shipped in the repo.
 
 ## Step 3a: Migrations and catalog schema
 **Assistant did:** Wrote the connection module, the migration runner (ordered files, per-migration transactions, checksums), the catalog migration and 27 tests run against throwaway databases. Diagnosed tests hanging on `localhost` (IPv6 `::1` vs compose's IPv4-only binding) and switched to `127.0.0.1`.
@@ -148,7 +148,7 @@ How the coding assistant helped, and what Justin checked himself.
 **Assistant did:** Wrote the production compose file (Caddy HTTPS, login, rate limit), the secrets-entry script, and ran the deploys; worked through the server sizing and the wrong-AWS-account mistake (found by comparing account ids) and cleaned up only the named resources. No secrets passed through the chat.
 **Justin checked / decided:** The AWS account and domain, the OpenRouter spend cap, public trace links, when to deploy, and which spare AWS items to keep.
 
-## Step 23: README and reviewer docs
+## Step 23: README and docs
 **Assistant did:** Wrote the README and `docs/EVALS.md` from the existing logs, checking each number and claim against them (and correcting its own first draft: an evaluator count, a tool name in the diagram, and a claim about citations that no evaluator makes). Made the three LangSmith links public and confirmed they resolve without a login. Stated the work that was planned and not done.
 **Justin checked / decided:** The before/after table keeps its noise caveats (the point is methodology, not accuracy); added the live-site link with a note to ask him or Katy for the password.
 

@@ -2,7 +2,7 @@
 
 A front-of-house service intake tool for bike shops. Counter staff pick the customer's bike and log each complaint on a POS-style form. An agent triages each complaint, looks up the shop's own knowledge, checks parts compatibility with deterministic code, and drafts a work order that a mechanic must approve before anything is committed.
 
-**Live demo: <https://counterwrench.shop>.** It sits behind a login. Ask the candidate (Justin), or Katy (who will be given one), for the password. The data is synthetic and the traces it produces are public.
+**Live demo: <https://counterwrench.shop>.** It sits behind a login. Ask Justin, or Katy (who will be given one), for the password. The data is synthetic and the traces it produces are public.
 
 **Contents:** [Try it](#try-it) · [How it works](#how-it-works) · [Evals](#evals) · [Before and after](#before-and-after) · [Failures and limits](#failures-and-limitations) · [Production evaluation](#production-evaluation) · [Public links](#public-links) · [AI usage](#ai-usage) · [Development](#development)
 
@@ -23,7 +23,7 @@ Things worth trying on the counter screen:
 - A **safety job**: "brake lever goes to the bar". The page goes red, the order is marked safety-critical, and it sorts first in the mechanic's queue.
 - A **question**: "my brakes squeal". The agent asks one question, keeps your answer with its question, and stops asking after two rounds.
 - The **mechanic's screens** (`/orders`): edit lines (validated against the catalog and the compatibility rules), approve, reject. Each order links to its public LangSmith traces.
-- **Results** (`/evals`): every experiment, switchable by slice, with run-to-run spread, and a severity confusion matrix where you can click a cell to see its cases. **Judges** (`/evals/judges`): kappa and confusion matrices for each judge against the candidate's blind grades, with both graders' reasoning per item. **Explore** (`/explore`): the retrieval ranking for any query, and the compatibility engine's verdict for any bike and part. These pages read committed files, so they work with no LangSmith key; each order also shows its live scores when tracing is on.
+- **Results** (`/evals`): every experiment, switchable by slice, with run-to-run spread, and a severity confusion matrix where you can click a cell to see its cases. **Judges** (`/evals/judges`): kappa and confusion matrices for each judge against Justin's blind grades, with both graders' reasoning per item. **Explore** (`/explore`): the retrieval ranking for any query, and the compatibility engine's verdict for any bike and part. These pages read committed files, so they work with no LangSmith key; each order also shows its live scores when tracing is on.
 
 ## How it works
 
@@ -120,7 +120,7 @@ The annotation queues (`counterwrench-failures` from the offline analysis, `coun
 
 ## AI usage
 
-This was built with an AI coding assistant working one approved step at a time: it proposed each step, the candidate approved the scope, and the assistant built it and reported results, including bad ones. The candidate labeled the goldens and judge-calibration set himself, blind to model output, decided every policy, and validated the bike-technical facts. [docs/AI_USAGE.md](docs/AI_USAGE.md) records, for every step, what the assistant did and what the candidate checked or decided.
+This was built with an AI coding assistant working one approved step at a time: it proposed each step, Justin approved the scope, and the assistant built it and reported results, including bad ones. Justin labeled the goldens and judge-calibration set himself, blind to model output, decided every policy, and validated the bike-technical facts. [docs/AI_USAGE.md](docs/AI_USAGE.md) records, for every step, what the assistant did and what the candidate checked or decided.
 
 ## Development
 

@@ -84,7 +84,7 @@ ui:
 ui-test:
 	npm --prefix frontend test
 
-# Everything in Docker, the reviewer path: http://localhost:8000
+# Everything in Docker, the quick path: http://localhost:8000
 start:
 	docker compose up -d --build --wait db app
 

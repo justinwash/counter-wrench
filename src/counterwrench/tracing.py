@@ -108,7 +108,7 @@ def trace_url(run_id, timeout_s: float = 60) -> str | None:
 
 
 def public_trace_url(run_id, timeout_s: float = 20) -> str | None:
-    """A public share link to a run's trace (Justin: reviewers should click straight through;
+    """A public share link to a run's trace (Justin: anyone can click straight through;
     the data is synthetic). None when tracing is off or the run hasn't arrived yet."""
     if os.environ.get("LANGSMITH_TRACING") != "true":
         return None
