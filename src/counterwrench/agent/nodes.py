@@ -342,6 +342,7 @@ def draft(state: GraphState, deps: Deps) -> dict:
                 intake=intake.model_dump(mode="json"),
                 langsmith_run_id=run_id,
                 source=state.get("source", "counter"),
+                draft_run_id=UUID(state["draft_run_id"]) if state.get("draft_run_id") else None,
             )
         if result.status == "saved":
             saved["result"] = result
@@ -408,7 +409,8 @@ def confirm(state: GraphState) -> dict:
         return {"outcome": "revised"}
     if action == "decline":
         return {"outcome": "declined", "decline": answer}
-    return {}
+    # Drafting runs as a new trace; the API passes its id so the order can link to it.
+    return {"draft_run_id": answer.get("draft_run_id")} if answer.get("draft_run_id") else {}
 
 
 def record_decline_node(state: GraphState, deps: Deps) -> dict:

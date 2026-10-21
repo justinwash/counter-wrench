@@ -93,10 +93,11 @@ def continue_to_draft(intake_id: str, request: Request) -> StreamingResponse:
     """Counter staff are done with the triage: draft the work order for the mechanic."""
     cw = request.app.state.cw
     _paused_at(cw, intake_id, "confirm")
-    config = {**_thread(intake_id), "run_name": "counterwrench-continue"}
-    return StreamingResponse(
-        _run(cw, Command(resume={"action": "draft"}), intake_id, config), media_type=SSE
-    )
+    # Drafting is its own LangSmith trace; give it an id we know, so the order can link to it.
+    draft_run = uuid.uuid4()
+    config = {**_thread(intake_id), "run_id": draft_run, "run_name": "counterwrench-continue"}
+    resume = Command(resume={"action": "draft", "draft_run_id": str(draft_run)})
+    return StreamingResponse(_run(cw, resume, intake_id, config), media_type=SSE)
 
 
 def add_answers(

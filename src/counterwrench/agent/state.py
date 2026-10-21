@@ -52,6 +52,7 @@ class GraphState(TypedDict, total=False):
     draft_error: str | None
     review: dict | None  # the mechanic's decision, after the graph resumes
     decline: dict | None  # counter staff's record of a customer declining the work
+    draft_run_id: str | None  # the LangSmith run that drafted the order (a trace of its own)
 
 
 class RowTask(TypedDict):

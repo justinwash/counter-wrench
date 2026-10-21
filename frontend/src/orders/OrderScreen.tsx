@@ -84,11 +84,18 @@ export default function OrderScreen() {
         <h1 className="text-lg font-bold">Order #{order.id}</h1>
         <SeverityBadge severity={order.severity} /> <StatusBadge status={order.status} />
         <span className="text-muted">{order.bike_name ?? "Bike not identified"}</span>
-        {detail.trace_url && (
-          <a className="ml-auto text-accent underline text-sm" href={detail.trace_url} target="_blank" rel="noreferrer">
-            Open the trace in LangSmith ↗
-          </a>
-        )}
+        <span className="ml-auto flex gap-4 text-sm">
+          {detail.draft_trace_url && (
+            <a className="text-accent underline" href={detail.draft_trace_url} target="_blank" rel="noreferrer">
+              Drafting trace ↗
+            </a>
+          )}
+          {detail.trace_url && (
+            <a className="text-accent underline" href={detail.trace_url} target="_blank" rel="noreferrer">
+              {detail.draft_trace_url ? "Triage trace ↗" : "Open the trace in LangSmith ↗"}
+            </a>
+          )}
+        </span>
       </div>
 
       {critical && open && (

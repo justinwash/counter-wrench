@@ -340,3 +340,14 @@ def test_an_answer_with_no_recorded_question_is_still_kept(seeded_db):
     answers, rounds = add_answers(prior, {}, {"r1": "It only started last week"})
     assert answers["r1"] == "Asked: (staff added this)\nAnswered: It only started last week"
     assert rounds == {"r1": 1}
+
+
+def test_the_order_records_the_run_that_drafted_it(seeded_db):
+    api, _ = client(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
+    intake_id = triaged(api)["done"]["intake_id"]
+    order_id = dict(continued(api, intake_id))["done"]["work_order_id"]
+    triage_run, draft_run = seeded_db.execute(
+        "SELECT langsmith_run_id, draft_run_id FROM work_orders WHERE id = %s", (order_id,)
+    ).fetchone()
+    assert str(triage_run) == intake_id  # the thread, as before
+    assert draft_run is not None and draft_run != triage_run  # a trace of its own

@@ -421,6 +421,8 @@ export interface components {
             triage: components["schemas"]["OrderTriage"] | null;
             /** Trace Url */
             trace_url: string | null;
+            /** Draft Trace Url */
+            draft_trace_url?: string | null;
         };
         /** OrderLine */
         OrderLine: {

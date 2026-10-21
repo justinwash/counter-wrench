@@ -116,7 +116,8 @@ class OrderDetail(BaseModel):
     lines: list[OrderLine]
     sources: list[OrderSource]
     triage: OrderTriage | None
-    trace_url: str | None
+    trace_url: str | None  # the triage run (everything, for orders made before the confirm step)
+    draft_trace_url: str | None = None  # the drafting run: the agent's tool calls
 
 
 def _thread(order: dict) -> dict | None:
@@ -174,21 +175,26 @@ def _detail(cw, order_id: int) -> OrderDetail:
     return OrderDetail(
         order=OrderRecord(**order), lines=[OrderLine(**line) for line in lines],
         sources=[OrderSource(**s) for s in sources], triage=triage,
-        trace_url=_trace_url(cw, order),
+        trace_url=_share(cw, order, "langsmith_run_id", "trace_url"),
+        draft_trace_url=_share(cw, order, "draft_run_id", "draft_trace_url"),
     )  # fmt: skip
 
 
-def _trace_url(cw, order: dict) -> str | None:
-    if order["trace_url"] or not order["langsmith_run_id"]:
-        return order["trace_url"]
+def _share(cw, order: dict, run_column: str, url_column: str) -> str | None:
+    """The public link for one of the order's runs: shared on first view, then remembered."""
+    if order[url_column] or not order[run_column]:
+        return order[url_column]
     try:
-        url = public_trace_url(order["langsmith_run_id"], timeout_s=5)
+        url = public_trace_url(order[run_column], timeout_s=5)
     except Exception:  # LangSmith being slow or down mustn't break the order page
-        log.warning("couldn't share the trace for order %s", order["id"], exc_info=True)
+        log.warning("couldn't share the %s for order %s", run_column, order["id"], exc_info=True)
         return None
     if url:
         with cw.deps.connect() as conn:
-            conn.execute("UPDATE work_orders SET trace_url = %s WHERE id = %s", (url, order["id"]))
+            conn.execute(
+                f"UPDATE work_orders SET {url_column} = %s WHERE id = %s",  # fixed names, not input
+                (url, order["id"]),
+            )
     return url
 
 
@@ -238,7 +244,9 @@ def review(order_id: int, decision: ReviewDecision, request: Request) -> ReviewR
         order = (
             conn.cursor(row_factory=dict_row)
             .execute(
-                "SELECT id, langsmith_run_id, edited_by FROM work_orders WHERE id = %s", (order_id,)
+                "SELECT id, langsmith_run_id, draft_run_id, edited_by "
+                "FROM work_orders WHERE id = %s",
+                (order_id,),
             )
             .fetchone()
         )
@@ -268,12 +276,13 @@ def review(order_id: int, decision: ReviewDecision, request: Request) -> ReviewR
 def _send_feedback(order: dict, decision: ReviewDecision) -> None:
     """The mechanic's verdict as LangSmith feedback on the drafting run: the production signal
     online evaluation builds on (step 21). Best effort; the review itself already happened."""
-    if not order["langsmith_run_id"] or os.environ.get("LANGSMITH_TRACING") != "true":
+    run_id = order.get("draft_run_id") or order["langsmith_run_id"]
+    if not run_id or os.environ.get("LANGSMITH_TRACING") != "true":
         return
     try:
         from langsmith import Client
 
-        client, run_id = Client(), order["langsmith_run_id"]
+        client = Client()
         project = read_run(client, run_id).session_id  # feedback without it is deprecated
         approved = 1 if decision.decision == "approve" else 0
         client.create_feedback(run_id, key="mechanic_decision", score=approved,

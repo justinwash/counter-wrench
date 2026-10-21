@@ -1054,6 +1054,17 @@
        }
       ],
       "title": "Trace Url"
+     },
+     "draft_trace_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Draft Trace Url"
      }
     },
     "type": "object",
