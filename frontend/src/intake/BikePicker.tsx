@@ -40,7 +40,7 @@ export default function BikePicker({ value, onChange, disabled }: {
   }
   return (
     // Close only when focus leaves the whole picker, so the list works by keyboard too.
-    <div className="flex flex-col gap-1"
+    <div className="relative flex flex-col gap-1"
       onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false); }}>
       <div className="flex flex-wrap items-center gap-2">
         <input id="bike-search" className="border border-line rounded-sm px-2 py-1 w-80" disabled={disabled}
@@ -51,7 +51,8 @@ export default function BikePicker({ value, onChange, disabled }: {
           onClick={() => onChange({ kind: "other", text: query })}>Not in the catalog</button>
       </div>
       {open && (
-        <ul className="border border-line rounded-sm bg-panel max-h-56 overflow-auto w-[28rem]">
+        // Floats over the page (absolute) instead of pushing everything below it down.
+        <ul className="absolute top-full left-0 z-20 mt-1 border border-line rounded-sm bg-panel shadow-lg shadow-black/50 max-h-72 overflow-auto w-[28rem] max-w-[calc(100vw-2rem)]">
           {(bikes.data ?? []).map((b) => (
             <li key={b.bike_id}>
               <button type="button" className="w-full text-left px-2 py-1 hover:bg-ground"
