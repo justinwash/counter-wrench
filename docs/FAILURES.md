@@ -21,7 +21,8 @@ Every interesting failure found, with trace link, root cause, and fix (or "unfix
 | F-013 | Labels that were wrong or undefined | Fixed (relabeled through the REVIEW table) |
 | F-014 | Explanation judge gaps | Partly fixed: diagnosis judge calibrated; explanation judge still fails calibration |
 | F-015 | A dropped connection lost three runs | Fixed (reports skip and list errored runs) |
-| F-016 | Over-escalation while a braking question is open | Policy set; `c02` and `e10` still missed (E-007 inconclusive) |
+| F-016 | Over-escalation while a braking question is open | Policy set; `c02` and `e10` still missed. E-008 confirmed E-007's effect is real but a swap |
+| F-017 | Eval infrastructure limits dropped runs | Mitigated (a watchdog during runs); an Opus comparison is only partial |
 
 <!--
 ## F-NNN: Title
@@ -130,4 +131,10 @@ The entries below come from step 16: the assistant proposed a root cause for eac
 **Found in:** E-002 to E-006 / `a02-fuelex-skip-inspection-lever` (3/3), `e10-fuelex-swapped-sram-brakes` (3/3), `m02-roscoe-play-when-braking` (3/3); the mirror case `c02-stumpjumper-squeak-is-brakes` (missed 3/3).
 **What happened:** With the never-release list always in view, the agent escalates a lever to the bar while asking whether the bike still stops (a02), and "pads are worn out" as worn to the wear line (e10). The labels say needs service plus a question for a02, needs service for e10, needs service for m02 (D-031), but safety-critical for c02, where whether braking is affected is equally unknown.
 **Root cause:** label question: the labels don't follow one rule for "braking may be compromised, unknown until answered".
-**Fix:** Justin's policy: "we default to safety if we're not sure." a02, e10 and m02 relabeled safety-critical (E-006b: no over-escalations left); the agent still holds c02 at needs service while asking. E-007 put the policy in the triage prompt: `c02` is still missed 3/3 and `e10` 2/3 (E-007 is inconclusive overall; see EVAL_RESULTS).
+**Fix:** Justin's policy: "we default to safety if we're not sure." a02, e10 and m02 relabeled safety-critical (E-006b: no over-escalations left); the agent still holds c02 at needs service while asking. E-007 put the policy in the triage prompt: `c02` is still missed 3/3 and `e10` 2/3. E-008 repeated E-007 and got the same misses: the change is real, and it is a swap (`s04` fixed, `e10` broken), not a closing of the gap. Asking triage for a JSON schema instead (E-009) catches both but over-escalates seven other cases.
+
+## F-017: Eval infrastructure limits dropped runs
+**Found in:** E-009 (first attempt and rerun) and E-010, while building the frontier-model comparison.
+**What happened:** Two limits nobody had looked at ended runs part-way. (1) LangSmith's workspace limit on monthly traces (a user-defined cap, 14,000 at first; the account's usage card showed 13,710 against its 5,000 included traces, which is not the same number): once it was reached, uploads were rejected with 429s while the run itself carried on. The first E-009 lost 63 of 186 runs and all their scores, and the rerun lost seven more in its first minutes, before a raised cap took effect. (2) OpenRouter reserves a large model's worst-case cost for every request in flight, so with four examples at a time on Opus 5.5 and about $20 of balance left, 92 of 186 runs were refused with HTTP 402, although the balance was never close to zero. The refused requests did not show up in the key's usage; the ones that completed cost $7.87.
+**Root cause:** other (eval tooling and account limits): the runner treats a failed upload or a refused request as an ordinary per-run problem and carries on, so a run can spend its budget and record half of it.
+**Fix:** none in the runner yet. The mitigation used for E-010 was a watchdog that polled LangSmith's reject flag and stopped the run if uploads began being refused (it never fired). The comparison is reported as partial (94 of 186 runs, at least one per case, no spreads) rather than rerun for about $8 more. What the runner should do: stop on the first rejected upload, run big models at lower concurrency, and check balance against the expected cost before starting.

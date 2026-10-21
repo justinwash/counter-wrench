@@ -66,6 +66,9 @@ Failing cases go to a LangSmith annotation queue, one item per case (the worst r
 | E-005 | Agreement computed from the agent's own area pick | Contradictions fixed by construction; overall figure barely moved (too strict for adjacent areas) |
 | E-006 | A generic tube; unverified parts are drafted, flagged | Parts coverage 0.62 to 0.89 |
 | E-007 | Prompt states the default-to-safety policy | Inconclusive: inside run-to-run noise; kept because it states the policy |
+| E-008 | E-007 run again, nothing changed | The same two cases missed: E-007's effect is real, but a swap (`s04` fixed, `e10` broken). Judges move to rubric v3, so judge columns stop being comparable here |
+| E-009 | Triage asks for structured output as a JSON schema (Haiku) | Not neutral: no safety case missed, but over-escalation 0.99 to 0.87 and severity accuracy 0.93 to 0.85. The default stays |
+| E-010 | Opus 5.5 as agent and triage, same JSON-schema method | Partial (94 of 186 runs): the same over-escalation as Haiku, better parts and labor coverage, about 6x the cost per run. A stronger model doesn't fix it |
 
 Each is listed in [EVAL_RESULTS.md](EVAL_RESULTS.md) with its config, cost, per-slice table and what it did to everything else, including side effects that went the wrong way.
 

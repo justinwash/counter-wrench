@@ -47,7 +47,19 @@ EXPERIMENTS = [
         "Triage told to default to safety when unsure (inconclusive)",
     ),
     ("E-008", "ad2d634-e2e-5a12197c", "E-007 run again, nothing changed: two identical runs"),
+    (
+        "E-009",
+        "412abfa-e2e-33bfeed9",
+        "Triage asks for structured output as a JSON schema, not a forced tool call (Haiku 5.5)",
+    ),
+    (
+        "E-010",
+        "412abfa-e2e-7bc9d206",
+        "Opus 5.5 as agent and triage, same JSON-schema method (partial: OpenRouter's in-flight "
+        "credit reservation refused half the runs)",
+    ),
 ]
+EXPECTED_RUNS = 186  # 62 cases x 3 repetitions
 
 
 def stat(per_rep: dict[int, list[float]]) -> dict | None:
@@ -123,6 +135,9 @@ def main() -> int:
         meta = (client.read_project(project_name=project).extra or {}).get("metadata", {})
         experiments.append({
             "id": exp_id, "project": project, "change": change, "runs": len(rows),
+            # A run with many missing runs has repetitions of different sizes, so its spread
+            # means nothing; the page shows its means without one.
+            "partial": len(rows) < 0.8 * EXPECTED_RUNS,
             "agent_model": meta.get("agent_model"),
             "structured_method": meta.get("triage_structured_method") or "default",
             # The judge rubric the experiment was scored with: v2 until E-008, v3 after (D-042).

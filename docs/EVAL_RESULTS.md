@@ -413,3 +413,60 @@ What moved, and why: the safety list fixed two of the three missed escalations (
 
 **Result:** the diagnosis judge now agrees with Justin on unseen items (held-out accuracy 0.62 to 0.88, kappa 0.25 to 0.60). The explanation judge is no longer too strict, but it catches none of the explanations Justin failed (c02's unusual symptom, `e05` not saying why the tire is a comparable replacement, `a02` not saying a pads-only purchase needs no work order): held-out kappa -0.20. Stopping at v3: chasing the remaining dev cases (mostly c02, where Justin's reading of the note is one of two) would fit the rubric to single items. Treat `explanation_quality` as a coarse check, not a quality score; the deterministic and diagnosis checks carry the weight.
 **Consequence:** rubric v3 is now what `make eval` uses, so judge columns from experiments before this point (v2) aren't comparable with later ones.
+
+## E-008: E-007 run again, nothing changed
+**Change:** none. The same code, labels and configuration as E-007, run a second time, to separate E-007's effect from run-to-run noise (E-007's takeaway was "inconclusive").
+**Config:** as E-001; commit `ad2d634` (clean). 186 runs, 0 errors, 11.8 min, $2.46. The judges now use rubric v3 (D-042); E-001 to E-007 used v2, so **judge columns are not comparable across this boundary** (explanation_quality reads 0.71 here against 0.21 in E-007, which is the rubric, not the agent).
+**LangSmith:** `ad2d634-e2e-5a12197c`. All numbers below are on today's labels (the Results page has every slice).
+
+| Evaluator (all slices) | E-006 | E-007 | E-008 |
+|---|---|---|---|
+| safety_escalated | 0.89 ±0.00 | 0.91 ±0.05 | 0.91 ±0.05 |
+| no_over_escalation | 1.00 ±0.00 | 0.98 ±0.02 | 0.99 ±0.02 |
+| severity_correct | 0.92 ±0.03 | 0.90 ±0.05 | 0.93 ±0.02 |
+| clarification_correct | 0.89 ±0.05 | 0.82 ±0.02 | 0.83 ±0.05 |
+| agreement_correct | 0.82 ±0.02 | 0.82 ±0.03 | 0.81 ±0.03 |
+| parts_categories_present | 0.89 ±0.05 | 0.87 ±0.10 | 0.89 ±0.05 |
+
+**Safety misses:** E-007: `c02` 3/3, `e10` 2/3, `n07` over-escalated 2/3. E-008: `c02` 3/3, `e10` 2/3, `n07` 1/3.
+**Takeaway:** E-007's effect is real, and it is small and a swap rather than a gain. Two identical runs agree to within the spread on every evaluator, with the same two missed cases. Against E-006, the policy line fixed `s04` (3/3 missed to 0) and broke `e10` (0 missed to 2/3), in both runs; `c02` is still missed every time. So the line moves one case in each direction; it does not close the gap the policy describes. Kept, because it states Justin's policy.
+
+## E-009: Triage asks for a JSON schema, not a forced tool call
+**Change:** one setting, `TRIAGE_STRUCTURED_METHOD=json_schema` (D-056). Triage requests structured output as a JSON schema instead of a forced tool call. Nothing else changes. It exists because the Claude 5.5 Sonnet, Opus and Fable tiers refuse a forced tool choice, so E-010 needs it; E-009 is the control that shows what the method alone does. Run on Haiku 5.5, as E-008.
+**Config:** as E-008; commit `412abfa` (clean). 179 of 186 runs recorded, $2.48, about 12 min. LangSmith's monthly trace cap (D-056, F-017) rejected the first seven runs' uploads; the first attempt, which lost 63 runs to the same cap, was deleted. Judge rubric v3.
+**LangSmith:** `412abfa-e2e-33bfeed9`.
+
+| Evaluator (all slices) | E-008 (default method) | E-009 (JSON schema) |
+|---|---|---|
+| safety_escalated | 0.91 ±0.05 | **1.00** ±0.00 |
+| no_unsafe_release | 0.91 ±0.05 | **1.00** ±0.00 |
+| no_over_escalation | 0.99 ±0.02 | **0.87** ±0.06 |
+| severity_correct | 0.93 ±0.02 | 0.85 ±0.02 |
+| agreement_correct | 0.81 ±0.03 | 0.87 ±0.03 |
+| clarification_correct | 0.83 ±0.05 | 0.77 ±0.03 |
+| first_try_valid | 0.96 ±0.02 | 1.00 ±0.00 |
+| parts_categories_present | 0.89 ±0.05 | 0.85 ±0.10 |
+| labor_required_present | 0.91 ±0.07 | 0.86 ±0.06 |
+
+**Safety:** no safety-critical case is missed (`c02` and `e10` are now escalated). Over-escalation rises from one run to many: `e03`, `e05`, `m08` and `n07` in every repetition, `c04` in both of its recorded repetitions, `m03` and `m05` once each.
+**Takeaway:** the method is not neutral. The same prompt, model and labels, asked for the answer as a schema, calls many more things safety-critical. It trades the two missed hazards for seven over-escalated cases, and lowers severity accuracy from 0.93 to 0.85. The production default is unchanged (function calling), which is the E-008 behavior.
+
+## E-010: Opus 5.5 as the agent and triage model (partial)
+**Change:** agent and triage model `claude-haiku-5.5` to `claude-opus-5.5`, with the JSON-schema method E-009 isolates, so E-009 is its control. The judge is unchanged (`gpt-6.1-sol`, a different family).
+**Config:** as E-009; commit `412abfa`. **94 of 186 runs completed** (cost $7.87, 7.7 min): OpenRouter began refusing requests part-way ("would exceed your available credits given your current in-flight requests", HTTP 402) because it reserves a large model's worst-case cost for every request in flight, and four examples at a time outran the key's remaining balance. The 94 runs are spread across all 62 cases (each case has one or two, two have three) and all six slices. At about $0.084 per run including judges, a full run is about 6x Haiku's cost per run.
+**LangSmith:** `412abfa-e2e-7bc9d206`. Repetitions are different sizes, so a spread isn't meaningful and the Results page shows means only.
+
+| Evaluator (all slices) | E-009 Haiku (179 runs) | E-010 Opus (94 runs) |
+|---|---|---|
+| safety_escalated | 1.00 | 1.00 |
+| no_over_escalation | 0.87 | 0.87 |
+| severity_correct | 0.85 | 0.89 |
+| agreement_correct | 0.87 | 0.77 |
+| clarification_correct | 0.77 | 0.72 |
+| parts_categories_present | 0.85 | 0.93 |
+| labor_required_present | 0.86 | 0.95 |
+| diagnosis_reasonable (judge, v3) | 0.92 | 0.94 |
+| explanation_quality (judge, v3) | 0.74 | 0.84 |
+
+**Takeaway:** a stronger model does not fix the over-escalation. The same cases are over-escalated by both (`c04`, `e03`, `e05`, `m05`, `n07`), with the same safety result, so those failures point at the prompt, the policy or the labels, not at model capability. What the stronger model does improve is parts and labor coverage and the judges' view of the explanation. Caveat: 94 runs, one or two repetitions per case. These are indications, not measurements; a full run would cost about $8 more.
+**For Justin:** `c04`, `e03`, `e05`, `m05` and `n07` are escalated by both models. Either the agent is wrong, or the labels are, as with the braking cases in F-016. They are worth a look.

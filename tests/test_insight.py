@@ -40,12 +40,13 @@ def test_results_snapshot_has_every_experiment_and_a_confusion_matrix(seeded_db)
     api, _ = client(seeded_db, {})
     snap = api.get("/api/evals/results").json()
     assert [e["id"] for e in snap["experiments"]][:2] == ["E-001b", "E-002"]
-    last = snap["experiments"][-1]
+    last = next(e for e in snap["experiments"] if e["id"] == "E-008")  # a full run
     escalated = last["evaluators"]["safety_escalated"]
     assert escalated["is_safety"] and escalated["slices"]["all"]["mean"] > 0.5
     assert (
         escalated["slices"]["safety"]["n"] > 0
     )  # the "safety" slice and the flag no longer collide
+    assert snap["experiments"][-1]["partial"] and not last["partial"]  # E-010 is marked partial
     assert last["confusion"]["labels"][0] == "safety_critical"
     assert sum(c["count"] for c in last["confusion"]["cells"]) > 100
 
