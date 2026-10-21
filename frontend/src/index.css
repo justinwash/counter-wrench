@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* POS look: plain, dense, high contrast. Severity colors are the only color with meaning. */
+@theme {
+  --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --font-mono: Consolas, "Cascadia Mono", "Courier New", monospace;
+  --color-ink: #1d232b;
+  --color-muted: #5d6875;
+  --color-line: #cfd6de;
+  --color-panel: #ffffff;
+  --color-ground: #eceff3;
+  --color-accent: #1f5fbf;
+  --color-sev-safety: #c4302b;
+  --color-sev-service: #a86200;
+  --color-sev-adjust: #1f5fbf;
+  --color-sev-cosmetic: #6b5aa6;
+  --color-sev-none: #2f7d4f;
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-size: 14px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}

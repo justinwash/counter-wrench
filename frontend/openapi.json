@@ -1,0 +1,901 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "CounterWrench",
+  "version": "0.1.0"
+ },
+ "paths": {
+  "/api/taxonomy": {
+   "get": {
+    "tags": [
+     "catalog"
+    ],
+    "summary": "Taxonomy",
+    "operationId": "taxonomy_api_taxonomy_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ComplaintOption"
+         },
+         "type": "array",
+         "title": "Response Taxonomy Api Taxonomy Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/bikes": {
+   "get": {
+    "tags": [
+     "catalog"
+    ],
+    "summary": "Bikes",
+    "description": "Catalog bikes whose make, model and year contain every word of `q`.",
+    "operationId": "bikes_api_bikes_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "",
+       "title": "Q"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/BikeCandidate"
+         },
+         "title": "Response Bikes Api Bikes Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/intakes": {
+   "post": {
+    "tags": [
+     "intakes"
+    ],
+    "summary": "Submit",
+    "operationId": "submit_api_intakes_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/IntakeForm"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/intakes/{intake_id}/answers": {
+   "post": {
+    "tags": [
+     "intakes"
+    ],
+    "summary": "Answer",
+    "description": "Re-run an intake that stopped for answers (the bike couldn't be resolved), with the\nanswers added. Questions about rows don't stop a run (D-037): they're answered at review.",
+    "operationId": "answer_api_intakes__intake_id__answers_post",
+    "parameters": [
+     {
+      "name": "intake_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Intake Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Answers"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/orders": {
+   "get": {
+    "tags": [
+     "orders"
+    ],
+    "summary": "Orders",
+    "description": "The review queue is `status=awaiting_review`: safety-critical first, then newest.",
+    "operationId": "orders_api_orders_get",
+    "parameters": [
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     },
+     {
+      "name": "include_eval",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Include Eval"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/OrderSummary"
+         },
+         "title": "Response Orders Api Orders Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/orders/{order_id}": {
+   "get": {
+    "tags": [
+     "orders"
+    ],
+    "summary": "Order",
+    "operationId": "order_api_orders__order_id__get",
+    "parameters": [
+     {
+      "name": "order_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Order Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Order Api Orders  Order Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/orders/{order_id}/lines": {
+   "put": {
+    "tags": [
+     "orders"
+    ],
+    "summary": "Edit",
+    "description": "Replace the lines of a draft awaiting review, checked like the agent's own drafts.",
+    "operationId": "edit_api_orders__order_id__lines_put",
+    "parameters": [
+     {
+      "name": "order_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Order Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EditLinesArgs"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Edit Api Orders  Order Id  Lines Put"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/orders/{order_id}/review": {
+   "post": {
+    "tags": [
+     "orders"
+    ],
+    "summary": "Review",
+    "operationId": "review_api_orders__order_id__review_post",
+    "parameters": [
+     {
+      "name": "order_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Order Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReviewDecision"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Review Api Orders  Order Id  Review Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "Answers": {
+    "properties": {
+     "answers": {
+      "additionalProperties": {
+       "type": "string",
+       "maxLength": 500,
+       "minLength": 1
+      },
+      "type": "object",
+      "title": "Answers",
+      "description": "row id -> answer"
+     },
+     "bike_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bike Id",
+      "description": "The catalog bike, if the bike was the question."
+     }
+    },
+    "type": "object",
+    "title": "Answers"
+   },
+   "BikeCandidate": {
+    "properties": {
+     "bike_id": {
+      "type": "string",
+      "title": "Bike Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     }
+    },
+    "type": "object",
+    "required": [
+     "bike_id",
+     "name"
+    ],
+    "title": "BikeCandidate"
+   },
+   "Complaint": {
+    "type": "string",
+    "enum": [
+     "squeak",
+     "creak",
+     "click",
+     "poor_shifting",
+     "skipping",
+     "chain_drop",
+     "brake_rub",
+     "brake_noise",
+     "soft_brake_lever",
+     "weak_braking",
+     "wobble",
+     "flat_tire",
+     "slow_leak",
+     "suspension_packing_up",
+     "suspension_bouncing",
+     "suspension_bottoming",
+     "suspension_harsh",
+     "suspension_sticky",
+     "suspension_leaking",
+     "suspension_knock",
+     "dropper_issue",
+     "other"
+    ],
+    "title": "Complaint"
+   },
+   "ComplaintOption": {
+    "properties": {
+     "value": {
+      "type": "string",
+      "title": "Value"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "areas": {
+      "items": {
+       "$ref": "#/components/schemas/Option"
+      },
+      "type": "array",
+      "title": "Areas"
+     }
+    },
+    "type": "object",
+    "required": [
+     "value",
+     "label",
+     "areas"
+    ],
+    "title": "ComplaintOption"
+   },
+   "ComplaintRow": {
+    "properties": {
+     "row_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,20}$",
+      "title": "Row Id"
+     },
+     "complaint": {
+      "$ref": "#/components/schemas/Complaint"
+     },
+     "suspected_area": {
+      "$ref": "#/components/schemas/SuspectedArea"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "row_id",
+     "complaint",
+     "suspected_area"
+    ],
+    "title": "ComplaintRow"
+   },
+   "EditLinesArgs": {
+    "properties": {
+     "editor": {
+      "type": "string",
+      "minLength": 1,
+      "title": "Editor"
+     },
+     "labor_lines": {
+      "items": {
+       "$ref": "#/components/schemas/LaborRequest"
+      },
+      "type": "array",
+      "title": "Labor Lines"
+     },
+     "part_lines": {
+      "items": {
+       "$ref": "#/components/schemas/PartRequest"
+      },
+      "type": "array",
+      "title": "Part Lines"
+     }
+    },
+    "type": "object",
+    "required": [
+     "editor"
+    ],
+    "title": "EditLinesArgs",
+    "description": "A mechanic's replacement lines for a draft awaiting review."
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "IntakeForm": {
+    "properties": {
+     "bike_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bike Id"
+     },
+     "bike_freetext": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bike Freetext"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/ComplaintRow"
+      },
+      "type": "array",
+      "maxItems": 10,
+      "minItems": 1,
+      "title": "Rows"
+     },
+     "general_notes": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 2000,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "General Notes"
+     },
+     "answers": {
+      "patternProperties": {
+       "^[A-Za-z0-9_-]{1,20}$": {
+        "type": "string",
+        "maxLength": 500,
+        "minLength": 1
+       }
+      },
+      "type": "object",
+      "title": "Answers"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "rows"
+    ],
+    "title": "IntakeForm"
+   },
+   "LaborRequest": {
+    "properties": {
+     "code": {
+      "type": "string",
+      "title": "Code",
+      "description": "Service menu code from get_labor_item or search_labor_menu."
+     },
+     "qty": {
+      "type": "integer",
+      "maximum": 10.0,
+      "minimum": 1.0,
+      "title": "Qty",
+      "description": "Units, e.g. 2 for both brakes.",
+      "default": 1
+     }
+    },
+    "type": "object",
+    "required": [
+     "code"
+    ],
+    "title": "LaborRequest"
+   },
+   "Option": {
+    "properties": {
+     "value": {
+      "type": "string",
+      "title": "Value"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     }
+    },
+    "type": "object",
+    "required": [
+     "value",
+     "label"
+    ],
+    "title": "Option"
+   },
+   "OrderSummary": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "severity": {
+      "type": "string",
+      "title": "Severity"
+     },
+     "priority": {
+      "type": "boolean",
+      "title": "Priority"
+     },
+     "bike": {
+      "type": "string",
+      "title": "Bike"
+     },
+     "estimate_total_cents": {
+      "type": "integer",
+      "title": "Estimate Total Cents"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "source": {
+      "type": "string",
+      "title": "Source"
+     },
+     "edited": {
+      "type": "boolean",
+      "title": "Edited"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "status",
+     "severity",
+     "priority",
+     "bike",
+     "estimate_total_cents",
+     "created_at",
+     "source",
+     "edited"
+    ],
+    "title": "OrderSummary"
+   },
+   "PartRequest": {
+    "properties": {
+     "part_id": {
+      "type": "string",
+      "title": "Part Id",
+      "description": "A part_id from find_compatible_parts."
+     },
+     "qty": {
+      "type": "integer",
+      "maximum": 10.0,
+      "minimum": 1.0,
+      "title": "Qty",
+      "default": 1
+     },
+     "position": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "front",
+         "rear"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Position",
+      "description": "Required for tires, tubes and rotors."
+     },
+     "tire_width_mm": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tire Width Mm",
+      "description": "Installed tire width, for tubes."
+     }
+    },
+    "type": "object",
+    "required": [
+     "part_id"
+    ],
+    "title": "PartRequest"
+   },
+   "ReviewDecision": {
+    "properties": {
+     "decision": {
+      "type": "string",
+      "enum": [
+       "approve",
+       "reject"
+      ],
+      "title": "Decision"
+     },
+     "reviewer": {
+      "type": "string",
+      "minLength": 1,
+      "title": "Reviewer"
+     },
+     "notes": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Notes"
+     }
+    },
+    "type": "object",
+    "required": [
+     "decision",
+     "reviewer"
+    ],
+    "title": "ReviewDecision"
+   },
+   "SuspectedArea": {
+    "type": "string",
+    "enum": [
+     "chain",
+     "cassette",
+     "freehub",
+     "chainrings",
+     "crankset",
+     "bottom_bracket",
+     "pedals",
+     "cleats",
+     "rear_derailleur",
+     "front_derailleur",
+     "derailleur_hanger",
+     "shifter",
+     "cables_housing",
+     "brake_pads",
+     "rotor",
+     "caliper",
+     "brake_lever",
+     "brake_hydraulics",
+     "wheel_true",
+     "hub",
+     "spokes",
+     "rim",
+     "axle",
+     "tire",
+     "tube",
+     "rim_tape",
+     "tubeless_setup",
+     "valve",
+     "frame",
+     "frame_pivots",
+     "headset",
+     "handlebar_stem",
+     "seatpost",
+     "saddle",
+     "dropper_post",
+     "fork",
+     "rear_shock",
+     "suspension_setup",
+     "unsure"
+    ],
+    "title": "SuspectedArea"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  }
+ }
+}

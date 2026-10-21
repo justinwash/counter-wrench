@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test
 
 install:
 	uv sync
@@ -70,3 +70,15 @@ api:
 # pgAdmin at http://localhost:5050, already connected to the CounterWrench database.
 db-ui:
 	docker compose --profile tools up -d --wait pgadmin
+
+# Regenerate the frontend's API types after changing a route or model.
+api-types:
+	uv run python -m counterwrench.api.openapi frontend/openapi.json
+	npm --prefix frontend run gen:api
+
+# The intake UI with hot reload at http://localhost:5173 (run `make api` alongside it).
+ui:
+	npm --prefix frontend run dev
+
+ui-test:
+	npm --prefix frontend test

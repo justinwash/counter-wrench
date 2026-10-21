@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/api/client.ts","./src/api/schema.d.ts","./src/api/stream.test.ts","./src/api/stream.ts","./src/intake/bikepicker.tsx","./src/intake/intakescreen.test.tsx","./src/intake/intakescreen.tsx","./src/intake/run.ts","./vite.config.ts"],"version":"5.8.3"}
