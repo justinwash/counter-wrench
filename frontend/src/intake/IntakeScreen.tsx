@@ -177,7 +177,7 @@ export default function IntakeScreen() {
                   </td>
                   <ResultCells result={result} failed={failed} pending={run.running && !result && !failed}
                     earlier={history[r.row_id] ?? []} unresolved={run.unresolved[r.row_id]}
-                    answer={confirming ? { value: r.answer, set: (v) => update(i, { answer: v }), id: `answer-${r.row_id}` } : null} />
+                    answer={confirming ? { value: r.answer, set: (v) => update(i, { answer: v }), id: `answer-${r.row_id}`, submit: retriage } : null} />
                   <td className="px-2 py-2">
                     {rows.length > 1 && !started && (
                       <button type="button" aria-label={`Remove row ${i + 1}`} className="text-muted hover:text-sev-safety"
@@ -304,7 +304,7 @@ function EarlierTriage({ earlier }: { earlier: Earlier[] }) {
 
 function ResultCells({ result, failed, pending, answer, earlier, unresolved }: {
   result?: RowResult; failed?: string; pending: boolean; earlier: Earlier[]; unresolved?: string;
-  answer: { value: string; set: (v: string) => void; id: string } | null;
+  answer: { value: string; set: (v: string) => void; id: string; submit: () => void } | null;
 }) {
   if (failed) return <td colSpan={3} className="px-2 py-2 text-warn">Couldn't assess this row; a mechanic will check it.</td>;
   if (!result) return (
@@ -335,8 +335,14 @@ function ResultCells({ result, failed, pending, answer, earlier, unresolved }: {
           <div className="text-xs mt-1 bg-ask-bg border border-ask-line px-1.5 py-1 flex flex-col gap-1">
             <span>Ask the customer: {result.question_for_customer}</span>
             {answer && (
-              <input id={answer.id} aria-label="Customer's answer" className="border border-line rounded-sm px-1.5 py-0.5"
-                placeholder="Their answer" value={answer.value} onChange={(e) => answer.set(e.target.value)} />
+              // Enter or Send re-triages with what's typed, right where you typed it.
+              <form className="flex gap-1" onSubmit={(e) => { e.preventDefault(); if (answer.value.trim()) answer.submit(); }}>
+                <input id={answer.id} aria-label="Customer's answer" className="border border-line rounded-sm px-1.5 py-0.5 flex-1 min-w-0"
+                  placeholder="Their answer, then Enter" value={answer.value} onChange={(e) => answer.set(e.target.value)} />
+                <button type="submit" disabled={!answer.value.trim()} className="bg-accent text-header font-semibold px-2 rounded-sm disabled:opacity-40">
+                  Send
+                </button>
+              </form>
             )}
           </div>
         )}

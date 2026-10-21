@@ -115,6 +115,27 @@ describe("IntakeScreen", () => {
       body: { answers: { r1: "Yes, but it's weak" }, notes: { r1: "Grinding, no sparks" } } });
   });
 
+  it("re-triages when you press Enter in the answer box, or click Send", async () => {
+    const calls = mockApi({
+      "/api/intakes": triage("i1", "needs_service"),
+      "/api/intakes/i1/revise": triage("i2", "needs_adjustment"),
+    });
+    renderScreen();
+    await fillOneRow();
+    await click("Triage");
+    const box = await screen.findByLabelText("Customer's answer");
+    expect((screen.getByText("Send") as HTMLButtonElement).disabled).toBe(true);  // nothing typed
+    fireEvent.change(box, { target: { value: "Only when it's wet" } });
+    await act(async () => { fireEvent.submit(box.closest("form")!); });  // what Enter does in a form
+    await waitFor(() => expect(screen.getByText("Needs adjustment")).toBeTruthy());
+    expect(calls[1]).toMatchObject({ url: "/api/intakes/i1/revise", body: { answers: { r1: "Only when it's wet" } } });
+
+    fireEvent.change(await screen.findByLabelText("Customer's answer"), { target: { value: "Yes" } });
+    await click("Send");
+    await waitFor(() => expect(calls.length).toBe(3));
+    expect(calls[2].body).toMatchObject({ answers: { r1: "Yes" } });
+  });
+
   it("records a declined safety-critical job only with a signed waiver", async () => {
     const calls = mockApi({
       "/api/intakes": triage("i1", "safety_critical", escalation),
