@@ -37,7 +37,8 @@ function renderScreen() {
 }
 
 async function fillOneRow() {
-  fireEvent.change(screen.getByPlaceholderText(/Search the catalog/), { target: { value: "slash" } });
+  fireEvent.focus(screen.getByPlaceholderText(/Search the catalog/));  // the whole list, no typing
+  expect(await screen.findByText("2023 Trek Marlin 7 Gen 3")).toBeTruthy();
   fireEvent.click(await screen.findByText("2024 Trek Slash 9.8 XT Gen 6"));
   await screen.findByRole("option", { name: "Brake noise" });
   fireEvent.change(screen.getByLabelText("Complaint"), { target: { value: "brake_noise" } });

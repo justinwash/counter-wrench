@@ -11,6 +11,7 @@ export default function BikePicker({ value, onChange, disabled }: {
   disabled?: boolean;
 }) {
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);  // the full list shows on focus, so no bike knowledge is needed
   const bikes = useQuery({
     queryKey: ["bikes", query],
     queryFn: async () => (await api.GET("/api/bikes", { params: { query: { q: query } } })).data ?? [],
@@ -38,20 +39,23 @@ export default function BikePicker({ value, onChange, disabled }: {
     );
   }
   return (
-    <div className="flex flex-col gap-1">
+    // Close only when focus leaves the whole picker, so the list works by keyboard too.
+    <div className="flex flex-col gap-1"
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false); }}>
       <div className="flex flex-wrap items-center gap-2">
         <input id="bike-search" className="border border-line rounded-sm px-2 py-1 w-80" disabled={disabled}
-          placeholder="Search the catalog: Hightower, Marlin 2023…" value={query}
-          onChange={(e) => setQuery(e.target.value)} />
+          placeholder="Search the catalog, or pick from the list" value={query}
+          onFocus={() => setOpen(true)} onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+          onChange={(e) => { setQuery(e.target.value); setOpen(true); }} />
         <button type="button" disabled={disabled} className="text-accent text-sm underline"
           onClick={() => onChange({ kind: "other", text: query })}>Not in the catalog</button>
       </div>
-      {query.length > 0 && (
+      {open && (
         <ul className="border border-line rounded-sm bg-panel max-h-56 overflow-auto w-[28rem]">
-          {(bikes.data ?? []).slice(0, 12).map((b) => (
+          {(bikes.data ?? []).map((b) => (
             <li key={b.bike_id}>
               <button type="button" className="w-full text-left px-2 py-1 hover:bg-ground"
-                onClick={() => { onChange({ kind: "catalog", bike: b }); setQuery(""); }}>
+                onClick={() => { onChange({ kind: "catalog", bike: b }); setQuery(""); setOpen(false); }}>
                 {b.name}
               </button>
             </li>
