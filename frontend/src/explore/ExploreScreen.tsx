@@ -52,6 +52,9 @@ function Retrieval() {
       </form>
       {result.isError && <p role="alert" className="text-warn">{(result.error as Error).message}</p>}
       {result.isFetching && <p className="text-muted">Searching…</p>}
+      {result.data && result.data.length > 0 && (
+        <p className="text-muted text-xs">Scores are rank-based (1 over the rank, roughly), so they shrink steadily down the list; they are not similarity percentages.</p>
+      )}
       {result.data?.length === 0 && <p className="text-muted">Nothing found.</p>}
       <ol className="flex flex-col gap-2">
         {result.data?.map((h, i) => (
