@@ -33,6 +33,22 @@ def taxonomy() -> list[ComplaintOption]:
     ]  # fmt: skip
 
 
+class LaborOption(BaseModel):
+    code: str
+    name: str
+    price_cents: int
+    category: str
+
+
+@router.get("/labor-menu")
+def labor_menu(request: Request) -> list[LaborOption]:
+    with request.app.state.cw.deps.connect() as conn:
+        rows = conn.execute(
+            "SELECT code, name, price_cents, category FROM labor_menu ORDER BY category, name"
+        ).fetchall()
+    return [LaborOption(code=c, name=n, price_cents=p, category=cat) for c, n, p, cat in rows]
+
+
 @router.get("/bikes")
 def bikes(request: Request, q: str = "") -> list[BikeCandidate]:
     """Catalog bikes whose make, model and year contain every word of `q`."""

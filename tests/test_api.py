@@ -267,3 +267,19 @@ def test_rate_limit_applies_only_to_requests_that_spend_money(seeded_db):
     assert api.get("/api/taxonomy").status_code == 200  # reads aren't limited
     other = api.post("/api/intakes", json=intake(), headers={"x-forwarded-for": "10.0.0.9"})
     assert other.status_code == 200  # per client, not global
+
+
+def test_labor_menu_and_part_options_for_the_edit_screen(seeded_db):
+    api, _ = client(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
+    menu = {m["code"]: m for m in api.get("/api/labor-menu").json()}
+    assert menu["CASSETTE-INSTALL"]["price_cents"] > 0 and len(menu) > 20
+    order_id = drafted(api)
+    options = api.get(
+        f"/api/orders/{order_id}/part-options", params={"category": "cassette"}
+    ).json()
+    ids = [p["part_id"] for p in options["compatible"]]
+    assert "sram-pg-1230-11-50" in ids and "shimano-cs-m7100-10-51" not in ids  # wrong freehub
+    assert (
+        api.get("/api/orders/999999/part-options", params={"category": "cassette"}).status_code
+        == 404
+    )

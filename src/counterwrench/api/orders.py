@@ -20,6 +20,7 @@ from counterwrench.agent.review import ReviewDecision, ReviewError, apply_review
 from counterwrench.compat.engine import check
 from counterwrench.compat.lookup import load_bike, load_part, load_rules
 from counterwrench.models import WheelPosition
+from counterwrench.tools.parts import CompatiblePartsResult, find_compatible_parts
 from counterwrench.tools.work_orders import EditLinesArgs, edit_lines
 from counterwrench.tracing import public_trace_url, read_run
 
@@ -133,6 +134,23 @@ def _trace_url(cw, order: dict) -> str | None:
 @router.get("/orders/{order_id}")
 def order(order_id: int, request: Request) -> dict:
     return _detail(request.app.state.cw, order_id)
+
+
+@router.get("/orders/{order_id}/part-options")
+def part_options(order_id: int, category: str, request: Request) -> CompatiblePartsResult:
+    """Parts of a category for the order's bike, split into compatible and unverified, for
+    the mechanic adding a line. Orders without a catalog bike have no parts to offer."""
+    with request.app.state.cw.deps.connect() as conn:
+        row = conn.execute("SELECT bike_id FROM work_orders WHERE id = %s", (order_id,)).fetchone()
+        if row is None:
+            raise HTTPException(404, f"no work order {order_id}")
+        if row[0] is None:
+            return CompatiblePartsResult(
+                bike_id="", category=category,
+                error="This bike isn't in the catalog, so parts can't be checked; "
+                "add labor and notes only.",
+            )  # fmt: skip
+        return find_compatible_parts(conn, row[0], category)
 
 
 @router.put("/orders/{order_id}/lines")
