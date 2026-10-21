@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api
 
 install:
 	uv sync
@@ -63,3 +63,6 @@ eval-report:
 
 eval-rescore:
 	uv run python -m evals.rescore $(EXP)
+
+api:
+	uv run uvicorn counterwrench.api.app:app --port 8000
