@@ -105,3 +105,18 @@ def trace_url(run_id, timeout_s: float = 60) -> str | None:
         return None
     client, run = wait_for_run(run_id, timeout_s)
     return run_url(client, run) if run else None
+
+
+def public_trace_url(run_id, timeout_s: float = 20) -> str | None:
+    """A public share link to a run's trace (Justin: reviewers should click straight through;
+    the data is synthetic). None when tracing is off or the run hasn't arrived yet."""
+    if os.environ.get("LANGSMITH_TRACING") != "true":
+        return None
+    from langsmith import Client
+
+    client = Client()
+    existing = client.read_run_shared_link(run_id)
+    if existing:
+        return existing
+    _, run = wait_for_run(run_id, timeout_s)
+    return client.share_run(run_id) if run else None

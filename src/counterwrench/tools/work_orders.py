@@ -179,6 +179,63 @@ def _validate(
     return draft, []
 
 
+def _insert_lines(conn: psycopg.Connection, order_id: int, draft: WorkOrderDraft) -> None:
+    for line in draft.labor_lines:
+        conn.execute(
+            "INSERT INTO work_order_lines (work_order_id, labor_code, qty, unit_price_cents) "
+            "VALUES (%s, %s, %s, %s)",
+            (order_id, line.code, line.qty, line.unit_price_cents),
+        )
+    for line in draft.part_lines:
+        conn.execute(
+            "INSERT INTO work_order_lines (work_order_id, part_id, qty, unit_price_cents, "
+            "position, unverified, unverified_reason) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (
+                order_id, line.part_id, line.qty, line.unit_price_cents,
+                line.position.value if line.position else None, line.unverified,
+                line.unverified_reason,
+            ),
+        )  # fmt: skip
+
+
+class EditLinesArgs(BaseModel):
+    """A mechanic's replacement lines for a draft awaiting review."""
+
+    editor: str = Field(min_length=1)
+    labor_lines: list[LaborRequest] = Field(default_factory=list)
+    part_lines: list[PartRequest] = Field(default_factory=list)
+
+
+def edit_lines(conn: psycopg.Connection, order_id: int, edit: EditLinesArgs) -> list[str]:
+    """Replace a draft's lines, validated exactly like the agent's (fit, catalog prices,
+    coherence). Returns the problems; nothing changes unless there are none."""
+    order = conn.execute(
+        "SELECT bike_id, bike_freetext, severity, customer_explanation, mechanic_notes, citations "
+        "FROM work_orders WHERE id = %s AND status = 'awaiting_review'",
+        (order_id,),
+    ).fetchone()
+    if order is None:
+        return [f"Work order {order_id} isn't awaiting review."]
+    bike_id, freetext, severity, explanation, notes, citations = order
+    args = DraftWorkOrderArgs(
+        bike_id=bike_id, bike_freetext=freetext, severity=severity,
+        labor_lines=edit.labor_lines, part_lines=edit.part_lines,
+        customer_explanation=explanation, mechanic_notes=notes, citations=citations,
+    )  # fmt: skip
+    draft, problems = _validate(conn, args)
+    if draft is None:
+        return problems
+    with conn.transaction():
+        conn.execute("DELETE FROM work_order_lines WHERE work_order_id = %s", (order_id,))
+        _insert_lines(conn, order_id, draft)
+        conn.execute(
+            "UPDATE work_orders SET estimate_total_cents = %s, edited_by = %s, edited_at = now() "
+            "WHERE id = %s",
+            (draft.estimate_total_cents, edit.editor, order_id),
+        )
+    return []
+
+
 def draft_work_order(
     conn: psycopg.Connection,
     args: DraftWorkOrderArgs,
@@ -209,22 +266,7 @@ def draft_work_order(
                 Jsonb(intake) if intake is not None else None, langsmith_run_id, source,
             ),
         ).fetchone()[0]  # fmt: skip
-        for line in draft.labor_lines:
-            conn.execute(
-                "INSERT INTO work_order_lines (work_order_id, labor_code, qty, unit_price_cents) "
-                "VALUES (%s, %s, %s, %s)",
-                (order_id, line.code, line.qty, line.unit_price_cents),
-            )
-        for line in draft.part_lines:
-            conn.execute(
-                "INSERT INTO work_order_lines (work_order_id, part_id, qty, unit_price_cents, "
-                "position, unverified, unverified_reason) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                (
-                    order_id, line.part_id, line.qty, line.unit_price_cents,
-                    line.position.value if line.position else None, line.unverified,
-                    line.unverified_reason,
-                ),
-            )  # fmt: skip
+        _insert_lines(conn, order_id, draft)
     unverified = [line.part_id for line in draft.part_lines if line.unverified]
     note = " Unverified parts are flagged for the mechanic." if unverified else ""
     return DraftResult(
