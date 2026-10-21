@@ -147,3 +147,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 22: Deployment
 **Assistant did:** Wrote the production compose file (Caddy HTTPS, login, rate limit), the secrets-entry script, and ran the deploys; worked through the server sizing and the wrong-AWS-account mistake (found by comparing account ids) and cleaned up only the named resources. No secrets passed through the chat.
 **Justin checked / decided:** The AWS account and domain, the OpenRouter spend cap, public trace links, when to deploy, and which spare AWS items to keep.
+
+## Step 23: README and reviewer docs
+**Assistant did:** Wrote the README and `docs/EVALS.md` from the existing logs, checking each number and claim against them (and correcting its own first draft: an evaluator count, a tool name in the diagram, and a claim about citations that no evaluator makes). Made the three LangSmith links public and confirmed they resolve without a login. Stated the work that was planned and not done.
+**Justin checked / decided:** The before/after table keeps its noise caveats (the point is methodology, not accuracy); added the live-site link with a note to ask him or Katy for the password.
