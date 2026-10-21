@@ -9,8 +9,11 @@ printf "LangSmith API key: "; stty -echo; read -r LANGSMITH_API_KEY; stty echo; 
 printf "Site login username: "; read -r SITE_USER
 printf "Site login password: "; stty -echo; read -r SITE_PASSWORD; stty echo; echo
 
-# Postgres is only reachable from inside Docker, but give it a real password anyway.
-DB_PASSWORD=$(openssl rand -hex 24)
+# Postgres is only reachable from inside Docker, but give it a real password anyway. Keep the
+# existing one when re-running: Postgres sets its password once, when its data volume is first
+# created, so a new one here would lock the app out of the database.
+DB_PASSWORD=$(grep '^POSTGRES_PASSWORD=' .env 2>/dev/null | cut -d= -f2-)
+[ -n "$DB_PASSWORD" ] || DB_PASSWORD=$(openssl rand -hex 24)
 umask 077
 cat > .env <<ENV
 OPENROUTER_API_KEY=$OPENROUTER_API_KEY
