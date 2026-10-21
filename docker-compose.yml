@@ -26,5 +26,35 @@ services:
       timeout: 3s
       retries: 30
 
+  # Optional database browser: `make db-ui`, then http://localhost:5050. Desktop mode, so no
+  # pgAdmin login; the CounterWrench server is pre-registered and connects without prompting.
+  # Behind a profile so `make up` doesn't pull it for people who don't want it.
+  pgadmin:
+    image: dpage/pgadmin4:9.8
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_DEFAULT_EMAIL: dev@counterwrench.dev
+      PGADMIN_DEFAULT_PASSWORD: unused-in-desktop-mode
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+      DB_USER: ${POSTGRES_USER:-counterwrench}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-counterwrench}
+    # libpq ignores a password file other users can read, and a file mounted from Windows can't
+    # be chmod-ed, so write it inside the container at start.
+    entrypoint:
+      - sh
+      - -c
+      - >-
+        echo "db:5432:*:$$DB_USER:$$DB_PASSWORD" > /var/lib/pgadmin/pgpass
+        && chmod 600 /var/lib/pgadmin/pgpass && exec /entrypoint.sh
+    ports:
+      - "127.0.0.1:5050:80"
+    volumes:
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+
 volumes:
   pgdata:

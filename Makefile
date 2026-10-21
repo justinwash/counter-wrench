@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui
 
 install:
 	uv sync
@@ -66,3 +66,7 @@ eval-rescore:
 
 api:
 	uv run uvicorn counterwrench.api.app:app --port 8000
+
+# pgAdmin at http://localhost:5050, already connected to the CounterWrench database.
+db-ui:
+	docker compose --profile tools up -d --wait pgadmin
