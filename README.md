@@ -120,7 +120,7 @@ The annotation queues (`counterwrench-failures` from the offline analysis, `coun
 
 ## AI usage
 
-This was built with an AI coding assistant working one approved step at a time: it proposed each step, Justin approved the scope, and the assistant built it and reported results, including bad ones. Justin labeled the goldens and judge-calibration set himself, blind to model output, decided every policy, and validated the bike-technical facts. [docs/AI_USAGE.md](docs/AI_USAGE.md) records, for every step, what the assistant did and what the candidate checked or decided.
+This was built with an AI coding assistant working one approved step at a time: it proposed each step, Justin approved the scope, and the assistant built it and reported results, including bad ones. Justin labeled the goldens and judge-calibration set himself, blind to model output, decided every policy, and validated the bike-technical facts. [docs/AI_USAGE.md](docs/AI_USAGE.md) records, for every step, what the assistant did and what Justin checked or decided.
 
 ## Development
 
