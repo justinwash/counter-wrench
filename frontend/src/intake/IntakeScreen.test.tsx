@@ -136,6 +136,27 @@ describe("IntakeScreen", () => {
     expect(calls[2].body).toMatchObject({ answers: { r1: "Yes" } });
   });
 
+  it("Enter sends only that answer; an unsent note edit stays where it is", async () => {
+    const calls = mockApi({
+      "/api/intakes": triage("i1", "needs_service"),
+      "/api/intakes/i1/revise": triage("i2", "needs_adjustment"),
+    });
+    renderScreen();
+    await fillOneRow();
+    await click("Triage");
+    const box = await screen.findByLabelText("Customer's answer");
+    fireEvent.change(screen.getByLabelText("Customer's words"), { target: { value: "Grinding, and now sparks" } });
+    fireEvent.change(box, { target: { value: "Only when it's wet" } });
+    await act(async () => { fireEvent.submit(box.closest("form")!); });
+    await waitFor(() => expect(screen.getByText("Needs adjustment")).toBeTruthy());
+    expect(calls[1].body).toEqual({ answers: { r1: "Only when it's wet" }, notes: {} });  // the note wasn't sent
+    expect((screen.getByLabelText("Customer's words") as HTMLInputElement).value).toBe("Grinding, and now sparks");
+    expect((screen.getByText("Re-triage with changes") as HTMLButtonElement).disabled).toBe(false);  // still pending
+    await click("Re-triage with changes");
+    await waitFor(() => expect(calls.length).toBe(3));
+    expect(calls[2].body).toEqual({ answers: {}, notes: { r1: "Grinding, and now sparks" } });
+  });
+
   it("records a declined safety-critical job only with a signed waiver", async () => {
     const calls = mockApi({
       "/api/intakes": triage("i1", "safety_critical", escalation),

@@ -79,21 +79,26 @@ export default function IntakeScreen() {
     void stream("/api/intakes", form);
   }
 
-  function retriage() {
+  // The Re-triage button sends everything typed. Enter in an answer box (`only`) sends just that
+  // answer and leaves other answers and note edits where they are, unsent, for their own turn.
+  function retriage(only?: string) {
+    const sentAnswers = only ? Object.fromEntries(Object.entries(answers).filter(([id]) => id === only)) : answers;
+    const sentNotes = only ? {} : changedNotes;
     setHistory((h) => {
       const next = { ...h };
       for (const r of rows) {
         const result = run.rows[r.row_id];
         if (!result) continue;
-        const noteChanged = r.note.trim() !== (triagedNotes[r.row_id] ?? "");
-        next[r.row_id] = [...(h[r.row_id] ?? []), { result, answer: r.answer.trim() || null,
+        const answered = r.row_id in sentAnswers;
+        const noteChanged = r.row_id in sentNotes;
+        next[r.row_id] = [...(h[r.row_id] ?? []), { result, answer: answered ? r.answer.trim() : null,
           note: noteChanged ? r.note.trim() : null }];
       }
       return next;
     });
-    snapshotNotes();
-    setRows((rs) => rs.map((r) => ({ ...r, answer: "" })));
-    void stream(`/api/intakes/${run.intakeId}/revise`, { answers, notes: changedNotes });
+    if (!only) snapshotNotes();
+    setRows((rs) => rs.map((r) => (r.row_id in sentAnswers ? { ...r, answer: "" } : r)));
+    void stream(`/api/intakes/${run.intakeId}/revise`, { answers: sentAnswers, notes: sentNotes });
   }
 
   function createWorkOrder() {
@@ -177,7 +182,7 @@ export default function IntakeScreen() {
                   </td>
                   <ResultCells result={result} failed={failed} pending={run.running && !result && !failed}
                     earlier={history[r.row_id] ?? []} unresolved={run.unresolved[r.row_id]}
-                    answer={confirming ? { value: r.answer, set: (v) => update(i, { answer: v }), id: `answer-${r.row_id}`, submit: retriage } : null} />
+                    answer={confirming ? { value: r.answer, set: (v) => update(i, { answer: v }), id: `answer-${r.row_id}`, submit: () => retriage(r.row_id) } : null} />
                   <td className="px-2 py-2">
                     {rows.length > 1 && !started && (
                       <button type="button" aria-label={`Remove row ${i + 1}`} className="text-muted hover:text-sev-safety"
@@ -217,7 +222,7 @@ export default function IntakeScreen() {
             Check the triage with the customer. Answer any questions or fix the notes and re-triage, or create the work order for the mechanic.
           </p>
           <div className="flex flex-wrap gap-2">
-            <button type="button" className={secondary} disabled={!revisable} onClick={retriage}>Re-triage with changes</button>
+            <button type="button" className={secondary} disabled={!revisable} onClick={() => retriage()}>Re-triage with changes</button>
             <button type="button" className={primary} onClick={createWorkOrder}>Create work order</button>
             <button type="button" className={`${secondary} ml-auto`} onClick={() => setDeclining((d) => !d)}>Customer declined…</button>
           </div>
