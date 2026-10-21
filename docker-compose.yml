@@ -26,6 +26,28 @@ services:
       timeout: 3s
       retries: 30
 
+  # The app: API plus the built UI on one port. `docker compose up` (or `make start`) builds
+  # and runs it; startup migrates, seeds and ingests, so a fresh clone needs only .env.
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ""  # a DATABASE_URL in .env points at the host, not the db container
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    ports:
+      - "127.0.0.1:${APP_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/taxonomy')"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
   # Optional database browser: `make db-ui`, then http://localhost:5050. Desktop mode, so no
   # pgAdmin login; the CounterWrench server is pre-registered and connects without prompting.
   # Behind a profile so `make up` doesn't pull it for people who don't want it.

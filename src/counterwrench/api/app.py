@@ -41,7 +41,32 @@ def create_app(deps: Deps | None = None, checkpointer=None, config=None) -> Fast
     app.include_router(catalog.router, prefix="/api")
     app.include_router(intakes.router, prefix="/api")
     app.include_router(orders.router, prefix="/api")
+    _serve_ui(app)
     return app
+
+
+def _serve_ui(app: FastAPI) -> None:
+    """Serve the built UI from the same port (the Docker image sets CW_STATIC_DIR). Any path
+    that isn't the API or a file gets index.html, so deep links like /orders/12 work."""
+    import os
+    from pathlib import Path
+
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    static = Path(os.environ.get("CW_STATIC_DIR", ""))
+    if not os.environ.get("CW_STATIC_DIR") or not (static / "index.html").exists():
+        return  # development: Vite serves the UI
+    app.mount("/assets", StaticFiles(directory=static / "assets"), name="assets")
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def ui(path: str):
+        if path.startswith("api/"):
+            from fastapi import HTTPException
+
+            raise HTTPException(404)
+        file = static / path
+        return FileResponse(file if path and file.is_file() else static / "index.html")
 
 
 def postgres_checkpointer(url: str | None = None):

@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test start
 
 install:
 	uv sync
@@ -23,8 +23,9 @@ doctor:
 trace-check:
 	uv run python -m counterwrench.trace_check
 
+# Postgres only, for development (the app runs on your machine: make api, make ui).
 up:
-	docker compose up -d --wait
+	docker compose up -d --wait db
 
 down:
 	docker compose down
@@ -82,3 +83,7 @@ ui:
 
 ui-test:
 	npm --prefix frontend test
+
+# Everything in Docker, the reviewer path: http://localhost:8000
+start:
+	docker compose up -d --build --wait db app

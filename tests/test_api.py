@@ -240,3 +240,16 @@ def test_a_paused_review_survives_a_restart(seeded_db, db_url):
         f"/api/orders/{order_id}/review", json={"decision": "approve", "reviewer": "sam"}
     )
     assert result.json()["resumed_graph"] is True and result.json()["status"] == "approved"
+
+
+def test_serves_the_built_ui_with_deep_links(seeded_db, tmp_path, monkeypatch):
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "index.html").write_text("<title>CounterWrench</title>")
+    (tmp_path / "assets" / "app.js").write_text("console.log(1)")
+    monkeypatch.setenv("CW_STATIC_DIR", str(tmp_path))
+    api, _ = client(seeded_db, {})
+    assert "CounterWrench" in api.get("/").text
+    assert "CounterWrench" in api.get("/orders/12").text  # the UI's router takes it from here
+    assert api.get("/assets/app.js").text == "console.log(1)"
+    assert api.get("/api/no-such-route").status_code == 404  # API misses aren't the UI
+    assert api.get("/api/taxonomy").status_code == 200
