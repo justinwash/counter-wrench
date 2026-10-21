@@ -46,6 +46,7 @@ EXPERIMENTS = [
         "0e070fe-e2e-542765c8",
         "Triage told to default to safety when unsure (inconclusive)",
     ),
+    ("E-008", "ad2d634-e2e-5a12197c", "E-007 run again, nothing changed: two identical runs"),
 ]
 
 
@@ -119,8 +120,13 @@ def main() -> int:
     for exp_id, project, change in EXPERIMENTS:
         print(f"{exp_id}: re-scoring {project} ...", flush=True)
         rows = rescore(client, project)
+        meta = (client.read_project(project_name=project).extra or {}).get("metadata", {})
         experiments.append({
             "id": exp_id, "project": project, "change": change, "runs": len(rows),
+            "agent_model": meta.get("agent_model"),
+            "structured_method": meta.get("triage_structured_method") or "default",
+            # The judge rubric the experiment was scored with: v2 until E-008, v3 after (D-042).
+            "rubric": f"v{(meta.get('rubric_versions') or {}).get('explanation_quality', 2)}",
             "evaluators": summarize(rows), "confusion": confusion(rows),
             "safety_misses": safety_misses(rows),
         })  # fmt: skip
@@ -128,7 +134,8 @@ def main() -> int:
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "commit": commit(), "slices": SLICES, "severities": SEVERITIES,
         "note": "Every experiment re-scored on the current labels; judge scores as recorded "
-                "(rubric v2 for all of them, so judge columns are not comparable with rubric v3).",
+                "(each experiment's judge rubric is shown: judge columns are not comparable "
+                "across rubric versions).",
         "experiments": experiments,
     }  # fmt: skip
     OUT.parent.mkdir(exist_ok=True)

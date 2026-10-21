@@ -7,7 +7,7 @@ interface Stat { mean: number; spread: number; n: number }
 interface Evaluator { is_safety: boolean; is_judge: boolean; slices: Record<string, Stat | null> }
 interface Cell { expected: string; predicted: string; count: number; cases: { case: string; row: string; runs: number }[] }
 interface Experiment {
-  id: string; project: string; change: string; runs: number;
+  id: string; project: string; change: string; runs: number; rubric?: string; agent_model?: string | null; structured_method?: string;
   evaluators: Record<string, Evaluator>;
   confusion: { labels: string[]; cells: Cell[] };
   safety_misses: { case: string; reps: number; failed: Record<string, number> }[];
@@ -72,6 +72,8 @@ export default function ResultsScreen() {
               {snap.experiments.map((e) => (
                 <th key={e.id} className="px-2 py-2" title={e.change}>
                   <button type="button" className={`font-bold uppercase ${exp.id === e.id ? "text-accent" : ""}`} onClick={() => { setExpId(e.id); setCell(null); }}>{e.id}</button>
+                  {e.rubric && e.rubric !== base.rubric && <span className="block text-[10px] normal-case font-normal text-warn" title="Scored by judge rubric v3; the baseline's judges used v2">judge {e.rubric}</span>}
+                  {e.agent_model && !e.agent_model.includes("haiku") && <span className="block text-[10px] normal-case font-normal text-accent" title={e.agent_model}>{e.agent_model.split("/").pop()}</span>}
                 </th>
               ))}
             </tr>
@@ -85,7 +87,9 @@ export default function ResultsScreen() {
                 </td>
                 {snap.experiments.map((e, i) => {
                   const now = e.evaluators[k] ? stat(e.evaluators[k], slice) : null;
-                  const v = i === 0 ? null : verdict(stat(base.evaluators[k], slice), now);
+                  // A judge scored with a different rubric than the baseline's can't be compared with it.
+                  const comparable = !base.evaluators[k].is_judge || !e.rubric || e.rubric === base.rubric;
+                  const v = i === 0 || !comparable ? null : verdict(stat(base.evaluators[k], slice), now);
                   return (
                     <td key={e.id} className={`px-2 py-1 tabular-nums ${v ? TONE[v] : ""}`}>
                       {now ? <>{now.mean.toFixed(2)} <span className="text-muted text-xs">±{now.spread.toFixed(2)}</span></> : "–"}

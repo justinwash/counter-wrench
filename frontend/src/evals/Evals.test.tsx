@@ -34,9 +34,10 @@ const severities = ["safety_critical", "needs_service", "needs_adjustment", "cos
 const snapshot = {
   generated_at: "2026-10-21T12:00:00+00:00", commit: "abc1234", note: "re-scored", slices: ["normal", "safety"], severities,
   experiments: ["E-001b", "E-002"].map((id, i) => ({
-    id, project: `p${i}`, change: i ? "Safety list" : "Baseline", runs: 186,
+    id, project: `p${i}`, change: i ? "Safety list" : "Baseline", runs: 186, rubric: i ? "v3" : "v2",
     evaluators: {
       safety_escalated: { is_safety: true, is_judge: false, slices: { all: stat(i ? 0.9 : 0.7), normal: stat(1), safety: stat(0.5) } },
+      diagnosis_reasonable: { is_safety: false, is_judge: true, slices: { all: stat(i ? 0.95 : 0.5), normal: stat(0.9), safety: stat(0.5) } },
       line_coherence: { is_safety: false, is_judge: false, slices: { all: stat(0.91, 0.06), normal: stat(0.9, 0.06), safety: null } },
     },
     confusion: { labels: severities, cells: [
@@ -70,6 +71,18 @@ describe("Results", () => {
     expect(screen.getByText(/c02-squeak \(r1\) in 3 of 3 runs/)).toBeTruthy();
     await click(screen.getByText("E-001b", { selector: "button" }));
     expect(screen.getByText(/safety_escalated failed 3\/3/)).toBeTruthy();
+  });
+
+  it("does not compare a judge scored on a different rubric with the baseline", async () => {
+    mockApi({ "GET /api/evals/results": () => snapshot });
+    renderAt(<ResultsScreen />);
+    await screen.findByText("Experiment results");
+    expect(screen.getByText("judge v3")).toBeTruthy();  // the header says which rubric
+    const judgeRow = screen.getByText("diagnosis_reasonable").closest("tr")!;
+    const cell = within(judgeRow).getByText("0.95").closest("td")!;
+    expect(cell.className).not.toMatch(/text-good/);  // a +0.45 gap across rubrics isn't called an improvement
+    const code = within(screen.getByText("safety_escalated").closest("tr")!).getByText("0.90").closest("td")!;
+    expect(code.className).toMatch(/text-good/);  // a code evaluator still is
   });
 
   it("says what is missing instead of failing blank", async () => {
