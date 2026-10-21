@@ -1,29 +1,39 @@
 # CounterWrench
 
-A front-of-house service intake tool for bike shops. Counter staff pick the customer's bike and log each complaint on a POS-style form. An agent triages each complaint, looks up the shop's own knowledge, checks parts compatibility with deterministic code, and drafts a work order that a mechanic must approve before anything is committed.
+**An AI intake assistant for a bike shop's service counter, built so that its quality can be measured.**
 
-**Live demo: <https://counterwrench.shop>.** It sits behind a login. Ask the candidate (Justin), or Katy (who will be given one), for the password. The data is synthetic and the traces it produces are public.
+## The premise
 
-**Contents:** [Try it](#try-it) · [How it works](#how-it-works) · [Evals](#evals) · [Before and after](#before-and-after) · [Failures and limits](#failures-and-limitations) · [Production evaluation](#production-evaluation) · [Public links](#public-links) · [AI usage](#ai-usage) · [Development](#development)
+At a bike shop's counter, someone hears "it skips under load" or "the brake lever goes to the bar" and has to decide how urgent it is, what it probably is, what it will cost, and whether to pull a mechanic off the bench. CounterWrench is that counter's intake screen, a POS-style form rather than a chatbot. Staff pick the customer's bike and log one row per complaint. An agent triages each row, looks things up in the shop's own knowledge base, and drafts a work order; deterministic code, not the model, decides whether a part fits the bike; and a mechanic approves, edits or rejects the draft. Nothing is committed without a human, and anything that might be unsafe is treated as unsafe until a mechanic has looked.
 
-## Try it
+This is an interview take-home, and its real subject is **evaluation methodology**: how you know whether an agent like this is any good, and how you keep knowing once it is live. So the ground truth was labeled by hand, blind to the model's answers; the LLM judges were checked against those labels before being trusted; seven experiments changed one thing each, with run-to-run noise shown beside every score; the failures are written up, including the ones not fixed; and the same checks now score live traffic, with thumbs and mechanic decisions closing the loop. The agent is the means; the evals are the deliverable.
 
-You need Docker (Compose v2) and **one** model API key: Anthropic, OpenAI, Google or [OpenRouter](https://openrouter.ai), whichever you have. Nothing else (no Node, no Python). With several keys set, Anthropic is picked first, then OpenAI, Google, OpenRouter; the judge for the evals comes from a different model family than the agent when your keys allow it (the config says which models it chose, and warns when the judge shares the agent's family).
+## Try it live
+
+**<https://counterwrench.shop>**. It sits behind a login: **ask the candidate (Justin), or Katy (who will be given one), for the password.** The data is synthetic, and the traces it produces are public.
+
+## Run it yourself
+
+You need Docker (Compose v2) and **one** model API key (Anthropic, OpenAI, Google or [OpenRouter](https://openrouter.ai)). No Node or Python.
 
 ```sh
 cp .env.example .env     # set one of ANTHROPIC_/OPENAI_/GOOGLE_/OPENROUTER_API_KEY; LANGSMITH_API_KEY is optional (tracing, evals)
-make start               # builds the image, migrates, seeds, ingests, serves on http://localhost:8000
+make start               # builds the image, migrates, seeds, ingests; open http://localhost:8000
 ```
 
-The numbers in this README come from one pinned configuration (Haiku 5.5 as agent, GPT-6.1 Sol as judge, both through OpenRouter with the serving backend fixed), so your scores on other models will differ; the LangSmith experiments are the reference. The model-selection rules are covered by tests (`tests/test_config.py`); the full app and the evals have been run end to end only on the OpenRouter configuration above, so if another provider's key misbehaves, `make doctor` (needs [uv](https://docs.astral.sh/uv/)) makes one real tool-calling and structured-output call per model and says what is wrong.
-
-Things worth trying on the counter screen:
+## What to try
 
 - A **normal job**: Hightower, "skipping", note "put a new chain on last month". The agent disagrees with the staff's "chain" pick (a worn cassette is the likelier cause) and says why.
 - A **safety job**: "brake lever goes to the bar". The page goes red, the order is marked safety-critical, and it sorts first in the mechanic's queue.
 - A **question**: "my brakes squeal". The agent asks one question, keeps your answer with its question, and stops asking after two rounds.
-- The **mechanic's screens** (`/orders`): edit lines (validated against the catalog and the compatibility rules), approve, reject. Each order links to its public LangSmith traces.
-- **Results** (`/evals`): every experiment, switchable by slice, with run-to-run spread, and a severity confusion matrix where you can click a cell to see its cases. **Judges** (`/evals/judges`): kappa and confusion matrices for each judge against the candidate's blind grades, with both graders' reasoning per item. **Explore** (`/explore`): the retrieval ranking for any query, and the compatibility engine's verdict for any bike and part. These pages read committed files, so they work with no LangSmith key; each order also shows its live scores when tracing is on.
+- The **mechanic's screens** (`/orders`): edit lines (validated against the catalog and the compatibility rules), approve, reject. Each order links to its public LangSmith traces and shows how it scored.
+- The **methodology pages**: **Results** (`/evals`): every experiment, switchable by slice, with run-to-run spread, and a severity confusion matrix where you can click a cell to see its cases. **Judges** (`/evals/judges`): kappa and confusion matrices for each judge against the candidate's blind grades, with both graders' reasoning per item. **Explore** (`/explore`): the retrieval ranking for any query, and the compatibility engine's verdict for any bike and part. These pages read committed files, so they work with no LangSmith key; each order also shows its live scores when tracing is on.
+
+---
+
+# Technical details
+
+[How it works](#how-it-works) · [Models and keys](#models-and-keys) · [Evals](#evals) · [Before and after](#before-and-after) · [Failures and limits](#failures-and-limitations) · [Production evaluation](#production-evaluation) · [Public links](#public-links) · [AI usage](#ai-usage) · [Development](#development)
 
 ## How it works
 
@@ -55,6 +65,12 @@ Design choices that shape the evals:
 - **Questions don't block the work order.** They ride along on the draft, capped at two rounds per row (D-037, D-051).
 
 Stack: LangGraph, LangSmith, Postgres + pgvector, FastAPI (server-sent events), React + Tailwind. The catalog is 17 bikes, 84 parts, 37 labor items and 147 knowledge chunks from 17 authored shop docs. Every decision and why is in [docs/DECISIONS.md](docs/DECISIONS.md) (D-001 to D-054).
+
+## Models and keys
+
+With several keys set, Anthropic is picked first, then OpenAI, Google, OpenRouter; the judge for the evals comes from a different model family than the agent when your keys allow it (the config says which models it chose, and warns when the judge shares the agent's family).
+
+The numbers in this README come from one pinned configuration (Haiku 5.5 as agent, GPT-6.1 Sol as judge, both through OpenRouter with the serving backend fixed), so your scores on other models will differ; the LangSmith experiments are the reference. The model-selection rules are covered by tests (`tests/test_config.py`); the full app and the evals have been run end to end only on that OpenRouter configuration, so if another provider's key misbehaves, `make doctor` (needs [uv](https://docs.astral.sh/uv/)) makes one real tool-calling and structured-output call per model and says what is wrong.
 
 ## Evals
 
