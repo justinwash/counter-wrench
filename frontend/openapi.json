@@ -547,6 +547,63 @@
     }
    }
   },
+  "/api/orders/{order_id}/rating": {
+   "post": {
+    "tags": [
+     "orders"
+    ],
+    "summary": "Rate",
+    "description": "Thumbs up or down on the agent's work. One vote per person per order; sending another\nreplaces it. See online/ratings.py for what a vote does in LangSmith.",
+    "operationId": "rate_api_orders__order_id__rating_post",
+    "parameters": [
+     {
+      "name": "order_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Order Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RatingRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Rating"
+         },
+         "title": "Response Rate Api Orders  Order Id  Rating Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/orders/{order_id}/review": {
    "post": {
     "tags": [
@@ -1065,6 +1122,14 @@
        }
       ],
       "title": "Draft Trace Url"
+     },
+     "ratings": {
+      "items": {
+       "$ref": "#/components/schemas/Rating"
+      },
+      "type": "array",
+      "title": "Ratings",
+      "default": []
      }
     },
     "type": "object",
@@ -1565,6 +1630,76 @@
      "part_id"
     ],
     "title": "PartRequest"
+   },
+   "Rating": {
+    "properties": {
+     "rater": {
+      "type": "string",
+      "title": "Rater"
+     },
+     "rating": {
+      "type": "string",
+      "enum": [
+       "up",
+       "down"
+      ],
+      "title": "Rating"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "rater",
+     "rating"
+    ],
+    "title": "Rating"
+   },
+   "RatingRequest": {
+    "properties": {
+     "rater": {
+      "type": "string",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Rater"
+     },
+     "rating": {
+      "type": "string",
+      "enum": [
+       "up",
+       "down"
+      ],
+      "title": "Rating"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "rater",
+     "rating"
+    ],
+    "title": "RatingRequest"
    },
    "ReviewDecision": {
     "properties": {

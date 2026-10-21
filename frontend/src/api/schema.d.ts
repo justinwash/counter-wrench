@@ -236,6 +236,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/orders/{order_id}/rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rate
+         * @description Thumbs up or down on the agent's work. One vote per person per order; sending another
+         *     replaces it. See online/ratings.py for what a vote does in LangSmith.
+         */
+        post: operations["rate_api_orders__order_id__rating_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/orders/{order_id}/review": {
         parameters: {
             query?: never;
@@ -423,6 +444,11 @@ export interface components {
             trace_url: string | null;
             /** Draft Trace Url */
             draft_trace_url?: string | null;
+            /**
+             * Ratings
+             * @default []
+             */
+            ratings: components["schemas"]["Rating"][];
         };
         /** OrderLine */
         OrderLine: {
@@ -581,6 +607,30 @@ export interface components {
              * @description Installed tire width, for tubes.
              */
             tire_width_mm?: number | null;
+        };
+        /** Rating */
+        Rating: {
+            /** Rater */
+            rater: string;
+            /**
+             * Rating
+             * @enum {string}
+             */
+            rating: "up" | "down";
+            /** Reason */
+            reason?: string | null;
+        };
+        /** RatingRequest */
+        RatingRequest: {
+            /** Rater */
+            rater: string;
+            /**
+             * Rating
+             * @enum {string}
+             */
+            rating: "up" | "down";
+            /** Reason */
+            reason?: string | null;
         };
         /** ReviewDecision */
         ReviewDecision: {
@@ -1007,6 +1057,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rate_api_orders__order_id__rating_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RatingRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rating"][];
                 };
             };
             /** @description Validation Error */

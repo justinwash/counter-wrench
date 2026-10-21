@@ -135,3 +135,15 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 19: API, plus pgAdmin
 **Assistant did:** Built the FastAPI layer over the existing graph (picklists, streamed intake, answer-and-rerun, review queue, order detail, validated line edits, resumable reviews on a Postgres checkpointer, LangSmith feedback, public trace links) with 12 route tests on scripted models, including a restart test; verified the whole flow live, restart included. Added a preconnected pgAdmin at Justin's request. Hit the shell-escape trap again in the compose file and fixed it with a direct edit.
 **Justin checked / decided:** Line edits in review; public trace links by default; asked for a no-install database viewer.
+
+## Step 20: Counter and mechanic screens
+**Assistant did:** Built the React app (intake form, confirm step, bike picker, decline with waiver, answer-and-retriage, review queue, order page with line editing) on generated API types, with component tests against a mocked API; the tests caught a crash (a hook below an early return) before Justin saw it. Fixed the screens as Justin used them (dropdown behavior, the New intake button, dark default, previous-suggestion history).
+**Justin checked / decided:** Every screen by hand; dark mode default; declines with waiver; the questions-shouldn't-block rule; the jargon is fine.
+
+## Step 21: Online evaluation and ratings
+**Assistant did:** Scored live runs in the app with the same evaluator code as the offline evals (so no second definition of any check), posting results to the right trace (triage vs. drafting, D-052), plus thumbs up/down with a reason, annotation-queue and candidate-dataset syncing, `make prod-report` and `make prod-harvest`. Verified scores landing on real traces with the real model, and tested the vote effects (switching votes, several raters) with a recording stand-in for LangSmith. Re-checked its own earlier claim about where mechanic decisions are recorded and corrected it.
+**Justin checked / decided:** Same code online and offline; judges on every run for now; anyone can rate; thumbs-up only makes candidates, never goldens; the thumbs idea itself.
+
+## Step 22: Deployment
+**Assistant did:** Wrote the production compose file (Caddy HTTPS, login, rate limit), the secrets-entry script, and ran the deploys; worked through the server sizing and the wrong-AWS-account mistake (found by comparing account ids) and cleaned up only the named resources. No secrets passed through the chat.
+**Justin checked / decided:** The AWS account and domain, the OpenRouter spend cap, public trace links, when to deploy, and which spare AWS items to keep.

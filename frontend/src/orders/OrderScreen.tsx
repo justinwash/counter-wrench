@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { api, type LaborOption, type OrderDetail, type OrderLine, type PartFit } from "../api/client";
+import { api, type LaborOption, type OrderDetail, type OrderLine, type PartFit, type Rating } from "../api/client";
 import type { RowResult } from "../api/stream";
 import { field, money, nice, primary, problemsFrom, secondary, SeverityBadge, StatusBadge, useRememberedName } from "../ui";
 
@@ -211,6 +211,8 @@ export default function OrderScreen() {
         </section>
       )}
 
+      <Ratings orderId={id} ratings={detail.ratings ?? []} />
+
       {open && !editing && (
         <section className="bg-panel border border-line rounded-sm p-3 flex flex-col gap-2">
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted">Your decision</h2>
@@ -233,6 +235,57 @@ export default function OrderScreen() {
         </section>
       )}
     </div>
+  );
+}
+
+/** Anyone can say whether the agent did well. A thumbs-down needs a reason and goes to the failure
+ * review; a thumbs-up makes the order a candidate for the golden set (nothing is auto-labeled). */
+function Ratings({ orderId, ratings }: { orderId: number; ratings: Rating[] }) {
+  const client = useQueryClient();
+  const [name, setName] = useRememberedName("cw-reviewer");
+  const [reason, setReason] = useState("");
+  const [asking, setAsking] = useState(false);
+  const [problems, setProblems] = useState<string[]>([]);
+  const mine = ratings.find((r) => r.rater === name.trim());
+
+  const rate = useMutation({
+    mutationFn: async (rating: "up" | "down") => {
+      const res = await api.POST("/api/orders/{order_id}/rating", {
+        params: { path: { order_id: orderId } },
+        body: { rater: name.trim(), rating, reason: rating === "down" ? reason.trim() : null },
+      });
+      if (!res.data) throw new Error(problemsFrom(res.error).join(" "));
+      return res.data;
+    },
+    onSuccess: (votes) => {
+      setProblems([]); setAsking(false); setReason("");
+      client.setQueryData(["order", orderId], (d: OrderDetail | undefined) => (d ? { ...d, ratings: votes } : d));
+    },
+    onError: (e: Error) => setProblems([e.message]),
+  });
+  const mark = (rating: "up" | "down") => (mine?.rating === rating ? "border-accent text-accent" : "");
+
+  return (
+    <section className="bg-panel border border-line rounded-sm p-3 flex flex-col gap-2">
+      <h2 className="text-xs font-bold uppercase tracking-wider text-muted">Did the agent get it right?</h2>
+      <div className="flex flex-wrap items-center gap-2">
+        <input aria-label="Rating name" className={`${field} w-48`} placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
+        <button type="button" aria-label="Thumbs up" className={`${secondary} ${mark("up")}`} disabled={!name.trim() || rate.isPending} onClick={() => rate.mutate("up")}>👍</button>
+        <button type="button" aria-label="Thumbs down" className={`${secondary} ${mark("down")}`} disabled={!name.trim() || rate.isPending} onClick={() => setAsking(true)}>👎</button>
+      </div>
+      {asking && (
+        <div className="flex flex-wrap items-center gap-2">
+          <input aria-label="What was wrong" className={`${field} flex-1 min-w-64`} placeholder="What was wrong? (required)" value={reason} onChange={(e) => setReason(e.target.value)} />
+          <button type="button" className={primary} disabled={!reason.trim() || rate.isPending} onClick={() => rate.mutate("down")}>Send to review</button>
+        </div>
+      )}
+      {problems.map((p) => <p key={p} role="alert" className="text-warn">{p}</p>)}
+      {ratings.length > 0 && (
+        <ul className="text-sm">
+          {ratings.map((r) => <li key={r.rater}>{r.rating === "up" ? "👍" : "👎"} {r.rater}{r.reason && <span className="text-muted"> · {r.reason}</span>}</li>)}
+        </ul>
+      )}
+    </section>
   );
 }
 

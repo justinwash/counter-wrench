@@ -27,3 +27,6 @@ frontend/*.tsbuildinfo
 
 # Production secrets, written on the server by deploy/setup-env.sh
 deploy/site-users
+
+# Output of make prod-harvest: live order data for hand-labeling, not for the repo
+harvest.yaml

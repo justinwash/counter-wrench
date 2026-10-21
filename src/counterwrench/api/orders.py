@@ -10,16 +10,18 @@ from __future__ import annotations
 import logging
 import os
 from datetime import datetime
+from typing import Annotated, Literal, Self
 
 from fastapi import APIRouter, HTTPException, Request
 from langgraph.types import Command
 from psycopg.rows import dict_row
-from pydantic import BaseModel
+from pydantic import BaseModel, StringConstraints, model_validator
 
 from counterwrench.agent.review import ReviewDecision, ReviewError, apply_review
 from counterwrench.compat.engine import check
 from counterwrench.compat.lookup import load_bike, load_part, load_rules
 from counterwrench.models import WheelPosition
+from counterwrench.online.ratings import Vote, candidate_for, record_vote, sync, votes_for
 from counterwrench.tools.parts import CompatiblePartsResult, find_compatible_parts
 from counterwrench.tools.work_orders import EditLinesArgs, edit_lines
 from counterwrench.tracing import public_trace_url, read_run
@@ -111,6 +113,12 @@ class OrderTriage(BaseModel):
     escalation_message: str | None
 
 
+class Rating(BaseModel):
+    rater: str
+    rating: Literal["up", "down"]
+    reason: str | None = None
+
+
 class OrderDetail(BaseModel):
     order: OrderRecord
     lines: list[OrderLine]
@@ -118,6 +126,7 @@ class OrderDetail(BaseModel):
     triage: OrderTriage | None
     trace_url: str | None  # the triage run (everything, for orders made before the confirm step)
     draft_trace_url: str | None = None  # the drafting run: the agent's tool calls
+    ratings: list[Rating] = []
 
 
 def _thread(order: dict) -> dict | None:
@@ -177,7 +186,16 @@ def _detail(cw, order_id: int) -> OrderDetail:
         sources=[OrderSource(**s) for s in sources], triage=triage,
         trace_url=_share(cw, order, "langsmith_run_id", "trace_url"),
         draft_trace_url=_share(cw, order, "draft_run_id", "draft_trace_url"),
+        ratings=_ratings(cw, order_id),
     )  # fmt: skip
+
+
+def _ratings(cw, order_id: int) -> list[Rating]:
+    with cw.deps.connect() as conn:
+        return [
+            Rating(rater=v.rater, rating=v.rating, reason=v.reason)
+            for v in votes_for(conn, order_id)
+        ]
 
 
 def _share(cw, order: dict, run_column: str, url_column: str) -> str | None:
@@ -229,6 +247,47 @@ def edit(order_id: int, body: EditLinesArgs, request: Request) -> OrderDetail:
     if problems:
         raise HTTPException(422, {"problems": problems})
     return _detail(cw, order_id)
+
+
+Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
+Reason = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+
+
+class RatingRequest(BaseModel):
+    rater: Name
+    rating: Literal["up", "down"]
+    reason: Reason | None = None
+
+    @model_validator(mode="after")
+    def _down_needs_a_reason(self) -> Self:
+        if self.rating == "down" and not self.reason:
+            raise ValueError("a thumbs-down needs a reason: it goes to the failure review")
+        return self
+
+
+@router.post("/orders/{order_id}/rating")
+def rate(order_id: int, body: RatingRequest, request: Request) -> list[Rating]:
+    """Thumbs up or down on the agent's work. One vote per person per order; sending another
+    replaces it. See online/ratings.py for what a vote does in LangSmith."""
+    cw = request.app.state.cw
+    with cw.deps.connect() as conn:
+        order = (
+            conn.cursor(row_factory=dict_row)
+            .execute(
+                "SELECT id, langsmith_run_id, draft_run_id FROM work_orders WHERE id = %s",
+                (order_id,),
+            )
+            .fetchone()
+        )
+        if order is None:
+            raise HTTPException(404, f"no work order {order_id}")
+        latest = Vote(body.rater, body.rating, body.reason if body.rating == "down" else None)
+        votes = record_vote(conn, order_id, latest)
+        candidate = candidate_for(conn, order_id)
+    run_id = order["draft_run_id"] or order["langsmith_run_id"]
+    if cw.ratings is not None and run_id:
+        sync(cw.ratings, order_id, str(run_id), votes, latest, candidate)
+    return [Rating(rater=v.rater, rating=v.rating, reason=v.reason) for v in votes]
 
 
 class ReviewResult(BaseModel):

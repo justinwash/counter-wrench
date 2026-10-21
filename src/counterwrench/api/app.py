@@ -23,6 +23,7 @@ class AppState:
     graph: Any
     config: Any = None  # ModelConfig, for run metadata; None in tests
     online: Any = None  # OnlineScorer, or None when live scoring is off
+    ratings: Any = None  # where thumbs go in LangSmith (online/ratings.py), or None
 
 
 def create_app(
@@ -31,6 +32,7 @@ def create_app(
     config=None,
     rate_limit_per_hour: int | None = None,
     online=None,
+    ratings=None,
 ) -> FastAPI:
     from counterwrench.api import catalog, intakes, limits, orders
 
@@ -44,11 +46,15 @@ def create_app(
             from counterwrench.online.scoring import build_scorer
 
             online = build_scorer(config, deps.connect)
+        if ratings is None and live_scoring_enabled():
+            from counterwrench.online.ratings import LangSmithSink
+
+            ratings = LangSmithSink()
     app = FastAPI(title="CounterWrench", version="0.1.0")
     graph = build_graph(
         deps, checkpointer=checkpointer or InMemorySaver(), confirm_before_draft=True
     )
-    app.state.cw = AppState(deps=deps, graph=graph, config=config, online=online)
+    app.state.cw = AppState(deps=deps, graph=graph, config=config, online=online, ratings=ratings)
     limits.install(app, rate_limit_per_hour)
     app.include_router(catalog.router, prefix="/api")
     app.include_router(intakes.router, prefix="/api")

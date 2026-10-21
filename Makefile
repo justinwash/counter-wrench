@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test start
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test start prod-report prod-harvest
 
 install:
 	uv sync
@@ -87,3 +87,13 @@ ui-test:
 # Everything in Docker, the reviewer path: http://localhost:8000
 start:
 	docker compose up -d --build --wait db app
+
+# How the live agent is doing: mechanic decisions, thumbs, escalations, scores, cost. Reads the
+# database in .env; on the server run it inside the app container (see the README).
+prod-report:
+	uv run python -m counterwrench.online.report
+
+# Live orders worth labeling (rejected, edited, thumbs) -> harvest.yaml for you to label.
+# Never added to a dataset by code.
+prod-harvest:
+	uv run python -m counterwrench.online.harvest

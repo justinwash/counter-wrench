@@ -23,3 +23,13 @@ make lint      # ruff check + format check
 make format    # apply ruff fixes and formatting
 make test      # run pytest
 ```
+
+## Watching the live app
+
+```sh
+make prod-report    # approval, edit and reject rates, escalations, thumbs, live scores, cost, problem orders
+make prod-harvest   # rejected / edited / rated orders -> harvest.yaml, for you to label (never auto-added)
+```
+
+On the server, run them in the app container: `docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app python -m counterwrench.online.report`.
+Every live run is scored with the same evaluators as the offline suite and the scores appear on its LangSmith trace; a thumbs-down goes to the `counterwrench-prod-failures` annotation queue. Nothing here pages anyone: in a real shop a LangSmith alert on `safety_consistent` and on thumbs-down would.

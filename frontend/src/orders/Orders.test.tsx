@@ -46,6 +46,7 @@ const detail = (over: object = {}, status = "awaiting_review") => ({
     agrees_with_suspected_area: false, disagreement_reason: "Cassette, not chain" } },
     questions: { r1: "Which gear?" }, escalation_message: "DO NOT RIDE. Safety-critical issue on row r1." },
   trace_url: "https://smith.langchain.com/public/abc/r",
+  ratings: [],
 });
 
 const orderRow = (id: number, severity: string, status: string) => ({ id, status, severity, priority: severity === "safety_critical",
@@ -149,5 +150,28 @@ describe("order screen", () => {
     await waitFor(() => expect(screen.queryByText("Approve")).toBeNull());
     expect(screen.getByText(/by sam/)).toBeTruthy();
     expect(calls.find((c) => c.method === "POST")!.body).toEqual({ decision: "approve", reviewer: "sam", notes: null });
+  });
+
+  it("thumbs-up goes straight through; thumbs-down asks why first", async () => {
+    let ratings: object[] = [];
+    const calls = mockApi({
+      "GET /api/orders/7": () => ({ ...detail(), ratings }),
+      "POST /api/orders/7/rating": (c) => { const b = c.body as { rater: string; rating: string; reason: string | null }; ratings = [b]; return ratings; },
+    });
+    renderAt("/orders/7");
+    const up = (await screen.findByLabelText("Thumbs up")) as HTMLButtonElement;
+    expect(up.disabled).toBe(true);  // needs a name
+    fireEvent.change(screen.getByLabelText("Rating name"), { target: { value: "sam" } });
+    await click(up);
+    await waitFor(() => expect(screen.getByText(/👍 sam/)).toBeTruthy());
+    expect(calls.find((c) => c.method === "POST")!.body).toEqual({ rater: "sam", rating: "up", reason: null });
+
+    await click(screen.getByLabelText("Thumbs down"));
+    const send = screen.getByText("Send to review") as HTMLButtonElement;
+    expect(send.disabled).toBe(true);  // a reason is required
+    fireEvent.change(screen.getByLabelText("What was wrong"), { target: { value: "wrong cassette" } });
+    await click(send);
+    await waitFor(() => expect(screen.getByText(/wrong cassette/)).toBeTruthy());
+    expect(calls.filter((c) => c.method === "POST").at(-1)!.body).toEqual({ rater: "sam", rating: "down", reason: "wrong cassette" });
   });
 });

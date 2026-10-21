@@ -14,6 +14,7 @@ export type ComplaintOption = components["schemas"]["ComplaintOption"];
 export type BikeCandidate = components["schemas"]["BikeCandidate"];
 export type IntakeForm = components["schemas"]["IntakeForm"];
 export type OrderDetail = components["schemas"]["OrderDetail"];
+export type Rating = components["schemas"]["Rating"];
 export type OrderLine = components["schemas"]["OrderLine"];
 export type OrderSummary = components["schemas"]["OrderSummary"];
 export type LaborOption = components["schemas"]["LaborOption"];
