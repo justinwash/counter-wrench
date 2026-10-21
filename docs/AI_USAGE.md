@@ -131,3 +131,7 @@ How the coding assistant helped, and what Justin checked himself.
 ## Step 18: Judge calibration
 **Assistant did:** Computed agreement between the judges and Justin's blind grades, read the judge's reasoning on every dev disagreement, proposed rubric changes from dev only, re-judged all 40 items with the original inputs, and reported held-out numbers including the bad one (explanation judge kappa -0.20) and the base-rate caveat (7 fails in 40). Stopped iterating rather than fit the rubric to single cases.
 **Justin checked / decided:** Graded all 40 outputs blind; settled the jargon question ("we're gonna use jargon").
+
+## Step 19: API, plus pgAdmin
+**Assistant did:** Built the FastAPI layer over the existing graph (picklists, streamed intake, answer-and-rerun, review queue, order detail, validated line edits, resumable reviews on a Postgres checkpointer, LangSmith feedback, public trace links) with 12 route tests on scripted models, including a restart test; verified the whole flow live, restart included. Added a preconnected pgAdmin at Justin's request. Hit the shell-escape trap again in the compose file and fixed it with a direct edit.
+**Justin checked / decided:** Line edits in review; public trace links by default; asked for a no-install database viewer.
