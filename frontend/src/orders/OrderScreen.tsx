@@ -211,6 +211,8 @@ export default function OrderScreen() {
         </section>
       )}
 
+      <LiveScores orderId={id} />
+
       <Ratings orderId={id} ratings={detail.ratings ?? []} />
 
       {open && !editing && (
@@ -235,6 +237,52 @@ export default function OrderScreen() {
         </section>
       )}
     </div>
+  );
+}
+
+/** Every score LangSmith holds for this order's two runs: the live checks the app ran after each, the
+ * judges, the mechanic's decision and the thumbs. Comes from LangSmith, so it can be unavailable. */
+function LiveScores({ orderId }: { orderId: number }) {
+  const scores = useQuery({
+    queryKey: ["order-scores", orderId],
+    retry: false,
+    queryFn: async () => {
+      const res = await api.GET("/api/orders/{order_id}/scores", { params: { path: { order_id: orderId } } });
+      if (!res.data) throw new Error(problemsFrom(res.error).join(" "));
+      return res.data;
+    },
+  });
+  const [open, setOpen] = useState<string | null>(null);
+  if (scores.isLoading) return null;
+  const data = scores.data;
+  if (!data?.available) {
+    return <p className="text-muted text-xs">Live scores: {data?.reason ?? "unavailable right now."}</p>;
+  }
+  return (
+    <section className="bg-panel border border-line rounded-sm p-3 flex flex-col gap-2">
+      <h2 className="text-xs font-bold uppercase tracking-wider text-muted">How it scored, live</h2>
+      <p className="text-muted text-xs">The same checks as the offline evals, run on this order after each stage. Click a score for the reasoning.</p>
+      {data.runs.map((r) => (
+        <div key={r.run_id}>
+          <p className="font-semibold capitalize">{r.stage} run {r.scores.length === 0 && <span className="text-muted font-normal">(scores still arriving, or none)</span>}</p>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {r.scores.map((sc) => {
+              const bad = sc.score !== null && sc.score < 1;
+              const k = `${r.run_id}${sc.key}`;
+              return (
+                <button key={k} type="button" aria-label={`${sc.key} ${sc.score}`} onClick={() => setOpen(open === k ? null : k)}
+                  className={`px-2 py-0.5 rounded-sm text-xs font-mono border ${bad ? "border-sev-safety text-sev-safety" : "border-line text-ink"} ${open === k ? "outline outline-1 outline-accent" : ""}`}>
+                  {sc.key} {sc.score === null ? "–" : sc.score}
+                </button>
+              );
+            })}
+          </div>
+          {r.scores.filter((sc) => open === `${r.run_id}${sc.key}`).map((sc) => (
+            <p key={sc.key} className="text-sm mt-1 whitespace-pre-wrap border-l-2 border-line pl-2">{sc.comment || "No comment recorded."}</p>
+          ))}
+        </div>
+      ))}
+    </section>
   );
 }
 

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
+import CalibrationScreen from "./evals/CalibrationScreen";
+import ResultsScreen from "./evals/ResultsScreen";
+import ExploreScreen from "./explore/ExploreScreen";
 import IntakeScreen from "./intake/IntakeScreen";
 import OrderScreen from "./orders/OrderScreen";
 import OrdersScreen from "./orders/OrdersScreen";
@@ -21,6 +24,9 @@ export default function App() {
             <NavLink to="/" end className={tab}
               onClick={() => pathname === "/" && setIntakeKey((k) => k + 1)}>New intake</NavLink>
             <NavLink to="/orders" className={tab}>Orders</NavLink>
+            <NavLink to="/evals" end className={tab}>Results</NavLink>
+            <NavLink to="/evals/judges" className={tab}>Judges</NavLink>
+            <NavLink to="/explore" className={tab}>Explore</NavLink>
           </nav>
         </div>
       </header>
@@ -29,6 +35,9 @@ export default function App() {
           <Route path="/" element={<IntakeScreen key={intakeKey} />} />
           <Route path="/orders" element={<OrdersScreen />} />
           <Route path="/orders/:id" element={<OrderScreen />} />
+          <Route path="/evals" element={<ResultsScreen />} />
+          <Route path="/evals/judges" element={<CalibrationScreen />} />
+          <Route path="/explore" element={<ExploreScreen />} />
         </Routes>
       </main>
     </div>

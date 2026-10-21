@@ -274,6 +274,128 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/evals/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Results
+         * @description The snapshot written by `make evals-snapshot`: every experiment, every evaluator by
+         *     slice (mean and run-to-run spread), the severity confusion matrix, the safety misses.
+         */
+        get: operations["results_api_evals_results_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/evals/calibration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Calibration
+         * @description How well each LLM judge agrees with Justin's blind pass/fail grades on 40 outputs.
+         */
+        get: operations["calibration_api_evals_calibration_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/explore/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Explore Search
+         * @description What retrieval returns for a query: the ranked chunks with their scores. Search is
+         *     local (the embedding model runs in the app), so exploring costs nothing.
+         */
+        get: operations["explore_search_api_explore_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/explore/parts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Explore Parts */
+        get: operations["explore_parts_api_explore_parts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/explore/compat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Explore Compat
+         * @description The compatibility engine's verdict, with the reasons and the specs it compared. This is
+         *     the code the agent can't override: the model never decides whether a part fits.
+         */
+        get: operations["explore_compat_api_explore_compat_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{order_id}/scores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Order Scores
+         * @description Every score LangSmith holds for the order's triage and drafting runs: the live checks,
+         *     the judges, the mechanic's decision and the thumbs. Reads LangSmith, so only when tracing
+         *     is on; otherwise it says so rather than failing.
+         */
+        get: operations["order_scores_api_orders__order_id__scores_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -298,6 +420,87 @@ export interface components {
             bike_id: string;
             /** Name */
             name: string;
+        };
+        /** Calibration */
+        Calibration: {
+            /** Experiment */
+            experiment: string;
+            /** N Items */
+            n_items: number;
+            /** Justin Passed */
+            justin_passed: number;
+            /** Justin Failed */
+            justin_failed: number;
+            /** Rubrics */
+            rubrics: components["schemas"]["RubricResult"][];
+            /** Items */
+            items: components["schemas"]["CalibrationItem"][];
+        };
+        /** CalibrationItem */
+        CalibrationItem: {
+            /** Id */
+            id: string;
+            /** Judge */
+            judge: string;
+            /** Case */
+            case: string;
+            /** Slice */
+            slice: string;
+            /** Split */
+            split: string;
+            /** Justin */
+            justin: string;
+            /** Justin Reason */
+            justin_reason: string | null;
+            /** Verdicts */
+            verdicts: {
+                [key: string]: components["schemas"]["Verdict"];
+            };
+            /** Intake */
+            intake: {
+                [key: string]: unknown;
+            };
+            /** Output */
+            output: unknown;
+        };
+        /** CompatResult */
+        CompatResult: {
+            /** Part Id */
+            part_id: string;
+            status: components["schemas"]["CompatStatus"];
+            /** Reasons */
+            reasons: string[];
+            /** Requires Adapter */
+            requires_adapter?: string | null;
+            position?: components["schemas"]["WheelPosition"] | null;
+        };
+        /**
+         * CompatStatus
+         * @enum {string}
+         */
+        CompatStatus: "compatible" | "incompatible" | "unknown";
+        /** CompatView */
+        CompatView: {
+            /** Bike Id */
+            bike_id: string;
+            /** Bike Name */
+            bike_name: string;
+            /** Part Id */
+            part_id: string;
+            /** Part Name */
+            part_name: string;
+            /** Category */
+            category: string;
+            /** Bike Specs */
+            bike_specs: {
+                [key: string]: unknown;
+            };
+            /** Part Specs */
+            part_specs: {
+                [key: string]: unknown;
+            };
+            /** Results */
+            results: components["schemas"]["CompatResult"][];
         };
         /** CompatiblePartsResult */
         CompatiblePartsResult: {
@@ -353,6 +556,20 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /**
+         * Confusion
+         * @description Rows are Justin's blind grade, columns are the judge's.
+         */
+        Confusion: {
+            /** Pass Pass */
+            pass_pass: number;
+            /** Pass Fail */
+            pass_fail: number;
+            /** Fail Pass */
+            fail_pass: number;
+            /** Fail Fail */
+            fail_fail: number;
+        };
         /** Decline */
         Decline: {
             /** Staff */
@@ -400,6 +617,13 @@ export interface components {
              */
             bike_unconfirmed: boolean;
         };
+        /** JudgeResult */
+        JudgeResult: {
+            /** Judge */
+            judge: string;
+            /** Splits */
+            splits: components["schemas"]["SplitResult"][];
+        };
         /** LaborOption */
         LaborOption: {
             /** Code */
@@ -424,6 +648,28 @@ export interface components {
              * @default 1
              */
             qty: number;
+        };
+        /** LiveScore */
+        LiveScore: {
+            /** Key */
+            key: string;
+            /** Score */
+            score: number | null;
+            /** Comment */
+            comment: string | null;
+        };
+        /** Metrics */
+        Metrics: {
+            /** N */
+            n: number;
+            /** Accuracy */
+            accuracy: number | null;
+            /** Tpr */
+            tpr: number | null;
+            /** Tnr */
+            tnr: number | null;
+            /** Kappa */
+            kappa: number | null;
         };
         /** Option */
         Option: {
@@ -522,6 +768,18 @@ export interface components {
             /** Waiver Signed */
             waiver_signed: boolean;
         };
+        /** OrderScores */
+        OrderScores: {
+            /** Available */
+            available: boolean;
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Runs
+             * @default []
+             */
+            runs: components["schemas"]["RunScores"][];
+        };
         /** OrderSource */
         OrderSource: {
             /** Id */
@@ -584,6 +842,15 @@ export interface components {
             why: string;
             /** Adapter */
             adapter?: string | null;
+        };
+        /** PartOption */
+        PartOption: {
+            /** Part Id */
+            part_id: string;
+            /** Category */
+            category: string;
+            /** Name */
+            name: string;
         };
         /** PartRequest */
         PartRequest: {
@@ -672,6 +939,44 @@ export interface components {
             /** General Notes */
             general_notes?: string | null;
         };
+        /** RubricResult */
+        RubricResult: {
+            /** Version */
+            version: string;
+            /** Label */
+            label: string;
+            /** Judges */
+            judges: components["schemas"]["JudgeResult"][];
+        };
+        /** RunScores */
+        RunScores: {
+            /** Stage */
+            stage: string;
+            /** Run Id */
+            run_id: string;
+            /** Scores */
+            scores: components["schemas"]["LiveScore"][];
+        };
+        /** SearchHit */
+        SearchHit: {
+            /** Chunk Id */
+            chunk_id: string;
+            /** Title */
+            title: string;
+            /** Heading */
+            heading: string;
+            /** Content */
+            content: string;
+            /** Score */
+            score: number;
+        };
+        /** SplitResult */
+        SplitResult: {
+            /** Split */
+            split: string;
+            metrics: components["schemas"]["Metrics"];
+            confusion: components["schemas"]["Confusion"];
+        };
         /**
          * SuspectedArea
          * @enum {string}
@@ -690,6 +995,18 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /** Verdict */
+        Verdict: {
+            /** Verdict */
+            verdict: string;
+            /** Comment */
+            comment: string;
+        };
+        /**
+         * WheelPosition
+         * @enum {string}
+         */
+        WheelPosition: "front" | "rear";
     };
     responses: never;
     parameters: never;
@@ -1127,6 +1444,164 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReviewResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    results_api_evals_results_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    calibration_api_evals_calibration_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Calibration"];
+                };
+            };
+        };
+    };
+    explore_search_api_explore_search_get: {
+        parameters: {
+            query: {
+                q: string;
+                bike_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchHit"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    explore_parts_api_explore_parts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartOption"][];
+                };
+            };
+        };
+    };
+    explore_compat_api_explore_compat_get: {
+        parameters: {
+            query: {
+                bike_id: string;
+                part_id: string;
+                tire_width_mm?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompatView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    order_scores_api_orders__order_id__scores_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderScores"];
                 };
             };
             /** @description Validation Error */

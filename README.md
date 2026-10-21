@@ -23,6 +23,7 @@ Things worth trying on the counter screen:
 - A **safety job**: "brake lever goes to the bar". The page goes red, the order is marked safety-critical, and it sorts first in the mechanic's queue.
 - A **question**: "my brakes squeal". The agent asks one question, keeps your answer with its question, and stops asking after two rounds.
 - The **mechanic's screens** (`/orders`): edit lines (validated against the catalog and the compatibility rules), approve, reject. Each order links to its public LangSmith traces.
+- **Results** (`/evals`): every experiment, switchable by slice, with run-to-run spread, and a severity confusion matrix where you can click a cell to see its cases. **Judges** (`/evals/judges`): kappa and confusion matrices for each judge against the candidate's blind grades, with both graders' reasoning per item. **Explore** (`/explore`): the retrieval ranking for any query, and the compatibility engine's verdict for any bike and part. These pages read committed files, so they work with no LangSmith key; each order also shows its live scores when tracing is on.
 
 ## How it works
 
@@ -67,29 +68,30 @@ The full explanation is in [docs/EVALS.md](docs/EVALS.md). In short:
 
 ## Before and after
 
-Seven experiments (E-001 to E-007), re-scored on one set of labels so the columns compare ([docs/EVAL_RESULTS.md](docs/EVAL_RESULTS.md) has every table, config, cost and per-slice spread). Models: `claude-haiku-5.5` for agent and triage, `gpt-6.1-sol` as judge, via OpenRouter. Each full run is 62 cases x 3 repetitions, about 11 minutes and $2.20.
+Seven experiments (E-001 to E-007), all **re-scored on today's labels** (the ones in force after the default-to-safety policy, D-041) so the columns compare. The same data is in the app's Evals pages, with every slice and a confusion matrix; [docs/EVAL_RESULTS.md](docs/EVAL_RESULTS.md) has each experiment's config, cost and notes, written at the labels of the day. Models: `claude-haiku-5.5` for agent and triage, `gpt-6.1-sol` as judge, via OpenRouter. Each full run is 62 cases x 3 repetitions, about 11 minutes and $2.20. Each score is the mean over all runs, with the spread (max minus min of the three repetition means) after the ±.
 
-| Evaluator (mean over all slices)        | Baseline | After E-006 | What the log says                                                                                     |
-| --------------------------------------- | -------- | ----------- | ----------------------------------------------------------------------------------------------------- |
-| safety_escalated                        | 0.84     | 0.93        | Targeted fix: `c03` and `n06` went from missed to escalated 3/3 (E-002)                               |
-| no_unsafe_release                       | 0.84     | 0.93        | 1.00 after E-002; E-003 let some questions through a draft (a trade-off, kept)                        |
-| no_over_escalation                      | 0.98     | 0.93        | **Got worse**: 3 to 9 runs, mostly three braking cases; led to the default-to-safety policy (F-016)   |
-| order_created_when_expected             | 0.88     | 0.98        | Beyond the spread on edge, note-vs-picklist and safety (E-003)                                        |
-| line_coherence                          | 0.91     | 1.00        | Beyond the spread on every slice; enforced in code (E-004)                                            |
-| parts_categories_present                | 0.69     | 0.89        | Generic tube, and unverified parts drafted rather than dropped (E-006)                                |
-| agreement_correct                       | 0.83     | 0.82        | No net change: fixed self-contradictions by construction, but too strict about adjacent areas (E-005) |
-| severity_correct                        | 0.87     | 0.89        | Within noise                                                                                          |
-| diagnosis_reasonable (judge, rubric v2) | 0.80     | 0.82        | Within noise; the judge was recalibrated later, so these aren't comparable with v3                    |
-| explanation_quality (judge, rubric v2)  | 0.17     | 0.22        | Not meaningful: the judge failed calibration                                                          |
+| Evaluator (all slices)                  | Baseline (E-001b) | After E-006 | After E-007 | What the log says                                                                                     |
+| --------------------------------------- | ----------------- | ----------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| safety_escalated                        | 0.72 ±0.05        | 0.89 ±0.00  | 0.91 ±0.05  | Beyond the spread. E-002 fixed `c03` and `n06`; `c02` (3/3) and `e10` (2/3 in E-007) are still missed |
+| no_unsafe_release                       | 0.88 ±0.05        | 0.89 ±0.00  | 0.91 ±0.05  | Peaked at 1.00 after E-002, fell when E-003 let a draft proceed with an open question; same cases as above |
+| no_over_escalation                      | 1.00 ±0.00        | 1.00 ±0.00  | 0.98 ±0.02  | Two runs of `n07` over-escalated in E-007. Before D-041 the braking cases counted as over-escalation (3 to 9 runs); the policy relabeled them |
+| severity_correct                        | 0.84 ±0.05        | 0.92 ±0.03  | 0.90 ±0.05  | Gain to E-006 is larger than the spread; E-007's move is noise                                        |
+| order_created_when_expected             | 0.88 ±0.02        | 0.98 ±0.00  | 0.98 ±0.00  | Beyond the spread (E-003: questions ride the draft)                                                   |
+| line_coherence                          | 0.91 ±0.06        | 1.00 ±0.00  | 1.00 ±0.00  | Enforced in code (E-004)                                                                              |
+| parts_categories_present                | 0.69 ±0.10        | 0.89 ±0.05  | 0.87 ±0.10  | Generic tube, and unverified parts drafted rather than dropped (E-006)                                |
+| agreement_correct                       | 0.83 ±0.03        | 0.82 ±0.02  | 0.82 ±0.03  | No net change: fixed self-contradictions by construction, but too strict about adjacent areas (E-005) |
+| clarification_correct                   | 0.91 ±0.01        | 0.89 ±0.05  | 0.82 ±0.02  | E-007 made the agent ask more, as the rule says; most of the drop is a cost of that change            |
+| diagnosis_reasonable (judge, rubric v2) | 0.80 ±0.11        | 0.82 ±0.11  | 0.82 ±0.03  | Within noise; the judge was recalibrated later, so these aren't comparable with v3                    |
+| explanation_quality (judge, rubric v2)  | 0.17 ±0.11        | 0.22 ±0.04  | 0.21 ±0.02  | Not meaningful: the judge failed calibration                                                          |
 
-Rules used to read this table: a gap smaller than the spread of the three repetitions is noise; small slices (5 to 8 cases) have large spreads; and within-experiment spread understates between-experiment variation for the judge columns. **E-007** (a prompt line stating the default-to-safety policy) is logged as _inconclusive_: one fewer missed run and two more over-escalated, inside the noise. It was kept because it states the policy, and the log says so. Baseline column: E-001b (E-001 re-scored on corrected labels, because the first report was built on corrupted scores, F-001). Run counts: 186 per experiment; E-006 has 183 scored (three runs lost to dropped connections, F-015).
+Rules used to read this table: a gap smaller than the spread of the three repetitions is noise; small slices (5 to 8 cases) have large spreads; and within-experiment spread understates between-experiment variation for the judge columns. **E-007** (a prompt line stating the default-to-safety policy) is logged as _inconclusive_: fewer missed runs and two over-escalated ones, with the headline moves inside the spread. It was kept because it states the policy, and the log says so. Baseline column: E-001b (E-001 re-scored on corrected labels, because the first report was built on corrupted scores, F-001). Run counts: 186 per experiment; E-006 has 183 scored (three runs lost to dropped connections, F-015).
 
 ## Failures and limitations
 
 The full list is [docs/FAILURES.md](docs/FAILURES.md) (F-001 to F-016); the ones that matter most:
 
 - **The first baseline report was wrong** (F-001): a LangSmith batch query duplicated and dropped feedback while its total looked right. Found because a case that escalated showed passing safety scores. Reports now fetch per run and refuse to report incomplete data.
-- **Over-escalation** is the main open safety-adjacent issue: when in doubt the agent escalates, which is the policy, but it costs counter time. E-007 did not separate that effect from noise.
+- **Two safety cases are still missed:** `c02` (a squeak that could be a loose caliper) is held at needs-service in all three runs, and `e10` in two of three. The default-to-safety rule (D-041, E-007) helped but did not close them, and it brought two over-escalated runs on `n07`. Whether E-007's gain is real or noise was not separated; one re-run (about $2.40) would.
 - **The explanation judge is uncalibrated** (held-out kappa -0.20). The deterministic checks (parts fit, prices, coherence, PII) and the diagnosis judge carry the weight; the explanation score should not be read as quality.
 - **One labeler.** The goldens are one person's judgment. Where shops reasonably differ (extra labor), labels are ranges, but severity is a single label.
 - **Compatibility is deliberately partial** (D-020): no rim internal width, no derailleur capacity vs cassette range, no valve-vs-drilling check, one wheel size per bike (D-017), and the catalog is the factory spec, so a modified bike relies on the intake note.

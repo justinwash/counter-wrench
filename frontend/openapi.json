@@ -655,6 +655,251 @@
      }
     }
    }
+  },
+  "/api/evals/results": {
+   "get": {
+    "tags": [
+     "insight"
+    ],
+    "summary": "Results",
+    "description": "The snapshot written by `make evals-snapshot`: every experiment, every evaluator by\nslice (mean and run-to-run spread), the severity confusion matrix, the safety misses.",
+    "operationId": "results_api_evals_results_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Results Api Evals Results Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/evals/calibration": {
+   "get": {
+    "tags": [
+     "insight"
+    ],
+    "summary": "Calibration",
+    "description": "How well each LLM judge agrees with Justin's blind pass/fail grades on 40 outputs.",
+    "operationId": "calibration_api_evals_calibration_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Calibration"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/explore/search": {
+   "get": {
+    "tags": [
+     "insight"
+    ],
+    "summary": "Explore Search",
+    "description": "What retrieval returns for a query: the ranked chunks with their scores. Search is\nlocal (the embedding model runs in the app), so exploring costs nothing.",
+    "operationId": "explore_search_api_explore_search_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Q"
+      }
+     },
+     {
+      "name": "bike_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Bike Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/SearchHit"
+         },
+         "title": "Response Explore Search Api Explore Search Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/explore/parts": {
+   "get": {
+    "tags": [
+     "insight"
+    ],
+    "summary": "Explore Parts",
+    "operationId": "explore_parts_api_explore_parts_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PartOption"
+         },
+         "type": "array",
+         "title": "Response Explore Parts Api Explore Parts Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/explore/compat": {
+   "get": {
+    "tags": [
+     "insight"
+    ],
+    "summary": "Explore Compat",
+    "description": "The compatibility engine's verdict, with the reasons and the specs it compared. This is\nthe code the agent can't override: the model never decides whether a part fits.",
+    "operationId": "explore_compat_api_explore_compat_get",
+    "parameters": [
+     {
+      "name": "bike_id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Bike Id"
+      }
+     },
+     {
+      "name": "part_id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Part Id"
+      }
+     },
+     {
+      "name": "tire_width_mm",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Tire Width Mm"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CompatView"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/orders/{order_id}/scores": {
+   "get": {
+    "tags": [
+     "insight"
+    ],
+    "summary": "Order Scores",
+    "description": "Every score LangSmith holds for the order's triage and drafting runs: the live checks,\nthe judges, the mechanic's decision and the thumbs. Reads LangSmith, so only when tracing\nis on; otherwise it says so rather than failing.",
+    "operationId": "order_scores_api_orders__order_id__scores_get",
+    "parameters": [
+     {
+      "name": "order_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Order Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OrderScores"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
   }
  },
  "components": {
@@ -700,6 +945,229 @@
      "name"
     ],
     "title": "BikeCandidate"
+   },
+   "Calibration": {
+    "properties": {
+     "experiment": {
+      "type": "string",
+      "title": "Experiment"
+     },
+     "n_items": {
+      "type": "integer",
+      "title": "N Items"
+     },
+     "justin_passed": {
+      "type": "integer",
+      "title": "Justin Passed"
+     },
+     "justin_failed": {
+      "type": "integer",
+      "title": "Justin Failed"
+     },
+     "rubrics": {
+      "items": {
+       "$ref": "#/components/schemas/RubricResult"
+      },
+      "type": "array",
+      "title": "Rubrics"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/CalibrationItem"
+      },
+      "type": "array",
+      "title": "Items"
+     }
+    },
+    "type": "object",
+    "required": [
+     "experiment",
+     "n_items",
+     "justin_passed",
+     "justin_failed",
+     "rubrics",
+     "items"
+    ],
+    "title": "Calibration"
+   },
+   "CalibrationItem": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "judge": {
+      "type": "string",
+      "title": "Judge"
+     },
+     "case": {
+      "type": "string",
+      "title": "Case"
+     },
+     "slice": {
+      "type": "string",
+      "title": "Slice"
+     },
+     "split": {
+      "type": "string",
+      "title": "Split"
+     },
+     "justin": {
+      "type": "string",
+      "title": "Justin"
+     },
+     "justin_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Justin Reason"
+     },
+     "verdicts": {
+      "additionalProperties": {
+       "$ref": "#/components/schemas/Verdict"
+      },
+      "type": "object",
+      "title": "Verdicts"
+     },
+     "intake": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Intake"
+     },
+     "output": {
+      "title": "Output"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "judge",
+     "case",
+     "slice",
+     "split",
+     "justin",
+     "justin_reason",
+     "verdicts",
+     "intake",
+     "output"
+    ],
+    "title": "CalibrationItem"
+   },
+   "CompatResult": {
+    "properties": {
+     "part_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Part Id"
+     },
+     "status": {
+      "$ref": "#/components/schemas/CompatStatus"
+     },
+     "reasons": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "minItems": 1,
+      "title": "Reasons"
+     },
+     "requires_adapter": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requires Adapter"
+     },
+     "position": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/WheelPosition"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "part_id",
+     "status",
+     "reasons"
+    ],
+    "title": "CompatResult"
+   },
+   "CompatStatus": {
+    "type": "string",
+    "enum": [
+     "compatible",
+     "incompatible",
+     "unknown"
+    ],
+    "title": "CompatStatus"
+   },
+   "CompatView": {
+    "properties": {
+     "bike_id": {
+      "type": "string",
+      "title": "Bike Id"
+     },
+     "bike_name": {
+      "type": "string",
+      "title": "Bike Name"
+     },
+     "part_id": {
+      "type": "string",
+      "title": "Part Id"
+     },
+     "part_name": {
+      "type": "string",
+      "title": "Part Name"
+     },
+     "category": {
+      "type": "string",
+      "title": "Category"
+     },
+     "bike_specs": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Bike Specs"
+     },
+     "part_specs": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Part Specs"
+     },
+     "results": {
+      "items": {
+       "$ref": "#/components/schemas/CompatResult"
+      },
+      "type": "array",
+      "title": "Results"
+     }
+    },
+    "type": "object",
+    "required": [
+     "bike_id",
+     "bike_name",
+     "part_id",
+     "part_name",
+     "category",
+     "bike_specs",
+     "part_specs",
+     "results"
+    ],
+    "title": "CompatView"
    },
    "CompatiblePartsResult": {
     "properties": {
@@ -860,6 +1328,35 @@
     ],
     "title": "ComplaintRow"
    },
+   "Confusion": {
+    "properties": {
+     "pass_pass": {
+      "type": "integer",
+      "title": "Pass Pass"
+     },
+     "pass_fail": {
+      "type": "integer",
+      "title": "Pass Fail"
+     },
+     "fail_pass": {
+      "type": "integer",
+      "title": "Fail Pass"
+     },
+     "fail_fail": {
+      "type": "integer",
+      "title": "Fail Fail"
+     }
+    },
+    "type": "object",
+    "required": [
+     "pass_pass",
+     "pass_fail",
+     "fail_pass",
+     "fail_fail"
+    ],
+    "title": "Confusion",
+    "description": "Rows are Justin's blind grade, columns are the judge's."
+   },
    "Decline": {
     "properties": {
      "staff": {
@@ -1004,6 +1501,27 @@
     ],
     "title": "IntakeForm"
    },
+   "JudgeResult": {
+    "properties": {
+     "judge": {
+      "type": "string",
+      "title": "Judge"
+     },
+     "splits": {
+      "items": {
+       "$ref": "#/components/schemas/SplitResult"
+      },
+      "type": "array",
+      "title": "Splits"
+     }
+    },
+    "type": "object",
+    "required": [
+     "judge",
+     "splits"
+    ],
+    "title": "JudgeResult"
+   },
    "LaborOption": {
     "properties": {
      "code": {
@@ -1053,6 +1571,104 @@
      "code"
     ],
     "title": "LaborRequest"
+   },
+   "LiveScore": {
+    "properties": {
+     "key": {
+      "type": "string",
+      "title": "Key"
+     },
+     "score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Score"
+     },
+     "comment": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Comment"
+     }
+    },
+    "type": "object",
+    "required": [
+     "key",
+     "score",
+     "comment"
+    ],
+    "title": "LiveScore"
+   },
+   "Metrics": {
+    "properties": {
+     "n": {
+      "type": "integer",
+      "title": "N"
+     },
+     "accuracy": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Accuracy"
+     },
+     "tpr": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tpr"
+     },
+     "tnr": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tnr"
+     },
+     "kappa": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Kappa"
+     }
+    },
+    "type": "object",
+    "required": [
+     "n",
+     "accuracy",
+     "tpr",
+     "tnr",
+     "kappa"
+    ],
+    "title": "Metrics"
    },
    "Option": {
     "properties": {
@@ -1418,6 +2034,38 @@
     ],
     "title": "OrderRecord"
    },
+   "OrderScores": {
+    "properties": {
+     "available": {
+      "type": "boolean",
+      "title": "Available"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     },
+     "runs": {
+      "items": {
+       "$ref": "#/components/schemas/RunScores"
+      },
+      "type": "array",
+      "title": "Runs",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "available"
+    ],
+    "title": "OrderScores"
+   },
    "OrderSource": {
     "properties": {
      "id": {
@@ -1581,6 +2229,29 @@
      "why"
     ],
     "title": "PartFit"
+   },
+   "PartOption": {
+    "properties": {
+     "part_id": {
+      "type": "string",
+      "title": "Part Id"
+     },
+     "category": {
+      "type": "string",
+      "title": "Category"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     }
+    },
+    "type": "object",
+    "required": [
+     "part_id",
+     "category",
+     "name"
+    ],
+    "title": "PartOption"
    },
    "PartRequest": {
     "properties": {
@@ -1804,6 +2475,112 @@
     "type": "object",
     "title": "Revision"
    },
+   "RubricResult": {
+    "properties": {
+     "version": {
+      "type": "string",
+      "title": "Version"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "judges": {
+      "items": {
+       "$ref": "#/components/schemas/JudgeResult"
+      },
+      "type": "array",
+      "title": "Judges"
+     }
+    },
+    "type": "object",
+    "required": [
+     "version",
+     "label",
+     "judges"
+    ],
+    "title": "RubricResult"
+   },
+   "RunScores": {
+    "properties": {
+     "stage": {
+      "type": "string",
+      "title": "Stage"
+     },
+     "run_id": {
+      "type": "string",
+      "title": "Run Id"
+     },
+     "scores": {
+      "items": {
+       "$ref": "#/components/schemas/LiveScore"
+      },
+      "type": "array",
+      "title": "Scores"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stage",
+     "run_id",
+     "scores"
+    ],
+    "title": "RunScores"
+   },
+   "SearchHit": {
+    "properties": {
+     "chunk_id": {
+      "type": "string",
+      "title": "Chunk Id"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "heading": {
+      "type": "string",
+      "title": "Heading"
+     },
+     "content": {
+      "type": "string",
+      "title": "Content"
+     },
+     "score": {
+      "type": "number",
+      "title": "Score"
+     }
+    },
+    "type": "object",
+    "required": [
+     "chunk_id",
+     "title",
+     "heading",
+     "content",
+     "score"
+    ],
+    "title": "SearchHit"
+   },
+   "SplitResult": {
+    "properties": {
+     "split": {
+      "type": "string",
+      "title": "Split"
+     },
+     "metrics": {
+      "$ref": "#/components/schemas/Metrics"
+     },
+     "confusion": {
+      "$ref": "#/components/schemas/Confusion"
+     }
+    },
+    "type": "object",
+    "required": [
+     "split",
+     "metrics",
+     "confusion"
+    ],
+    "title": "SplitResult"
+   },
    "SuspectedArea": {
     "type": "string",
     "enum": [
@@ -1888,6 +2665,32 @@
      "type"
     ],
     "title": "ValidationError"
+   },
+   "Verdict": {
+    "properties": {
+     "verdict": {
+      "type": "string",
+      "title": "Verdict"
+     },
+     "comment": {
+      "type": "string",
+      "title": "Comment"
+     }
+    },
+    "type": "object",
+    "required": [
+     "verdict",
+     "comment"
+    ],
+    "title": "Verdict"
+   },
+   "WheelPosition": {
+    "type": "string",
+    "enum": [
+     "front",
+     "rear"
+    ],
+    "title": "WheelPosition"
    }
   }
  }

@@ -34,7 +34,7 @@ def create_app(
     online=None,
     ratings=None,
 ) -> FastAPI:
-    from counterwrench.api import catalog, intakes, limits, orders
+    from counterwrench.api import catalog, insight, intakes, limits, orders
 
     if deps is None:
         from counterwrench.config import load_config
@@ -59,6 +59,7 @@ def create_app(
     app.include_router(catalog.router, prefix="/api")
     app.include_router(intakes.router, prefix="/api")
     app.include_router(orders.router, prefix="/api")
+    app.include_router(insight.router, prefix="/api")
     _serve_ui(app)
     return app
 

@@ -44,7 +44,11 @@ def rescore(client: Client, experiment: str) -> list[dict]:
         scores.update({k: old[k] for k in JUDGES if k in old})
         rep = seen.get(example.id, 0)
         seen[example.id] = rep + 1
-        rows.append({"case": example.id, "slice": example.slice, "rep": rep, "scores": scores})
+        rows.append({"case": example.id, "slice": example.slice, "rep": rep, "scores": scores,
+                     "run_id": str(run.id),
+                     "expected": {rid: exp.severity.value for rid, exp in example.rows.items()},
+                     "predicted": {rid: a.severity for rid, a in
+                                   out.assessments.items()}})  # fmt: skip
     return rows
 
 

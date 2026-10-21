@@ -1,7 +1,7 @@
 # Each recipe is a single command so it runs the same under sh, cmd and PowerShell.
 # Targets are added by the step that makes them work; none are placeholders.
 
-.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test start prod-report prod-harvest
+.PHONY: install lint format test doctor up down db-reset psql migrate seed ingest trace-check studio upload-datasets judge-smoke eval eval-report eval-rescore api db-ui api-types ui ui-test start prod-report prod-harvest evals-snapshot
 
 install:
 	uv sync
@@ -97,3 +97,7 @@ prod-report:
 # Never added to a dataset by code.
 prod-harvest:
 	uv run python -m counterwrench.online.harvest
+
+# Freeze every experiment's results (re-scored on current labels) for the Evals pages.
+evals-snapshot:
+	uv run python -m evals.snapshot
