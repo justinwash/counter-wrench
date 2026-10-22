@@ -95,6 +95,11 @@ export default function OrderScreen() {
               {detail.draft_trace_url ? "Triage trace ↗" : "Open the trace in LangSmith ↗"}
             </a>
           )}
+          {detail.review_trace_url && (
+            <a className="text-accent underline" href={detail.review_trace_url} target="_blank" rel="noreferrer" title="The run that resumed after the mechanic decided">
+              Review trace ↗
+            </a>
+          )}
         </span>
       </div>
 

@@ -129,6 +129,16 @@ describe("order screen", () => {
     expect(screen.getByText("Save changes")).toBeTruthy();  // still editing
   });
 
+  it("links the triage, drafting and review traces when it has them", async () => {
+    const withLinks = detail({ status: "approved", reviewed_by: "sam" }, "approved");
+    Object.assign(withLinks, { draft_trace_url: "https://smith.example/d", review_trace_url: "https://smith.example/r" });
+    mockApi({ "GET /api/orders/7": () => withLinks });
+    renderAt("/orders/7");
+    expect((await screen.findByText("Review trace ↗")).closest("a")!.getAttribute("href")).toBe("https://smith.example/r");
+    expect(screen.getByText("Drafting trace ↗")).toBeTruthy();
+    expect(screen.getByText("Triage trace ↗")).toBeTruthy();
+  });
+
   it("approves with a name, and won't reject without notes", async () => {
     let status = "awaiting_review";
     const calls = mockApi({

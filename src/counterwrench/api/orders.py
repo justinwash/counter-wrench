@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
+import uuid
 from datetime import datetime
 from typing import Annotated, Literal, Self
 
@@ -126,6 +127,7 @@ class OrderDetail(BaseModel):
     triage: OrderTriage | None
     trace_url: str | None  # the triage run (everything, for orders made before the confirm step)
     draft_trace_url: str | None = None  # the drafting run: the agent's tool calls
+    review_trace_url: str | None = None  # the run that resumed after the mechanic's decision
     ratings: list[Rating] = []
 
 
@@ -186,6 +188,7 @@ def _detail(cw, order_id: int) -> OrderDetail:
         sources=[OrderSource(**s) for s in sources], triage=triage,
         trace_url=_share(cw, order, "langsmith_run_id", "trace_url"),
         draft_trace_url=_share(cw, order, "draft_run_id", "draft_trace_url"),
+        review_trace_url=_share(cw, order, "review_run_id", "review_trace_url"),
         ratings=_ratings(cw, order_id),
     )  # fmt: skip
 
@@ -314,12 +317,17 @@ def review(order_id: int, decision: ReviewDecision, request: Request) -> ReviewR
     thread = _thread(order)
     paused = thread and "human_review" in (cw.graph.get_state(thread).next or ())
     try:
-        if paused:  # finish the drafting run, so the decision lands in its trace
+        if paused:  # resume the paused run: its own trace, which the order links to
+            review_run = uuid.uuid4()
             cw.graph.invoke(
                 Command(resume=decision.model_dump()),
-                {**thread, "run_name": "counterwrench-review"},
+                {**thread, "run_name": "counterwrench-review", "run_id": review_run},
             )
             with cw.deps.connect() as conn:
+                conn.execute(
+                    "UPDATE work_orders SET review_run_id = %s WHERE id = %s",
+                    (review_run, order_id),
+                )
                 status = conn.execute(
                     "SELECT status FROM work_orders WHERE id = %s", (order_id,)
                 ).fetchone()[0]

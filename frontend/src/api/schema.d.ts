@@ -690,6 +690,8 @@ export interface components {
             trace_url: string | null;
             /** Draft Trace Url */
             draft_trace_url?: string | null;
+            /** Review Trace Url */
+            review_trace_url?: string | null;
             /**
              * Ratings
              * @default []

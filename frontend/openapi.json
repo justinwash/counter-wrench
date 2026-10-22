@@ -1739,6 +1739,17 @@
       ],
       "title": "Draft Trace Url"
      },
+     "review_trace_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Review Trace Url"
+     },
      "ratings": {
       "items": {
        "$ref": "#/components/schemas/Rating"

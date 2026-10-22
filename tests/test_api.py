@@ -215,6 +215,21 @@ def test_review_resumes_the_drafting_run(seeded_db):
     assert api.put(f"/api/orders/{order_id}/lines", json={"editor": "sam"}).status_code == 422
 
 
+def test_the_resumed_review_is_a_trace_of_its_own_that_the_order_records(seeded_db):
+    api, _ = client(seeded_db, {"r1": [triage_ok()]}, [[("draft_work_order", DRAFT_ARGS)]])
+    order_id = drafted(api)
+    before = seeded_db.execute(
+        "SELECT review_run_id FROM work_orders WHERE id = %s", (order_id,)
+    ).fetchone()[0]
+    assert before is None  # nothing has resumed yet
+    api.post(f"/api/orders/{order_id}/review", json={"decision": "approve", "reviewer": "sam"})
+    review_run, draft_run = seeded_db.execute(
+        "SELECT review_run_id, draft_run_id FROM work_orders WHERE id = %s", (order_id,)
+    ).fetchone()
+    assert review_run is not None and review_run != draft_run  # a third run, not the drafting one
+    assert api.get(f"/api/orders/{order_id}").json()["review_trace_url"] is None  # tracing is off
+
+
 def test_orders_made_outside_the_api_are_reviewed_directly(seeded_db):
     from counterwrench.tools.work_orders import DraftWorkOrderArgs, draft_work_order
 
