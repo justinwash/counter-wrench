@@ -8,6 +8,13 @@ A front-of-house service intake tool for bike shops. Counter staff pick the cust
 
 https://github.com/user-attachments/assets/4ee0e3ed-d00a-405a-b7f0-fc0cc756ef9b
 
+<sub>Corrections:</sub>
+
+<sub>~4:40, where orders go. A thumbs-up on an order adds it to the candidates dataset (never directly to the goldens). A thumbs-down with a reason goes to the annotation queue. A mechanic's approve or reject is recorded as feedback on the trace, and rejected orders are collected by a report for review.</sub>
+
+<sub>~6:10, kappa. On unseen items, the diagnosis judge's agreement with me went up (kappa 0.25 to 0.60). Only the explanation judge's went down (to -0.20), and I treat it as a coarse check. With only 7 fails in 40 grades, neither number is solid.</sub>
+
+## README
 **Contents:** [Try it](#try-it) · [How it works](#how-it-works) · [Evals](#evals) · [Before and after](#before-and-after) · [Failures and limits](#failures-and-limitations) · [Production evaluation](#production-evaluation) · [Public links](#public-links) · [AI usage](#ai-usage) · [Development](#development)
 
 ## Try it
