@@ -4,6 +4,10 @@ A front-of-house service intake tool for bike shops. Counter staff pick the cust
 
 **Live demo: <https://counterwrench.shop>.** It sits behind a login. Ask Justin, or Katy (who will be given one), for the password. The data is synthetic and the traces it produces are public.
 
+## Video Overview
+
+https://github.com/user-attachments/assets/4ee0e3ed-d00a-405a-b7f0-fc0cc756ef9b
+
 **Contents:** [Try it](#try-it) · [How it works](#how-it-works) · [Evals](#evals) · [Before and after](#before-and-after) · [Failures and limits](#failures-and-limitations) · [Production evaluation](#production-evaluation) · [Public links](#public-links) · [AI usage](#ai-usage) · [Development](#development)
 
 ## Try it
