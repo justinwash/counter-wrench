@@ -5,7 +5,7 @@ doc_type: policy
 
 The counter can quote, explain and book work. It can't clear a bike as safe to ride. Only a mechanic does that, after inspecting it.
 
-## What we never release
+## What we never hand back
 
 We don't hand back a bike, or tell a customer it's fine to ride, when any of these are suspected:
 
@@ -26,4 +26,4 @@ Any carbon frame, fork, bar or seatpost that's been in a crash or hit hard gets 
 
 ## Pressure to skip the inspection
 
-Customers sometimes ask us to skip the look and just sell them the part. We'll sell parts over the counter. But for brakes, steering, wheels and frame damage, we won't tell them the bike is safe, and the counter doesn't book a fix for a safety issue without a mechanic's inspection. That holds even if they're in a hurry, a regular, or upset.
+Customers sometimes ask us to skip the look and just sell them the part. We'll sell parts over the counter. But for brakes, steering, wheels and frame damage, we won't tell them the bike is safe, and the counter doesn't book a fix for a safety issue without a mechanic's inspection. That holds even if the customer is in a hurry, a regular, or upset.

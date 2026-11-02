@@ -34,7 +34,7 @@
 
 - id: r-new-creak-after-crash
   query: crashed last week and now theres a new creak i cant find
-  expected_chunks: [diagnosis-noises#a-creak-that-could-be-a-cracked-frame, policy-safety#carbon-after-a-crash, policy-safety#what-we-never-release]
+  expected_chunks: [diagnosis-noises#a-creak-that-could-be-a-cracked-frame, policy-safety#carbon-after-a-crash, policy-safety#what-we-never-hand-back]
   author: assistant
   labeled_by: justin
 
