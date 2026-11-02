@@ -101,13 +101,18 @@ def retrieve(state: GraphState, deps: Deps) -> dict:
     row_chunks: dict[str, list[SearchHit]] = {}
     with deps.connect() as conn:
         pinned = get_chunks(conn, ALWAYS_INCLUDED)
+        # One search per intake rather than per row: the rows share a bike and usually a story,
+        # and each triage call is told which row to assess. Saves an embedding per extra row.
+        query = " ".join(
+            retrieval_query(row, bike, intake.answers.get(row.row_id)) for row in intake.rows
+        )
+        hits = search_knowledge(
+            conn, query, bike.id if bike else None, k=CHUNKS_PER_ROW, embedder=deps.embedder
+        )
+        found = {h.chunk_id for h in hits}
+        shared = hits + [c for c in pinned if c.chunk_id not in found]
         for row in intake.rows:
-            query = retrieval_query(row, bike, intake.answers.get(row.row_id))
-            hits = search_knowledge(
-                conn, query, bike.id if bike else None, k=CHUNKS_PER_ROW, embedder=deps.embedder
-            )
-            found = {h.chunk_id for h in hits}
-            row_chunks[row.row_id] = hits + [c for c in pinned if c.chunk_id not in found]
+            row_chunks[row.row_id] = shared
     return {"row_chunks": row_chunks}
 
 
