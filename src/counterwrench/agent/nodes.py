@@ -24,7 +24,7 @@ from counterwrench.agent.state import GraphState, RowTask
 from counterwrench.compat.lookup import load_bike
 from counterwrench.config import structured_kwargs
 from counterwrench.db.connection import connect
-from counterwrench.models import RowAssessment, Severity, max_severity
+from counterwrench.models import RowAssessment, Severity
 from counterwrench.rag.embed import Embedder
 from counterwrench.rag.search import SearchHit, get_chunks, search_knowledge
 from counterwrench.taxonomy import SuspectedArea
@@ -282,6 +282,15 @@ def route(state: GraphState) -> dict:
 MAX_DRAFT_STEPS = 10  # model turns; stops a looping model cleanly
 
 
+def order_severity(state: GraphState) -> Severity | None:
+    """The order takes the severity of its most severe row. Severity declares its levels in
+    order, so their position is the comparison."""
+    assessments = state.get("assessments", {})
+    if not assessments:
+        return None
+    return max((a.severity for a in assessments.values()), key=list(Severity).index)
+
+
 def _triage_block(state: GraphState) -> str:
     rows = {
         row_id: a.model_dump(mode="json", exclude_none=True)
@@ -302,8 +311,7 @@ def draft(state: GraphState, deps: Deps) -> dict:
     """Tool-calling loop: the model picks parts and lines; code injects what it must not choose
     (bike, overall severity, intake, trace link) and records every tool call."""
     intake, bike = state["intake"], state.get("bike")
-    assessments = state.get("assessments", {})
-    severity = max_severity(a.severity for a in assessments.values()) if assessments else None
+    severity = order_severity(state)
     failed_note = (
         f"Triage couldn't assess rows {sorted(state['failed_rows'])}: check them in person."
         if state.get("failed_rows")
@@ -419,8 +427,7 @@ def confirm(state: GraphState) -> dict:
 def record_decline_node(state: GraphState, deps: Deps) -> dict:
     """The customer declined the work: keep the record, draft nothing."""
     intake, bike = state["intake"], state.get("bike")
-    assessments = state.get("assessments", {})
-    severity = max_severity(a.severity for a in assessments.values()) if assessments else None
+    severity = order_severity(state)
     decline = state["decline"]
     with deps.connect() as conn:
         order_id = record_decline(
