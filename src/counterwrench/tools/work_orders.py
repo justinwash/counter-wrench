@@ -66,12 +66,15 @@ class DraftWorkOrderArgs(BaseModel):
 # works on a part that's being replaced. evals/evaluators/draft.py checks the saved orders
 # against its own copy of these rules, so a bug here can't hide from the evals.
 INSTALL_LABOR: dict[str, set[str]] = {
+    # drivetrain
+    "bottom_bracket": {"BB-INSTALL-THREADED", "BB-INSTALL-PRESSFIT"},
     "cassette": {"CASSETTE-INSTALL"},
     "chain": {"CHAIN-INSTALL"},
     "rear_derailleur": {"DERAILLEUR-INSTALL"},
-    "brake_pads": {"BRAKE-PAD-INSTALL"},
+    # brakes
+    "brake_pads": {"BRAKE-PADS-INSTALL"},
     "rotor": {"ROTOR-INSTALL"},
-    "bottom_bracket": {"BB-INSTALL-THREADED", "BB-INSTALL-PRESSFIT"},
+    # wheels
     "tire": {"TIRE-INSTALL", "TUBELESS-SETUP"},
     "tube": {"FLAT-REPAIR", "TIRE-INSTALL"},
 }
