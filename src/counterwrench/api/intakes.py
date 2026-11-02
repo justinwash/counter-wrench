@@ -82,8 +82,13 @@ def _new_run(cw, intake: IntakeForm, previous: str | None = None) -> Iterator[st
             cw.config, pii_redacted=guarded.pii_counts, guardrail_flags=flags,
             previous_intake=previous,
         )  # fmt: skip
-    inputs = {"intake": guarded.intake, "run_id": intake_id, "source": "counter",
-              "guardrail_note": guarded.mechanic_note(), "guardrail_flags": flags}  # fmt: skip
+    inputs = {
+        "intake": intake,
+        "run_id": intake_id,
+        "source": "counter",
+        "guardrail_note": guarded.mechanic_note(),
+        "guardrail_flags": flags,
+    }
     yield from _run(cw, inputs, intake_id, config, stage="triage")
 
 
