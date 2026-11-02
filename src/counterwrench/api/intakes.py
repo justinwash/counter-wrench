@@ -119,12 +119,13 @@ def add_answers(
     """Append this round's answers to each row's record, each with the question it answers.
     A bare "yes" means nothing on the next round, and replacing the earlier answer made the
     agent forget what it had been told, so it asked again (the loop Justin hit)."""
-    answers, rounds = dict(prior.answers), dict(prior.question_rounds)
+    answers = dict(prior.answers)
     for row_id, answer in new.items():
         question = questions.get(row_id) or "(staff added this)"
         entry = f"Asked: {question}\nAnswered: {answer}"
         answers[row_id] = f"{answers[row_id]}\n\n{entry}" if answers.get(row_id) else entry
-        rounds[row_id] = rounds.get(row_id, 0) + 1
+    # A row's round count: has it been answered (this round or before)?
+    rounds = {**prior.question_rounds, **dict.fromkeys(new, 1)}
     return answers, rounds
 
 
